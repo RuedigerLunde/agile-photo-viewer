@@ -4,6 +4,8 @@ The Control Panel (in the top-left corner) contains buttons for basic navigation
 
 The currently selected photo is shown on the right of the splitbar. Zooming is possible with Mouse-Wheel.
 
+![file:AgilePhotoViewer-P1.jpg]
+
 ![http://agile-photo-viewer.googlecode.com/files/AgilePhotoViewer-v0.9.3-pic1.jpg](http://agile-photo-viewer.googlecode.com/files/AgilePhotoViewer-v0.9.3-pic1.jpg)
 
 Visibility of photos can be controlled using the Keyword Panel. Visibility Expression 'true' means that all photos in the current directory are visible.
