@@ -1,4 +1,5 @@
-= Getting Started =
+# Getting Started #
+
 
 <p>This lightweight pure-java photo viewer provides the following features:
 <ul>
