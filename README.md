@@ -11,7 +11,7 @@ difficult.
 AgilePhotoViewer is a lightweight pure-java photo viewer which
 presents geotagged photos together with a map image. No Internet access is
 needed for that. Just select a screenshot of Google Earth as map image and
-locate at leat two photos in it. The layout is especially useful for presentation on
+locate at least two photos in it. The layout is especially useful for presentation on
 16:9 displays. Photos can be filtered by keyword, selected by map position, ordered
 by name and Exif-date, and exported using new indexed names. 
 
