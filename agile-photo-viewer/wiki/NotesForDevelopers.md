@@ -1,4 +1,4 @@
-= Comments on Architecture =
+# Comments on Architecture #
 
 The architecture of the AgilePhotoViewer is dominated by the model-view-controller
 pattern. Class 'AgilePhotoViewerApp' contains the static main method which creates
