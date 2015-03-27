@@ -4,7 +4,7 @@ The Control Panel (in the top-left corner) contains buttons for basic navigation
 
 The currently selected photo is shown on the right of the splitbar. Zooming is possible with Mouse-Wheel.
 
-![file:pics/AgilePhotoViewer-P1.jpg]
+![https://github.com/RuedigerLunde/agile-photo-viewer/blob/master/agile-photo-viewer/wiki/pics/AgilePhotoViewer-P1.jpg]
 
 ![http://agile-photo-viewer.googlecode.com/files/AgilePhotoViewer-v0.9.3-pic1.jpg](http://agile-photo-viewer.googlecode.com/files/AgilePhotoViewer-v0.9.3-pic1.jpg)
 
