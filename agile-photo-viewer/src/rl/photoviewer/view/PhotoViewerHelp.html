@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>Agile Photo Viewer</h1>
+<h2>Version 1.0 (03-Jan-2015)</h2>
+
+<p>This lightweight pure-java photo viewer provides the following features:
+<ul>
+<li>Show picture locations in map image (haven't seen this feature elsewhere...)</li>
+<li>Display Exif-Tags, especially caption, date, camera model, position, and keywords
+(using the library of Drew Noakes, see http://drewnoakes.com/code/exif/)</li>
+<li>Control picture visibility by keyword (with flexible positive and negative 
+selection criteria)</li>
+<li>Select picture by map position</li>
+<li>Sort pictures by name and date</li>
+<li>Export visible pictures with new indexed names preserving chosen order
+    (useful when using different cameras)</li>
+<li>Support full-screen mode (some functions disabled)</li>
+<li>Support presenter mouse</li>
+</ul>
+</p>
+
+<p><b>To start</b>, press 'Select' and select a picture file or a directory
+with pictures in the file chooser. You can zoom into the picture by mouse-wheel
+and mouse-drag. Check sharpness with mouse-middle.
+The viewer is directory-based. You can move back and forth with the
+control panel buttons. If you don't want to see all pictures
+in the current directory, specify a visibility expression in the Keyword Panel.
+The visibility expression is a propositional sentence in conjunctive normal
+form which uses keywords as symbols. Select what you want to see and what you
+don't by clicking on keyword list entries and the buttons below the list.
+The Info Panel shows you some metadata about the
+current picture. Picture captions can also be displayed in the status field using
+the context menu of the Info Panel. Picasa is a suitable tool to add captions
+and keywords ('poster', 'private', 'people', 'historic', ...) to your pictures.
+When pressing 'Exit', your personal settings are saved in your home directory
+('.agilephotoviewer').</p>
+
+<p><b>To export pictures</b> via the context menu of the control panel,
+you can either just specify the destination directory or provide also
+a file name like '2012-Scotland-0005'. The first copied picture will
+then be named '2012-Scotland-0006.jpg' if it is a jpg file.</p>
+
+<p><b>To use the Map Panel</b>, try the following:
+<ul>
+<li>Navigate to a picture showing a map (e.g. a photo of a map or a screenshot of
+Google Earth possibly including track data) and press 'Use Photo as Map' in the
+context menu of the Control Panel.</li>
+<li>Navigate to a (correctly!) geotagged picture and mark its position on the
+map with 'Set Reference Point Here' (context menu of the Map Panel). Repeat with
+another picture. Now a red marker should follow the locations of the pictures shown
+in the photo panel. Accuracy improves when at least three reference points
+(placed in a triangle) are set. Reference points can be removed by
+'Remove Reference Point Here' (mouse-right on the reference point's position).
+By mouse-left on the map you load the picture next to the current
+mouse position into the Photo Panel.</li>
+<li>Previously prepared map images can be opened using the context menu of the
+Map Panel.</li>
+</ul>
+</p>
+
+<p>Agile Photo Viewer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.</p>
+
+<p>Agile Photo Viewer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.</p>
+
+<p>You should have received a copy of the GNU General Public License
+    along with Agile Photo Viewer.  If not, see http://www.gnu.org/licenses.</p>
+
+
+<p>Have fun,<br/>Ruediger Lunde</p>
+
+</body>
+</html> 

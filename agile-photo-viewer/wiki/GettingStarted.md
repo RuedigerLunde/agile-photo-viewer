@@ -1,0 +1,60 @@
+= Getting Started =
+
+<p>This lightweight pure-java photo viewer provides the following features:
+<ul>
+<li>Show picture locations in map image (haven't seen this feature elsewhere...)</li>
+<li>Display Exif-Tags, especially caption, date, camera model, position, and keywords
+(using the library of Drew Noakes, see http://drewnoakes.com/code/exif/)</li>
+<li>Control picture visibility by keyword (with flexible positive and negative 
+selection criteria)</li>
+<li>Select picture by map position</li>
+<li>Sort pictures by name and date</li>
+<li>Export visible pictures with new indexed names preserving chosen order
+(useful when using different cameras)</li>
+<li>Support full-screen mode (some functions disabled)</li>
+<li>Support presenter mouse</li>
+</ul>
+</p>
+
+<p><b>To install</b>, just copy the executable jar on your hard disk drive.
+Make sure that your Java is up to date.</p>
+
+<p><b>To start</b>, double-click the jar file, press 'Select' and select a
+picture file or a directory with pictures in the file chooser. You can zoom
+into the picture by mouse-wheel and mouse-drag. Check sharpness with mouse-middle.
+The viewer is directory-based. You can move back and forth with the
+control panel buttons.  If you don't want to see all pictures
+in the current directory, specify a visibility expression in the Keyword Panel.
+Select what you want to see and what you don't using the 'Negate'-Button.
+The Info Panel shows you some metadata about the
+current picture. Picture captions can also be displayed in the status field using
+the context menu of the Info Panel. Picasa is a suitable tool to add captions
+and keywords ('poster', 'private', 'people', 'historic', ...) to your pictures.
+When pressing 'Exit', your personal settings are saved in your home directory
+('.agilephotoviewer').</p>
+
+<p><b>To export pictures</b> via the context menu of the control panel,
+you can either just specify the destination directory or provide also
+a file name like '2012-Scotland-0005'. The first copied picture will
+then be named '2012-Scotland-0006.jpg' if it is a jpg file.</p>
+
+<p><b>To use the Map Panel</b>, try the following:
+<ul>
+<li>Navigate to a picture showing a map (e.g. a photo of a map or a screenshot of
+Google Earth possibly including track data) and press 'Use Photo as Map' in the
+context menu of the Control Panel.</li>
+<li>Navigate to a (correctly!) geotagged picture and mark its position on the
+map with 'Set Reference Point Here' (context menu of the Map Panel). Repeat with
+another picture. Now a red marker should follow the locations of the pictures shown
+in the photo panel. Accuracy improves when at least three reference points
+(placed in a triangle) are set. Reference points can be removed by
+'Remove Reference Point Here' (mouse-right on the reference point's position).
+By mouse-left on the map you load the picture next to the current
+mouse position into the Photo Panel.</li>
+<li>Previously prepared map images can be opened using the context menu of the
+Map Panel.</li>
+</ul>
+</p>
+
+If you are a Java developer, you find in NotesForDevelopers some comments on the
+architecture. It should be quite easy to change and extend the software.
