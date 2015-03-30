@@ -1,4 +1,4 @@
-# agile-photo-viewer
+# AgilePhotoViewer
 
 Nowadays it is quite usual, that you return from holidays with hundreds or
 even thousands of photos and other related data, e.g. track data from external
