@@ -19,7 +19,7 @@ selection criteria)</li>
 
 <p><b>To install</b>, just copy the executable jar on your hard disk drive.
 Make sure that your Java is up to date. Additionally, there is a starter (cmd-file)
-which starts the viewer with additional heap space from a shell
+available which starts the viewer with additional heap space from a shell
 showing error messages if any.</p>
 
 <p><b>To start</b>, double-click the jar or cmd file, press 'Select' and select a
@@ -30,8 +30,11 @@ control panel buttons.  If you don't want to see all pictures
 in the current directory, specify a visibility expression in the Keyword Panel.
 Select what you want to see and what you don't using the 'Negate'-Button.
 The Info Panel shows you some metadata about the
-current picture. Picture captions can also be displayed in the status field using
-the context menu of the Info Panel. Picasa is a suitable tool to add captions
+current picture. Picture captions can also be displayed in the status area using
+the context menu of the Control Panel (recommended). Text size can be adjusted
+via the same context menu. If an exreme high resolution display is used, exit
+and restart the application to reuse text size settings also for menus and buttons.
+Picasa is a suitable tool to add captions
 and keywords ('poster', 'private', 'people', 'historic', ...) to your pictures.
 When pressing 'Exit', your personal settings are saved in your home directory
 ('.agilephotoviewer').</p>
@@ -52,6 +55,8 @@ another picture. Now a red marker should follow the locations of the pictures sh
 in the photo panel. Accuracy improves when at least three reference points
 (placed in a triangle) are set. Reference points can be removed by
 'Remove Reference Point Here' (mouse-right on the reference point's position).
+Additionally, the context menu provides and option to show all visible pictures
+positions in the map (recommended).
 By mouse-left on the map you load the picture next to the current
 mouse position into the Photo Panel.</li>
 <li>Previously prepared map images can be opened using the context menu of the
