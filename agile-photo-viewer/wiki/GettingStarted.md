@@ -31,8 +31,8 @@ in the current directory, specify a visibility expression in the Keyword Panel.
 Select what you want to see and what you don't using the 'Negate'-Button.
 The Info Panel shows you some metadata about the
 current picture. Picture captions can also be displayed in the status area using
-the context menu of the Control Panel (recommended). Text size can be adjusted
-via the same context menu. If an exreme high resolution display is used, exit
+the context menu of the Info Panel (recommended). Text size can be adjusted
+via the Control Panel context menu. If an exreme high resolution display is used, exit
 and restart the application to reuse text size settings also for menus and buttons.
 Picasa is a suitable tool to add captions
 and keywords ('poster', 'private', 'people', 'historic', ...) to your pictures.
