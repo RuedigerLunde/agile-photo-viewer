@@ -3,7 +3,7 @@
 <body>
 
 <h1>Agile Photo Viewer</h1>
-<h2>Version 1.0 (03-Jan-2015)</h2>
+<h2>Version 1.1 (30-Mar-2015)</h2>
 
 <p>This lightweight pure-java photo viewer provides the following features:
 <ul>
@@ -15,24 +15,30 @@ selection criteria)</li>
 <li>Select picture by map position</li>
 <li>Sort pictures by name and date</li>
 <li>Export visible pictures with new indexed names preserving chosen order
-    (useful when using different cameras)</li>
+(useful when using different cameras)</li>
 <li>Support full-screen mode (some functions disabled)</li>
 <li>Support presenter mouse</li>
 </ul>
 </p>
 
-<p><b>To start</b>, press 'Select' and select a picture file or a directory
-with pictures in the file chooser. You can zoom into the picture by mouse-wheel
-and mouse-drag. Check sharpness with mouse-middle.
+<p><b>To install</b>, just copy the executable jar on your hard disk drive.
+Make sure that your Java is up to date. Additionally, there is a starter (cmd-file)
+available which starts the viewer with additional heap space from a shell
+showing error messages if any.</p>
+
+<p><b>To start</b>, double-click the jar or cmd file, press 'Select' and select a
+picture file or a directory with pictures in the file chooser. You can zoom
+into the picture by mouse-wheel and mouse-drag. Check sharpness with mouse-middle.
 The viewer is directory-based. You can move back and forth with the
-control panel buttons. If you don't want to see all pictures
+control panel buttons.  If you don't want to see all pictures
 in the current directory, specify a visibility expression in the Keyword Panel.
-The visibility expression is a propositional sentence in conjunctive normal
-form which uses keywords as symbols. Select what you want to see and what you
-don't by clicking on keyword list entries and the buttons below the list.
+Select what you want to see and what you don't using the 'Negate'-Button.
 The Info Panel shows you some metadata about the
-current picture. Picture captions can also be displayed in the status field using
-the context menu of the Info Panel. Picasa is a suitable tool to add captions
+current picture. Picture captions can also be displayed in the status area using
+the context menu of the Control Panel (recommended). Text size can be adjusted
+via the same context menu. If an exreme high resolution display is used, exit
+and restart the application to reuse text size settings also for menus and buttons.
+Picasa is a suitable tool to add captions
 and keywords ('poster', 'private', 'people', 'historic', ...) to your pictures.
 When pressing 'Exit', your personal settings are saved in your home directory
 ('.agilephotoviewer').</p>
@@ -53,12 +59,15 @@ another picture. Now a red marker should follow the locations of the pictures sh
 in the photo panel. Accuracy improves when at least three reference points
 (placed in a triangle) are set. Reference points can be removed by
 'Remove Reference Point Here' (mouse-right on the reference point's position).
+Additionally, the context menu provides and option to show all visible picture
+positions in the map (recommended).
 By mouse-left on the map you load the picture next to the current
 mouse position into the Photo Panel.</li>
 <li>Previously prepared map images can be opened using the context menu of the
 Map Panel.</li>
 </ul>
 </p>
+
 
 <p>Agile Photo Viewer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

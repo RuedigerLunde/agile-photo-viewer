@@ -1,7 +1,11 @@
+Version 1.1
+-----------
+- Project has moved to GitHub.
+
 Version 1.0
 -----------
 New Feature
-- Photo orientation is analysed and used for image display
+- Photo orientation is analysed and used for image display.
 
 Version 0.9.3
 -------------
