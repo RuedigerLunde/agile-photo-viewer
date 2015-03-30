@@ -22,7 +22,7 @@ Make sure that your Java is up to date. Additionally, there is a starter (cmd-fi
 which starts the viewer with additional heap space from a shell
 showing error messages if any.</p>
 
-<p><b>To start</b>, double-click the jar file, press 'Select' and select a
+<p><b>To start</b>, double-click the jar or cmd file, press 'Select' and select a
 picture file or a directory with pictures in the file chooser. You can zoom
 into the picture by mouse-wheel and mouse-drag. Check sharpness with mouse-middle.
 The viewer is directory-based. You can move back and forth with the
