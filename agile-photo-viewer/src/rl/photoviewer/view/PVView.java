@@ -149,9 +149,9 @@ public class PVView implements Observer {
 			ctrlPanel.setSortByDateSelected(pm.getBooleanValue(
 					"gui.sortbydate", false));
 			mapImagePanel.setShowAllPhotoPositions(pm.getBooleanValue(
-					"gui.showallphotopositions", false));
+					"gui.showallphotopositions", true));
 			infoPanel.setShowCaptionInStatus(pm.getBooleanValue(
-					"gui.showcaptioninstatus", false));
+					"gui.showcaptioninstatus", true));
 			float size = pm.getIntValue("gui.fontsize", 12);
 			
 			if (size > 24) {
