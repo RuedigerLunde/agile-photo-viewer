@@ -55,7 +55,7 @@ another picture. Now a red marker should follow the locations of the pictures sh
 in the photo panel. Accuracy improves when at least three reference points
 (placed in a triangle) are set. Reference points can be removed by
 'Remove Reference Point Here' (mouse-right on the reference point's position).
-Additionally, the context menu provides and option to show all visible pictures
+Additionally, the context menu provides and option to show all visible picture
 positions in the map (recommended).
 By mouse-left on the map you load the picture next to the current
 mouse position into the Photo Panel.</li>
