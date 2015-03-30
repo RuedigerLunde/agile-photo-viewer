@@ -18,7 +18,9 @@ selection criteria)</li>
 </p>
 
 <p><b>To install</b>, just copy the executable jar on your hard disk drive.
-Make sure that your Java is up to date.</p>
+Make sure that your Java is up to date. Additionally, there is a starter (cmd-file)
+which starts the viewer with additional heap space from a shell
+showing error messages if any.</p>
 
 <p><b>To start</b>, double-click the jar file, press 'Select' and select a
 picture file or a directory with pictures in the file chooser. You can zoom
