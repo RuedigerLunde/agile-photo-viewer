@@ -70,6 +70,7 @@ public class VisibilityPanel extends JPanel {
 						Commands.SET_RATING_FILTER);
 				VisibilityPanel.this.controller.actionPerformed(ae);
 			}});
+		ratingCombo.setFocusable(false);
 		addAt(ratingCombo, c, 0, 0, 3, 0);
 		
 		keywordTable = new JTable(new KeywordTableModel("Specify Keyword Expression"));
@@ -91,14 +92,17 @@ public class VisibilityPanel extends JPanel {
 		notButton = new JToggleButton("Not");
 		notButton.setActionCommand(Commands.KEYWORDS_NEGATION_CMD);
 		notButton.addActionListener(controller);
+		notButton.setFocusable(false);
 		addAt(notButton, c, 0, 2, 1, 0);
 		JButton button = new JButton("And");
 		button.setActionCommand(Commands.KEYWORDS_ADD_CLAUSE_CMD);
 		button.addActionListener(controller);
+		button.setFocusable(false);
 		addAt(button, c, 1, 2, 1, 0);
 		button = new JButton("Delete");
 		button.setActionCommand(Commands.KEYWORDS_DELETE_CMD);
 		button.addActionListener(controller);
+		button.setFocusable(false);
 		addAt(button, c, 2, 2, 1, 0);
 
 		keywordTextArea = new JTextArea();
