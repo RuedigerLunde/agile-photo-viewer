@@ -39,7 +39,8 @@ public class ExifDataManager {
 	private List<PhotoMetadata> photoDataList = Collections.emptyList();
 	/** Metadata of the currently selected photo. */
 	private PhotoMetadata selectedPhotoData;
-	private VisibilityExpression visibilityExpression = new VisibilityExpression();
+	private int minRating;
+	private KeywordExpression keywordExpression = new KeywordExpression();
 	private HashSet<PhotoMetadata> visiblePhotoData = new HashSet<PhotoMetadata>();
 	private List<String> allKeywords = Collections.emptyList();
 	private List<Integer> keywordCounts = Collections.emptyList();
@@ -66,23 +67,28 @@ public class ExifDataManager {
 		}
 		changeOrder(sortByDate);
 		if (dirChanged)
-			setVisibility(new VisibilityExpression());
+			setVisibility(0, new KeywordExpression());
 	}
 
 	public File getCurrDirectory() {
 		return currDirectory;
 	}
 
-	public void setVisibility(VisibilityExpression expression) {
-		visibilityExpression = expression;
+	public void setVisibility(int minRating, KeywordExpression expression) {
+		this.minRating = minRating;
+		keywordExpression = expression;
 		visiblePhotoData.clear();
 		for (PhotoMetadata data : photoDataList)
-			if (visibilityExpression.checkKeywords(data.getKeywords()))
+			if (data.getRating() >= minRating && keywordExpression.checkKeywords(data.getKeywords()))
 				visiblePhotoData.add(data);
 	}
 
-	public VisibilityExpression getVisibilityExpression() {
-		return visibilityExpression;
+	public int getRatingFilter() {
+		return minRating;
+	}
+	
+	public KeywordExpression getVisibilityExpression() {
+		return keywordExpression;
 	}
 
 	public synchronized void changeOrder(boolean sortByDate) {

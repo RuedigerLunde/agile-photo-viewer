@@ -70,13 +70,13 @@ public class PVModel extends Observable {
 		return result;
 	}
 
-	public void setVisibility(VisibilityExpression expression) {
-		exifDataManager.setVisibility(expression);
+	public void setVisibility(int minRating, KeywordExpression expression) {
+		exifDataManager.setVisibility(minRating, expression);
 		setChanged();
 		notifyObservers();
 	}
 
-	public VisibilityExpression getVisibilityExpression() {
+	public KeywordExpression getVisibilityExpression() {
 		return exifDataManager.getVisibilityExpression();
 	}
 

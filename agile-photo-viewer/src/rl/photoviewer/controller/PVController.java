@@ -20,11 +20,12 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import rl.photoviewer.model.IndexedGeoPoint;
+import rl.photoviewer.model.KeywordExpression;
 import rl.photoviewer.model.PVModel;
-import rl.photoviewer.model.VisibilityExpression;
 import rl.photoviewer.view.Commands;
 import rl.photoviewer.view.HelpDialog;
 import rl.photoviewer.view.PVView;
+import rl.photoviewer.view.VisibilityPanel;
 import rl.util.exceptions.ErrorHandler;
 
 /**
@@ -59,7 +60,8 @@ public class PVController extends MouseAdapter implements Controller {
 							.isSortByDateSelected()))
 						statusMsg = model.getVisiblePhotoCount()
 								+ " photo(s) found.";
-					view.getKeywordPanel().clear();
+					view.getVisibilityPanel().resetSelectedRating();
+					view.getVisibilityPanel().clear();
 				}
 			} else if (e.getActionCommand() == Commands.FIRST_CMD) {
 				model.selectFirstPhoto();
@@ -110,22 +112,24 @@ public class PVController extends MouseAdapter implements Controller {
 				Font nf = font
 						.deriveFont(Math.max(font.getSize() - 2.0f, 4.0f));
 				view.setInfoFont(nf);
-			} else if (e.getActionCommand() == Commands.KEYWORDS_CHANGE_SELECTION_CMD) {
-				List<String> keywords = view.getKeywordPanel()
-						.getSelectedKeywords();
-				VisibilityExpression expression = model
+			} else if (e.getActionCommand() == Commands.SET_RATING_FILTER) {
+				model.setVisibility(view.getVisibilityPanel().getSelectedRating(), model
+						.getVisibilityExpression());
+			} else if (e.getActionCommand() == Commands.KEYWORDS_CHANGED_SELECTION_CMD) {
+				VisibilityPanel vPanel = view.getVisibilityPanel();
+				List<String> keywords = vPanel.getSelectedKeywords();
+				KeywordExpression expression = model
 						.getVisibilityExpression();
 				for (String keyword : keywords)
-					expression.addLiteral(keyword, view.getKeywordPanel()
-							.isNegationSelected());
-				view.getKeywordPanel().setNegationSelected(false);
-				model.setVisibility(expression);
+					expression.addLiteral(keyword, vPanel.isNegationSelected());
+				view.getVisibilityPanel().setNegationSelected(false);
+				model.setVisibility(vPanel.getSelectedRating(), expression);
 			} else if (e.getActionCommand() == Commands.KEYWORDS_ADD_CLAUSE_CMD) {
 				model.getVisibilityExpression().addClause();
-				view.getKeywordPanel().clear();
+				view.getVisibilityPanel().clear();
 			} else if (e.getActionCommand() == Commands.KEYWORDS_DELETE_CMD) {
 				model.getVisibilityExpression().deleteLastClause();
-				view.getKeywordPanel().clear();
+				view.getVisibilityPanel().clear();
 			} else if (e.getActionCommand().startsWith("LoadMap ")) {
 				File file = new File(e.getActionCommand().substring(8));
 				model.setMap(file);

@@ -45,6 +45,8 @@ public class InfoPanel extends JTextArea {
 			text.append("File:\n  " + data.getFileName());
 			if (data.getCaption() != null)
 				text.append("\nCaption:\n  " + data.getCaption());
+			if (data.getRating() != 0)
+				text.append("\nRating:\n  " + "******".substring(0, data.getRating()));
 			if (data.getDate() != null)
 				text.append("\nDate:\n  " + data.getDate());
 			if (data.getModel() != null)

@@ -32,7 +32,8 @@ public abstract class Commands {
 	public static String INC_FONT_SIZE_CMD = "IncFontSizeCmd";
 	public static String DEC_FONT_SIZE_CMD = "DecFontSizeCmd";
 	
-	public static String KEYWORDS_CHANGE_SELECTION_CMD = "KeywordsChangeSelectionCmd";
+	public static String SET_RATING_FILTER = "SetRatingFilterCmd";
+	public static String KEYWORDS_CHANGED_SELECTION_CMD = "KeywordsChangeSelectionCmd";
 	public static String KEYWORDS_NEGATION_CMD = "KeywordsNegationCmd";
 	public static String KEYWORDS_ADD_CLAUSE_CMD = "KeywordsPushCmd";
 	//public static String KEYWORDS_CLEAR_CMD = "KeywordsClearCmd";

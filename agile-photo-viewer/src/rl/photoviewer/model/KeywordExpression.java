@@ -15,12 +15,12 @@ import java.util.List;
  * 
  * @author Ruediger Lunde
  */
-public class VisibilityExpression {
+public class KeywordExpression {
 
 	/** Contains at least one clause. */
 	private List<List<Literal>> clauses;
 
-	public VisibilityExpression() {
+	public KeywordExpression() {
 		clauses = new ArrayList<List<Literal>>();
 		addClause();
 	}
@@ -78,7 +78,7 @@ public class VisibilityExpression {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		else {
-			VisibilityExpression ve = (VisibilityExpression) o;
+			KeywordExpression ve = (KeywordExpression) o;
 			return clauses.equals(ve.clauses);
 		}
 	}

@@ -3,14 +3,14 @@
 <body>
 
 <h1>Agile Photo Viewer</h1>
-<h2>Version 1.1 (30-Mar-2015)</h2>
+<h2>Version 1.2 (24-May-2015)</h2>
 
 <p>This lightweight pure-java photo viewer provides the following features:
 <ul>
 <li>Show picture locations in map image (haven't seen this feature elsewhere...)</li>
-<li>Display Exif-Tags, especially caption, date, camera model, position, and keywords
+<li>Display Exif-Tags, especially caption, rating, date, camera model, position, and keywords
 (using the library of Drew Noakes, see http://drewnoakes.com/code/exif/)</li>
-<li>Control picture visibility by keyword (with flexible positive and negative 
+<li>Control picture visibility by rating and keyword (with flexible positive and negative 
 selection criteria)</li>
 <li>Select picture by map position</li>
 <li>Sort pictures by name and date</li>
@@ -31,14 +31,14 @@ picture file or a directory with pictures in the file chooser. You can zoom
 into the picture by mouse-wheel and mouse-drag. Check sharpness with mouse-middle.
 The viewer is directory-based. You can move back and forth with the
 control panel buttons.  If you don't want to see all pictures
-in the current directory, specify a visibility expression in the Keyword Panel.
-Select what you want to see and what you don't using the 'Negate'-Button.
+in the current directory, specify a rating filter or a keyword expression in the
+Visibility Panel. Select what you want to see and what you don't using the 'Negate'-Button.
 The Info Panel shows you some metadata about the current picture. Picture captions
 can additionally be displayed in the status area using
 the context menu of the Info Panel (recommended). Text size can be adjusted
 via the Control Panel context menu. If an extreme high resolution display is used, exit
 and restart the application to reuse text size settings also for menus and buttons.
-Picasa is a suitable tool to add captions
+Lightroom and Picasa are suitable tools to add captions
 and keywords ('poster', 'private', 'people', 'historic', ...) to your pictures.
 When pressing 'Exit', your personal settings are saved in your home directory
 ('.agilephotoviewer').</p>

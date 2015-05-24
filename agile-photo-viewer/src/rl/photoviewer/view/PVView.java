@@ -48,7 +48,7 @@ public class PVView implements Observer {
 	private JTabbedPane tabbedPane;
 	private ControlPanel ctrlPanel;
 	private InfoPanel infoPanel;
-	private KeywordPanel keywordPanel;
+	private VisibilityPanel visibilityPanel;
 	private StatusArea statusArea;
 	private ImagePanel photoPanel;
 	private MapImagePanel mapImagePanel;
@@ -122,8 +122,8 @@ public class PVView implements Observer {
 		infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		infoPanel.setMinimumSize(new Dimension(0, 0));
 		tabbedPane.addTab("Info", infoPanel);
-		keywordPanel = new KeywordPanel(model, controller);
-		tabbedPane.addTab("Keywords", keywordPanel);
+		visibilityPanel = new VisibilityPanel(model, controller);
+		tabbedPane.addTab("Visibility", visibilityPanel);
 		mapImagePanel = new MapImagePanel(model.getMapData(), controller);
 		mapImagePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
 		tabbedPane.addTab("Map", mapImagePanel);
@@ -252,14 +252,14 @@ public class PVView implements Observer {
 		return photoPanel;
 	}
 
-	public KeywordPanel getKeywordPanel() {
-		return keywordPanel;
+	public VisibilityPanel getVisibilityPanel() {
+		return visibilityPanel;
 	}
 
 	public void setInfoFont(Font font) {
 		getStatusPanel().setFont(font);
 		getInfoPanel().setFont(font);
-		getKeywordPanel().setFont(font);
+		getVisibilityPanel().setFont(font);
 		getMapImagePanel().setFont(font);
 	}
 	
@@ -291,10 +291,10 @@ public class PVView implements Observer {
 		PhotoMetadata data = model.getSelectedPhotoData();
 		infoPanel.update(data);
 		mapImagePanel.update(data, model.getVisiblePhotoPositions());
-		String txt = "Visibility Expression:\n"
+		String txt = "Keyword Expression:\n"
 				+ model.getVisibilityExpression().toString() + "\n"
 				+ model.getVisiblePhotoCount() + " photo(s) visible.";
-		keywordPanel.setText(txt);
+		visibilityPanel.setText(txt);
 		photoPanel.setImage(model.getSelectedPhotoImage(), PhotoMetadata.getOrientation(data));
 	}
 }

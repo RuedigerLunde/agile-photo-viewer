@@ -11,6 +11,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.Observer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -34,16 +37,17 @@ import javax.swing.table.TableModel;
 import rl.photoviewer.controller.Controller;
 import rl.photoviewer.model.PVModel;
 
-public class KeywordPanel extends JPanel {
+public class VisibilityPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	PVModel pvModel;
 	Controller controller;
 
+	private final JComboBox<String> ratingCombo;
 	private final JTable keywordTable;
 	private final JTextArea keywordTextArea;
 	private final JToggleButton notButton;
 
-	public KeywordPanel(PVModel model, Controller controller) {
+	public VisibilityPanel(PVModel model, Controller controller) {
 		pvModel = model;
 		this.controller = controller;
 		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -57,7 +61,18 @@ public class KeywordPanel extends JPanel {
 		// adjust free space around the components (in pixel)
 		c.insets = new Insets(5, 5, 5, 5);
 
-		keywordTable = new JTable(new KeywordTableModel("Specify Visibility"));
+		ratingCombo = new JComboBox<String>(new String[] { "No Rating Filter",
+				">= *", ">= **", ">= ***", ">= ****", ">= *****" });
+		ratingCombo.addItemListener(new ItemListener(){
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				ActionEvent ae = new ActionEvent(this, 0,
+						Commands.SET_RATING_FILTER);
+				VisibilityPanel.this.controller.actionPerformed(ae);
+			}});
+		addAt(ratingCombo, c, 0, 0, 3, 0);
+		
+		keywordTable = new JTable(new KeywordTableModel("Specify Keyword Expression"));
 		keywordTable.addKeyListener(controller);
 		keywordTable.getSelectionModel().addListSelectionListener(
 				new ListSelectionListener() {
@@ -65,33 +80,33 @@ public class KeywordPanel extends JPanel {
 					public void valueChanged(ListSelectionEvent e) {
 						if (e.getValueIsAdjusting() == false) {
 							ActionEvent ae = new ActionEvent(this, 0,
-									Commands.KEYWORDS_CHANGE_SELECTION_CMD);
-							KeywordPanel.this.controller.actionPerformed(ae);
+									Commands.KEYWORDS_CHANGED_SELECTION_CMD);
+							VisibilityPanel.this.controller.actionPerformed(ae);
 						}
 					}
 				});
 		JScrollPane scroller = new JScrollPane(keywordTable);
-		addAt(scroller, c, 0, 0, 3, 0.95);
+		addAt(scroller, c, 0, 1, 3, 0.95);
 
 		notButton = new JToggleButton("Not");
 		notButton.setActionCommand(Commands.KEYWORDS_NEGATION_CMD);
 		notButton.addActionListener(controller);
-		addAt(notButton, c, 0, 1, 1, 0);
+		addAt(notButton, c, 0, 2, 1, 0);
 		JButton button = new JButton("And");
 		button.setActionCommand(Commands.KEYWORDS_ADD_CLAUSE_CMD);
 		button.addActionListener(controller);
-		addAt(button, c, 1, 1, 1, 0);
+		addAt(button, c, 1, 2, 1, 0);
 		button = new JButton("Delete");
 		button.setActionCommand(Commands.KEYWORDS_DELETE_CMD);
 		button.addActionListener(controller);
-		addAt(button, c, 2, 1, 1, 0);
+		addAt(button, c, 2, 2, 1, 0);
 
 		keywordTextArea = new JTextArea();
 		keywordTextArea.setBackground(Color.DARK_GRAY);
 		keywordTextArea.setForeground(Color.LIGHT_GRAY);
 		keywordTextArea.setEditable(false);
 		keywordTextArea.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-		addAt(keywordTextArea, c, 0, 2, 3, 0.05);
+		addAt(keywordTextArea, c, 0, 3, 3, 0.05);
 	}
 
 	/**
@@ -109,6 +124,14 @@ public class KeywordPanel extends JPanel {
 		add(comp, c);
 	}
 
+	public void resetSelectedRating() {
+		ratingCombo.setSelectedIndex(0);
+	}
+	
+	public int getSelectedRating() {
+		return ratingCombo.getSelectedIndex();
+	}
+	
 	public List<String> getSelectedKeywords() {
 		if (keywordTable.getSelectionModel().isSelectionEmpty())
 			return Collections.emptyList();
@@ -143,7 +166,7 @@ public class KeywordPanel extends JPanel {
 		if (!changed) { // update expression text even if selection has not
 						// changed
 			ActionEvent e = new ActionEvent(this, 0,
-					Commands.KEYWORDS_CHANGE_SELECTION_CMD);
+					Commands.KEYWORDS_CHANGED_SELECTION_CMD);
 			controller.actionPerformed(e);
 		}
 	}

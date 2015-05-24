@@ -20,6 +20,7 @@ import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.GpsDirectory;
 import com.drew.metadata.iptc.IptcDirectory;
+import com.drew.metadata.xmp.XmpDirectory;
 
 /**
  * Container for selected Exif metadata. Currently, for each photo the file
@@ -33,6 +34,7 @@ public class PhotoMetadata implements IndexedGeoPoint {
 	private int index;
 	private String fileName;
 	private String caption;
+	private int rating;
 	private Date date;
 	private String model;
 	private int orientation;
@@ -92,6 +94,14 @@ public class PhotoMetadata implements IndexedGeoPoint {
 			if (dir4.getKeywords() != null)
 				keywords = dir4.getKeywords();
 		}
+		XmpDirectory dir5 = metadata.getDirectory(XmpDirectory.class);
+		if (dir5 != null) {
+			try {
+				rating = dir5.getInt(XmpDirectory.TAG_RATING);
+			} catch (Exception e) {
+				// nothing to do...
+			}
+		}
 	}
 
 	public int getIndex() {
@@ -108,6 +118,10 @@ public class PhotoMetadata implements IndexedGeoPoint {
 
 	public String getCaption() {
 		return caption;
+	}
+	
+	public int getRating() {
+		return rating;
 	}
 
 	public Date getDate() {
