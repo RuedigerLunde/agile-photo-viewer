@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -16,8 +17,14 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+
+import rl.util.exceptions.ErrorHandler;
+import rl.util.exceptions.PersistenceException;
 
 /**
  * Simple panel showing an image. The image is scaled so that it fills the
@@ -31,6 +38,7 @@ import javax.swing.JPanel;
  */
 public class ImagePanel extends JPanel {
 	private static final long serialVersionUID = 1L;
+	protected File imageFile;
 	protected Image image;
 	private int imageRefPosX;
 	private int imageRefPosY;
@@ -53,28 +61,40 @@ public class ImagePanel extends JPanel {
 		setUnadjusted();
 	}
 
-	public void setImage(Image image, int orientation) {
-		if (this.image != image) {
+	public void setImage(File imageFile, int orientation) {
+		if (imageFile != null && !imageFile.equals(this.imageFile)) {
 			Image save = this.image;
-			if (image != null && (orientation == 6 || orientation == 8 || orientation == 3)) {
-				int w = orientation == 3 ? image.getWidth(null) : image.getHeight(null);
-				int h = orientation == 3 ? image.getHeight(null) : image.getWidth(null);
-				this.image = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
-				AffineTransform trans = new AffineTransform();
-				if (orientation == 6) {
-					trans.translate(this.image.getWidth(null), 0);
-					trans.rotate(Math.toRadians(90));
-				} else if (orientation == 8) {
-					trans.translate(0, this.image.getHeight(null));
-					trans.rotate(Math.toRadians(-90));
-				} else {
-					trans.translate(this.image.getWidth(null), this.image.getHeight(null));
-					trans.rotate(Math.toRadians(180));
+			try {
+				image = ImageIO.read(imageFile);
+				this.imageFile = imageFile;
+				if (image != null
+						&& (orientation == 6 || orientation == 8 || orientation == 3)) {
+					int w = orientation == 3 ? image.getWidth(null) : image
+							.getHeight(null);
+					int h = orientation == 3 ? image.getHeight(null) : image
+							.getWidth(null);
+					this.image = new BufferedImage(w, h,
+							BufferedImage.TYPE_3BYTE_BGR);
+					AffineTransform trans = new AffineTransform();
+					if (orientation == 6) {
+						trans.translate(this.image.getWidth(null), 0);
+						trans.rotate(Math.toRadians(90));
+					} else if (orientation == 8) {
+						trans.translate(0, this.image.getHeight(null));
+						trans.rotate(Math.toRadians(-90));
+					} else {
+						trans.translate(this.image.getWidth(null),
+								this.image.getHeight(null));
+						trans.rotate(Math.toRadians(180));
+					}
+					((Graphics2D) this.image.getGraphics()).drawImage(image,
+							trans, null);
+					image.flush();
 				}
-				((Graphics2D) this.image.getGraphics()).drawImage(image, trans, null);
-				image.flush();
-			} else {
-				this.image = image;
+			} catch (IOException ex) {
+				Exception e = new PersistenceException(
+						"Could not read image from file " + imageFile + ".", ex);
+				ErrorHandler.getInstance().handleError(e);
 			}
 			if (save != null)
 				save.flush();
@@ -176,6 +196,8 @@ public class ImagePanel extends JPanel {
 		int viewW = viewWidth - border.left - border.right;
 		int viewH = viewHeight - border.top - border.bottom;
 		((Graphics2D) g).setBackground(getBackground());
+		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
+		        RenderingHints.VALUE_ANTIALIAS_ON);
 		if (image != null) {
 			int imageW = round(image.getWidth(this) * scaleFactor);
 			int imageH = round(image.getHeight(this) * scaleFactor);

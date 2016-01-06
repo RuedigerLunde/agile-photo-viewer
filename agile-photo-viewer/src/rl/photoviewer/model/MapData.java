@@ -22,8 +22,6 @@ public interface MapData {
 
 	public boolean hasData();
 
-	public Image getImage();
-
 	public File getFile();
 
 	public void addRefPoint(GeoRefPoint refPoint); // remove from this

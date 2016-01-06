@@ -21,7 +21,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import rl.photoviewer.controller.Controller;
+import rl.photoviewer.controller.swing.Controller;
 import rl.photoviewer.model.IndexedGeoPoint;
 import rl.photoviewer.model.MapData;
 import rl.photoviewer.model.MapDataManager.GeoRefPoint;
@@ -65,8 +65,8 @@ public class MapImagePanel extends ImagePanel {
 	public void update(PhotoMetadata photoData,
 			Set<? extends IndexedGeoPoint> allPhotoPositions) {
 		this.allPhotoPositions = allPhotoPositions;
-		if (image != mapData.getImage()) {
-			setImage(mapData.getImage(), 0);
+		if (imageFile != mapData.getFile()) {
+			setImage(mapData.getFile(), 0);
 		}
 		if (image != null && photoData != null) {
 			this.photoData = photoData;

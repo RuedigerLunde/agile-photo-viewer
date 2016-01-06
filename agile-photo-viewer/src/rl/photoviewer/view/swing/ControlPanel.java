@@ -19,7 +19,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 
-import rl.photoviewer.controller.Controller;
+import rl.photoviewer.controller.swing.Controller;
 
 /**
  * Panel with Buttons to control navigation, slide show, full-screen mode etc.

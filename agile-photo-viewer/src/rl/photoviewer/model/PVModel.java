@@ -4,17 +4,10 @@
  */
 package rl.photoviewer.model;
 
-import java.awt.Image;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Observable;
 import java.util.Set;
-
-import javax.imageio.ImageIO;
-
-import rl.util.exceptions.ErrorHandler;
-import rl.util.exceptions.PersistenceException;
 
 /**
  * Facade which provides access to the complete state of the photo viewer. The
@@ -29,7 +22,6 @@ public class PVModel extends Observable {
 
 	public final static String METADATA_CHANGED = "MetadataChanged";
 
-	private Image currImage;
 	private ExifDataManager exifDataManager;
 	private MapDataManager mapDataManager;
 
@@ -137,10 +129,6 @@ public class PVModel extends Observable {
 			return null;
 	}
 
-	public Image getSelectedPhotoImage() {
-		return currImage;
-	}
-
 	public PhotoMetadata getSelectedPhotoData() {
 		return exifDataManager.getSelectedPhotoData();
 	}
@@ -148,8 +136,6 @@ public class PVModel extends Observable {
 	public void deleteSelectedPhoto() {
 		exifDataManager.deleteSelectedPhoto();
 		loadImage(getSelectedPhotoFile());
-		setChanged();
-		notifyObservers();
 	}
 
 	public File getCurrDirectory() {
@@ -213,21 +199,21 @@ public class PVModel extends Observable {
 
 	/** Accepts null! */
 	private void loadImage(File file) {
-		Image image = null;
-		if (file != null) {
-			try {
-				image = ImageIO.read(file);
-			} catch (IOException ex) {
-				Exception e = new PersistenceException(
-						"Could not read image from file " + file + ".", ex);
-				ErrorHandler.getInstance().handleError(e);
-			}
-		}
-		Image save = currImage;
-		currImage = image;
+//		Image image = null;
+//		if (file != null) {
+//			try {
+//				image = ImageIO.read(file);
+//			} catch (IOException ex) {
+//				Exception e = new PersistenceException(
+//						"Could not read image from file " + file + ".", ex);
+//				ErrorHandler.getInstance().handleError(e);
+//			}
+//		}
+//		Image save = currImage;
+//		currImage = image;
 		setChanged();
 		notifyObservers();
-		if (save != null)
-			save.flush();
+//		if (save != null)
+//			save.flush();
 	}
 }

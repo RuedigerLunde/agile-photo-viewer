@@ -4,11 +4,9 @@
  */
 package rl.photoviewer.model;
 
-import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -16,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 import rl.util.exceptions.ErrorHandler;
 import rl.util.exceptions.PersistenceException;
@@ -37,36 +33,24 @@ public class MapDataManager implements MapData {
 
 	private static final String MAP_PARAM_LOOKUP_FILE_NAME = "MapParamLookup.ser";
 
-	private Image image;
 	private MapParams params;
 	private List<MapParams> mapParamLookup = new ArrayList<MapParams>();
 
 	public void setMap(File mapFile) {
-		image = null;
 		params = null;
 		if (mapFile != null) {
 			params = lookupMapParams(mapFile);
-			try {
-				image = ImageIO.read(mapFile);
-				if (params == null) {
-					params = new MapParams();
-					params.file = mapFile;
-					mapParamLookup.add(params);
-					Collections.sort(mapParamLookup);
-				}
-			} catch (IOException ex) {
-				if (params != null) {
-					clearCurrentMap();
-				}
-				Exception e = new PersistenceException(
-						"Could not read map image from file " + mapFile + ".",
-						ex);
-				ErrorHandler.getInstance().handleError(e);
+			if (params == null) {
+				params = new MapParams();
+				params.file = mapFile;
+				mapParamLookup.add(params);
+				Collections.sort(mapParamLookup);
 			}
-			if (params != null && image == null) {
-				// map file doesn't exist anymore, remove data.
-				mapParamLookup.remove(params);
-				params = null;
+			if (!mapFile.exists()) {
+				clearCurrentMap();
+				Exception e = new PersistenceException(
+					"Could not read map image from file " + mapFile + ".");
+				ErrorHandler.getInstance().handleError(e);
 			}
 		}
 	}
@@ -75,7 +59,6 @@ public class MapDataManager implements MapData {
 		if (params != null) {
 			mapParamLookup.remove(params);
 			params = null;
-			image = null;
 		}
 	}
 
@@ -88,10 +71,6 @@ public class MapDataManager implements MapData {
 
 	public boolean hasData() {
 		return params != null && params.refPoints.size() >= 2;
-	}
-
-	public Image getImage() {
-		return image;
 	}
 
 	public File getFile() {

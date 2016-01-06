@@ -34,7 +34,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
-import rl.photoviewer.controller.Controller;
+import rl.photoviewer.controller.swing.Controller;
 import rl.photoviewer.model.PVModel;
 
 public class VisibilityPanel extends JPanel {

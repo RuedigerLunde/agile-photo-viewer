@@ -25,8 +25,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import rl.photoviewer.AgilePhotoViewerApp;
-import rl.photoviewer.controller.ControllerProxy;
-import rl.photoviewer.controller.PVController;
+import rl.photoviewer.controller.swing.ControllerProxy;
+import rl.photoviewer.controller.swing.PVController;
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.model.PhotoMetadata;
 import rl.util.exceptions.ErrorHandler;
@@ -295,6 +295,6 @@ public class PVView implements Observer {
 				+ model.getVisibilityExpression().toString() + "\n"
 				+ model.getVisiblePhotoCount() + " photo(s) visible.";
 		visibilityPanel.setText(txt);
-		photoPanel.setImage(model.getSelectedPhotoImage(), PhotoMetadata.getOrientation(data));
+		photoPanel.setImage(model.getSelectedPhotoFile(), PhotoMetadata.getOrientation(data));
 	}
 }

@@ -17,7 +17,7 @@ import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
-import rl.photoviewer.controller.PVController;
+import rl.photoviewer.controller.swing.PVController;
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.view.swing.Commands;
 import rl.photoviewer.view.swing.PVView;

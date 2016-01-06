@@ -15,7 +15,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 
-import rl.photoviewer.controller.Controller;
+import rl.photoviewer.controller.swing.Controller;
 import rl.photoviewer.model.PhotoMetadata;
 
 public class InfoPanel extends JTextArea {

@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Ruediger Lunde
  * Licensed under the GNU General Public License, Version 3
  */
-package rl.photoviewer.controller;
+package rl.photoviewer.controller.swing;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
