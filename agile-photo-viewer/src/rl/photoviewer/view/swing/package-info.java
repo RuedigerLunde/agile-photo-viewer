@@ -13,4 +13,4 @@
  * 
  * @author Ruediger Lunde
  */
-package rl.photoviewer.view;
+package rl.photoviewer.view.swing;

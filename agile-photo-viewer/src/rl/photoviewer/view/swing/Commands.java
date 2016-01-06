@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Ruediger Lunde
  * Licensed under the GNU General Public License, Version 3
  */
-package rl.photoviewer.view;
+package rl.photoviewer.view.swing;
 
 /**
  * Defines constants for action commands.

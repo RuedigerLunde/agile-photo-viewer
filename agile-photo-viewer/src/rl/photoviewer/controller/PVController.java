@@ -22,10 +22,10 @@ import javax.swing.SwingUtilities;
 import rl.photoviewer.model.IndexedGeoPoint;
 import rl.photoviewer.model.KeywordExpression;
 import rl.photoviewer.model.PVModel;
-import rl.photoviewer.view.Commands;
-import rl.photoviewer.view.HelpDialog;
-import rl.photoviewer.view.PVView;
-import rl.photoviewer.view.VisibilityPanel;
+import rl.photoviewer.view.swing.Commands;
+import rl.photoviewer.view.swing.HelpDialog;
+import rl.photoviewer.view.swing.PVView;
+import rl.photoviewer.view.swing.VisibilityPanel;
 import rl.util.exceptions.ErrorHandler;
 
 /**

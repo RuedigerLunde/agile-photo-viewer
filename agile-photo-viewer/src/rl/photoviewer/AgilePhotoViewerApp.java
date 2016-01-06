@@ -19,8 +19,8 @@ import javax.swing.plaf.FontUIResource;
 
 import rl.photoviewer.controller.PVController;
 import rl.photoviewer.model.PVModel;
-import rl.photoviewer.view.Commands;
-import rl.photoviewer.view.PVView;
+import rl.photoviewer.view.swing.Commands;
+import rl.photoviewer.view.swing.PVView;
 import rl.util.exceptions.ErrorHandler;
 import rl.util.persistence.PropertyManager;
 
