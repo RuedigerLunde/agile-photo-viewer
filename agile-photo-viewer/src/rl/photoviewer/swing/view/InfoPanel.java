@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Ruediger Lunde
  * Licensed under the GNU General Public License, Version 3
  */
-package rl.photoviewer.view.swing;
+package rl.photoviewer.swing.view;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -15,8 +15,8 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 
-import rl.photoviewer.controller.swing.Controller;
 import rl.photoviewer.model.PhotoMetadata;
+import rl.photoviewer.swing.controller.Controller;
 
 public class InfoPanel extends JTextArea {
 	private static final long serialVersionUID = 1L;

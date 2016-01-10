@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Ruediger Lunde
  * Licensed under the GNU General Public License, Version 3
  */
-package rl.photoviewer.view.swing;
+package rl.photoviewer.swing.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,7 +19,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 
-import rl.photoviewer.controller.swing.Controller;
+import rl.photoviewer.swing.controller.Controller;
 
 /**
  * Panel with Buttons to control navigation, slide show, full-screen mode etc.

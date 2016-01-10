@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Ruediger Lunde
  * Licensed under the GNU General Public License, Version 3
  */
-package rl.photoviewer.controller.swing;
+package rl.photoviewer.swing.controller;
 
 import java.awt.Font;
 import java.awt.GraphicsDevice;
@@ -22,10 +22,10 @@ import javax.swing.SwingUtilities;
 import rl.photoviewer.model.IndexedGeoPoint;
 import rl.photoviewer.model.KeywordExpression;
 import rl.photoviewer.model.PVModel;
-import rl.photoviewer.view.swing.Commands;
-import rl.photoviewer.view.swing.HelpDialog;
-import rl.photoviewer.view.swing.PVView;
-import rl.photoviewer.view.swing.VisibilityPanel;
+import rl.photoviewer.swing.view.Commands;
+import rl.photoviewer.swing.view.HelpDialog;
+import rl.photoviewer.swing.view.PVView;
+import rl.photoviewer.swing.view.VisibilityPanel;
 import rl.util.exceptions.ErrorHandler;
 
 /**
@@ -53,11 +53,10 @@ public class PVController extends MouseAdapter implements Controller {
 		String statusMsg = "";
 		try {
 			if (e.getActionCommand() == Commands.SELECT_CMD) {
-				File file = model.getSelectedPhotoFile();
+				File file = model.getSelectedPhoto();
 				file = view.showInputFileChooser(file);
 				if (file != null) {
-					if (model.selectPhoto(file, view.getCtrlPanel()
-							.isSortByDateSelected()))
+					if (model.selectPhoto(file))
 						statusMsg = model.getVisiblePhotoCount()
 								+ " photo(s) found.";
 					view.getVisibilityPanel().resetSelectedRating();
@@ -77,7 +76,7 @@ public class PVController extends MouseAdapter implements Controller {
 					slideShowThread.exit();
 				}
 			} else if (e.getActionCommand() == Commands.SORT_BY_DATE_CMD) {
-				model.changeOrder(view.getCtrlPanel().isSortByDateSelected());
+				model.setSortByDate(view.getCtrlPanel().isSortByDateSelected());
 			} else if (e.getActionCommand() == Commands.FULL_SCREEN_CMD) {
 				toggleFullScreen();
 			} else if (e.getActionCommand() == Commands.DECORATION_CMD) {
@@ -85,7 +84,7 @@ public class PVController extends MouseAdapter implements Controller {
 			} else if (e.getActionCommand() == Commands.HELP_CMD) {
 				HelpDialog.showHelpDialog(view.getFrame());
 			} else if (e.getActionCommand() == Commands.USE_PHOTO_AS_MAP_CMD) {
-				model.setMap(model.getSelectedPhotoFile());
+				model.setMap(model.getSelectedPhoto());
 				view.selectMapTab();
 			} else if (e.getActionCommand() == Commands.CLEAR_MAP_CMD) {
 				model.clearCurrentMap();
@@ -155,7 +154,7 @@ public class PVController extends MouseAdapter implements Controller {
 			IndexedGeoPoint gpoint = view.getMapImagePanel()
 					.getNextPhotoPosition(e.getX(), e.getY());
 			if (gpoint != null)
-				model.selectPhoto(gpoint);
+				model.selectPhotoByMetadata(gpoint);
 		}
 		updateStatus("");
 	}
@@ -263,7 +262,7 @@ public class PVController extends MouseAdapter implements Controller {
 	}
 
 	protected void deleteSelectedPhoto() {
-		File file = model.getSelectedPhotoFile();
+		File file = model.getSelectedPhoto();
 		String txt = "Delete the following file?";
 		if (file != null
 				&& JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(

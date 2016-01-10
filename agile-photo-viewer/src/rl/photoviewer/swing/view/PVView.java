@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Ruediger Lunde
  * Licensed under the GNU General Public License, Version 3
  */
-package rl.photoviewer.view.swing;
+package rl.photoviewer.swing.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -24,11 +24,11 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import rl.photoviewer.AgilePhotoViewerApp;
-import rl.photoviewer.controller.swing.ControllerProxy;
-import rl.photoviewer.controller.swing.PVController;
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.model.PhotoMetadata;
+import rl.photoviewer.swing.AgilePhotoViewerApp;
+import rl.photoviewer.swing.controller.ControllerProxy;
+import rl.photoviewer.swing.controller.PVController;
 import rl.util.exceptions.ErrorHandler;
 import rl.util.exceptions.PersistenceException;
 import rl.util.persistence.PropertyManager;
@@ -177,7 +177,7 @@ public class PVView implements Observer {
 			if (fileName != null && model.getCurrDirectory() == null) {
 				File f = new File(fileName);
 				if (f.exists())
-					model.selectPhoto(f, getCtrlPanel().isSortByDateSelected());
+					model.selectPhoto(f);
 			}
 			fileName = pm.getStringValue("model.currmapfile", "");
 			if (!fileName.isEmpty()) {
@@ -211,8 +211,8 @@ public class PVView implements Observer {
 			pm.setValue("gui.outputfile", file.getAbsolutePath());
 		else if (model.getCurrDirectory() != null)
 			pm.setValue("gui.outputfile", model.getCurrDirectory());
-		if (model.getSelectedPhotoFile() != null)
-			pm.setValue("model.currfile", model.getSelectedPhotoFile());
+		if (model.getSelectedPhoto() != null)
+			pm.setValue("model.currfile", model.getSelectedPhoto());
 		file = model.getMapData().getFile();
 		pm.setValue("model.currmapfile", file != null ? file.getAbsolutePath()
 				: "");
@@ -295,6 +295,6 @@ public class PVView implements Observer {
 				+ model.getVisibilityExpression().toString() + "\n"
 				+ model.getVisiblePhotoCount() + " photo(s) visible.";
 		visibilityPanel.setText(txt);
-		photoPanel.setImage(model.getSelectedPhotoFile(), PhotoMetadata.getOrientation(data));
+		photoPanel.setImage(model.getSelectedPhoto(), PhotoMetadata.getOrientation(data));
 	}
 }

@@ -3,7 +3,7 @@
  * Licensed under the GNU General Public License, Version 3
  */
 
-package rl.photoviewer;
+package rl.photoviewer.swing;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -17,10 +17,10 @@ import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
-import rl.photoviewer.controller.swing.PVController;
 import rl.photoviewer.model.PVModel;
-import rl.photoviewer.view.swing.Commands;
-import rl.photoviewer.view.swing.PVView;
+import rl.photoviewer.swing.controller.PVController;
+import rl.photoviewer.swing.view.Commands;
+import rl.photoviewer.swing.view.PVView;
 import rl.util.exceptions.ErrorHandler;
 import rl.util.persistence.PropertyManager;
 
@@ -48,7 +48,7 @@ public class AgilePhotoViewerApp {
 
 	public AgilePhotoViewerApp(File photo) {
 		this();
-		model.selectPhoto(photo, view.getCtrlPanel().isSortByDateSelected());
+		model.selectPhoto(photo);
 	}
 
 	/** Restores the last session and starts the application. */

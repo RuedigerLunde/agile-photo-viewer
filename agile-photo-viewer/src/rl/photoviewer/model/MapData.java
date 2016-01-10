@@ -4,7 +4,6 @@
  */
 package rl.photoviewer.model;
 
-import java.awt.Image;
 import java.io.File;
 import java.util.List;
 

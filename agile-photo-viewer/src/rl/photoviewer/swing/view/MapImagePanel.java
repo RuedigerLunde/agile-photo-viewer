@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Ruediger Lunde
  * Licensed under the GNU General Public License, Version 3
  */
-package rl.photoviewer.view.swing;
+package rl.photoviewer.swing.view;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -21,10 +21,10 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import rl.photoviewer.controller.swing.Controller;
 import rl.photoviewer.model.IndexedGeoPoint;
 import rl.photoviewer.model.MapData;
 import rl.photoviewer.model.MapDataManager.GeoRefPoint;
+import rl.photoviewer.swing.controller.Controller;
 import rl.photoviewer.model.PhotoMetadata;
 
 /**

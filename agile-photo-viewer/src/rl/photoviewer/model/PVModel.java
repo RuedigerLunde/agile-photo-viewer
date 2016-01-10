@@ -21,6 +21,7 @@ import java.util.Set;
 public class PVModel extends Observable {
 
 	public final static String METADATA_CHANGED = "MetadataChanged";
+	public final static String SELECTED_PHOTO_CHANGED = "SelectedPhotoChanged";
 
 	private ExifDataManager exifDataManager;
 	private MapDataManager mapDataManager;
@@ -38,7 +39,7 @@ public class PVModel extends Observable {
 	 *            File in photo format or directory with photos.
 	 * @return Value true if current directory has changed.
 	 */
-	public boolean selectPhoto(File file, boolean sortByDate) {
+	public boolean selectPhoto(File file) {
 		boolean result = false;
 		File dir = file;
 		String fileName = null;
@@ -50,13 +51,12 @@ public class PVModel extends Observable {
 			setMap(null);
 			result = true;
 		}
-		exifDataManager.setCurrDirectory(dir, sortByDate);
-		File f = null;
+		exifDataManager.setCurrDirectory(dir);
 		if (fileName != null)
-			f = exifDataManager.selectPhoto(fileName);
+			exifDataManager.selectPhoto(fileName);
 		else if (exifDataManager.getVisiblePhotoCount() > 0)
-			f = exifDataManager.selectFirstPhoto();
-		loadImage(f);
+			exifDataManager.selectFirstPhoto();
+		changeSelectedPhoto();
 		setChanged();
 		notifyObservers(METADATA_CHANGED);
 		return result;
@@ -74,17 +74,15 @@ public class PVModel extends Observable {
 
 	/** Selects the first photo in the current directory. */
 	public void selectFirstPhoto() {
-		File file = exifDataManager.selectFirstPhoto();
-		loadImage(file);
+		exifDataManager.selectFirstPhoto();
+		changeSelectedPhoto();
 	}
 
-	public void selectPhoto(IndexedGeoPoint pos) {
+	public void selectPhotoByMetadata(IndexedGeoPoint pos) {
 		if (pos instanceof PhotoMetadata) {
 			PhotoMetadata data = (PhotoMetadata) pos;
-			File f = exifDataManager.selectPhoto(data.getFileName());
-			loadImage(f);
-			setChanged();
-			notifyObservers();
+			exifDataManager.selectPhoto(data.getFileName());
+			changeSelectedPhoto();
 		}
 	}
 
@@ -92,21 +90,21 @@ public class PVModel extends Observable {
 	 * Searches for the previous photo in the current directory and selects it.
 	 */
 	public void selectPrevPhoto() {
-		File file = exifDataManager.selectPreviousPhoto();
-		loadImage(file);
+		exifDataManager.selectPreviousPhoto();
+		changeSelectedPhoto();
 	}
 
 	/**
 	 * Searches for the next photo in the current directory and selects it.
 	 */
 	public void selectNextPhoto() {
-		File file = exifDataManager.selectNextPhoto();
-		loadImage(file);
+		exifDataManager.selectNextPhoto();
+		changeSelectedPhoto();
 	}
 
 	/** Changes the order of the photos. Options: Order by name or by date. */
-	public void changeOrder(boolean sortByDate) {
-		exifDataManager.changeOrder(sortByDate);
+	public void setSortByDate(boolean state) {
+		exifDataManager.setSortByDate(state);
 	}
 
 	/**
@@ -121,7 +119,7 @@ public class PVModel extends Observable {
 		return exifDataManager.getVisiblePhotoPositions();
 	}
 
-	public File getSelectedPhotoFile() {
+	public File getSelectedPhoto() {
 		PhotoMetadata data = getSelectedPhotoData();
 		if (data != null)
 			return new File(getCurrDirectory(), data.getFileName());
@@ -135,7 +133,7 @@ public class PVModel extends Observable {
 
 	public void deleteSelectedPhoto() {
 		exifDataManager.deleteSelectedPhoto();
-		loadImage(getSelectedPhotoFile());
+		changeSelectedPhoto();
 	}
 
 	public File getCurrDirectory() {
@@ -198,7 +196,7 @@ public class PVModel extends Observable {
 	}
 
 	/** Accepts null! */
-	private void loadImage(File file) {
+	private void changeSelectedPhoto() {
 //		Image image = null;
 //		if (file != null) {
 //			try {
@@ -212,7 +210,7 @@ public class PVModel extends Observable {
 //		Image save = currImage;
 //		currImage = image;
 		setChanged();
-		notifyObservers();
+		notifyObservers(SELECTED_PHOTO_CHANGED);
 //		if (save != null)
 //			save.flush();
 	}

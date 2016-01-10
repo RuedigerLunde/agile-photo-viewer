@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Ruediger Lunde
  * Licensed under the GNU General Public License, Version 3
  */
-package rl.photoviewer.view.swing;
+package rl.photoviewer.swing.view;
 
 import java.awt.Dimension;
 import java.io.IOException;

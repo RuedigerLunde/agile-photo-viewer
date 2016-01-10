@@ -37,6 +37,7 @@ public class ExifDataManager {
 
 	private File currDirectory;
 	private List<PhotoMetadata> photoDataList = Collections.emptyList();
+	private boolean sortByDate = true;
 	/** Metadata of the currently selected photo. */
 	private PhotoMetadata selectedPhotoData;
 	private int minRating;
@@ -51,8 +52,15 @@ public class ExifDataManager {
 	public void enableDebugMode(boolean b) {
 		debug = b;
 	}
+	
+	public void setSortByDate(boolean state) {
+		if (state != sortByDate) {
+			sortByDate = state;
+			sortPhotoDataList();
+		}
+	}
 
-	public void setCurrDirectory(File dir, boolean sortByDate) {
+	public void setCurrDirectory(File dir) {
 		selectedPhotoData = null;
 		boolean dirChanged = !dir.equals(currDirectory);
 		if (dirChanged) {
@@ -65,9 +73,18 @@ public class ExifDataManager {
 			updateStoredMetadata(dir, newPhotoDataList, newKeywordList,
 					newKeywordCounts);
 		}
-		changeOrder(sortByDate);
+		sortPhotoDataList();
 		if (dirChanged)
 			setVisibility(0, new KeywordExpression());
+	}
+	
+	private synchronized void sortPhotoDataList() {
+		Comparator<PhotoMetadata> comp = sortByDate ? new PhotoMetadata.SortByDateComparator()
+				: new PhotoMetadata.SortByFileNameComparator();
+		Collections.sort(photoDataList, comp);
+		for (int i = 0; i < photoDataList.size(); i++) {
+			photoDataList.get(i).setIndex(i);
+		}
 	}
 
 	public File getCurrDirectory() {
@@ -89,15 +106,6 @@ public class ExifDataManager {
 	
 	public KeywordExpression getVisibilityExpression() {
 		return keywordExpression;
-	}
-
-	public synchronized void changeOrder(boolean sortByDate) {
-		Comparator<PhotoMetadata> comp = sortByDate ? new PhotoMetadata.SortByDateComparator()
-				: new PhotoMetadata.SortByFileNameComparator();
-		Collections.sort(photoDataList, comp);
-		for (int i = 0; i < photoDataList.size(); i++) {
-			photoDataList.get(i).setIndex(i);
-		}
 	}
 
 	public List<String> getAllKeywords() {

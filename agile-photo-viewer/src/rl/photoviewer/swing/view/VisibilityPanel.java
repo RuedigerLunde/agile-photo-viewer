@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Ruediger Lunde
  * Licensed under the GNU General Public License, Version 3
  */
-package rl.photoviewer.view.swing;
+package rl.photoviewer.swing.view;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -34,8 +34,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
-import rl.photoviewer.controller.swing.Controller;
 import rl.photoviewer.model.PVModel;
+import rl.photoviewer.swing.controller.Controller;
 
 public class VisibilityPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
