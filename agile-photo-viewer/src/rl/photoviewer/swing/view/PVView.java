@@ -152,7 +152,7 @@ public class PVView implements Observer {
 					"gui.showallphotopositions", true));
 			infoPanel.setShowCaptionInStatus(pm.getBooleanValue(
 					"gui.showcaptioninstatus", true));
-			float size = pm.getIntValue("gui.fontsize", 12);
+			float size = (float) pm.getDoubleValue("gui.fontsize", 12);
 			
 			if (size > 24) {
 				// hack - hope there will be better solutions for hd displays in future...
