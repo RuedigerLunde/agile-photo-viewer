@@ -31,6 +31,8 @@ import javafx.util.Duration;
 import rl.photoviewer.model.KeywordExpression;
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.model.PhotoMetadata;
+import rl.util.exceptions.ErrorHandler;
+import rl.util.exceptions.PersistenceException;
 import rl.util.persistence.PropertyManager;
 
 public class AgilePhotoViewerController implements Initializable, Observer {
@@ -58,10 +60,10 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	@FXML
 	private ComboBox<Sec> slideShowCombo;
-	
+
 	@FXML
 	private ToggleButton sortByDateBtn;
-	
+
 	@FXML
 	private ToggleButton undecorateBtn;
 
@@ -106,7 +108,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		SplitPane.setResizableWithParent(leftPane, Boolean.FALSE);
 		slideShowCombo.getItems().addAll(new Sec(2), new Sec(4), new Sec(6), new Sec(8));
 		slideShowCombo.setValue(new Sec(4));
-		
+
 		ratingCombo.getItems().addAll("No Rating Filter", ">= *", ">= **", ">= ***", ">= ****", ">= *****");
 		ratingCombo.setValue("No Rating Filter");
 		ratingCombo.setOnAction(new EventHandler<ActionEvent>() {
@@ -123,28 +125,9 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		photoViewController.initialize(imageView, rightPane);
 
 		splitPane.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
-		try {
-			String home = System.getProperty("user.home");
-			File propDir = new File(home, ".agilephotoviewer");
-			if (!propDir.exists())
-				propDir.mkdir();
-			PropertyManager.setApplicationDataDirectory(propDir);
-			PropertyManager pm = PropertyManager.getInstance();
-			model = new PVModel();
-			model.setSortByDate(sortByDateBtn.isSelected());
-			model.loadMapParamLookup();
-			String fileName = pm.getStringValue("model.currfile", null);
-			if (fileName != null && model.getCurrDirectory() == null) {
-				File f = new File(fileName);
-				if (f.exists())
-					model.selectPhoto(f); // todo
-			}
-			model.addObserver(this);
-			update(model, PVModel.SELECTED_PHOTO_CHANGED);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		model = new PVModel();
+		model.addObserver(this);
+		restoreSession();
 	}
 
 	@FXML
@@ -160,8 +143,8 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			model.selectNextPhoto();
 		else if (source == slideShowBtn) {
 			if (slideShowBtn.isSelected()) {
-				slideShowTimer = new Timeline(
-						new KeyFrame(Duration.millis(1000 * slideShowCombo.getValue().seconds), ae -> model.selectNextPhoto()));
+				slideShowTimer = new Timeline(new KeyFrame(Duration.millis(1000 * slideShowCombo.getValue().seconds),
+						ae -> model.selectNextPhoto()));
 				slideShowTimer.setCycleCount(Timeline.INDEFINITE);
 				slideShowTimer.play();
 			} else {
@@ -236,10 +219,90 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		}
 		infoPane.setText(text.toString());
 	}
-	
-	private class Sec {
+
+	public static class Sec {
 		int seconds;
-		private Sec(int sec) { seconds = sec; }
-		public String toString() { return seconds + " sec"; }
+
+		private Sec(int sec) {
+			seconds = sec;
+		}
+
+		public int getSeconds() {
+			return seconds;
+		}
+
+		public String toString() {
+			return seconds + " sec";
+		}
 	}
+
+	/**
+	 * Restores view settings according to the settings of the last session.
+	 */
+	public void restoreSession() {
+		try {
+			String home = System.getProperty("user.home");
+			File propDir = new File(home, ".agilephotoviewer");
+			if (!propDir.exists())
+				propDir.mkdir();
+			PropertyManager.setApplicationDataDirectory(propDir);
+			PropertyManager pm = PropertyManager.getInstance();
+
+			slideShowCombo.setValue(new Sec(pm.getIntValue("gui.slideshowsec", 5)));
+			sortByDateBtn.setSelected(pm.getBooleanValue("gui.sortbydate", true));
+			model.setSortByDate(sortByDateBtn.isSelected());
+			statusPane.setFont(new Font(pm.getDoubleValue("gui.fontsize", 12)));
+			
+			model.loadMapParamLookup();
+			String fileName = pm.getStringValue("model.currfile", null);
+			if (fileName != null && model.getCurrDirectory() == null) {
+				File f = new File(fileName);
+				if (f.exists())
+					model.selectPhoto(f);
+			}
+			
+			// mapImagePanel.setShowAllPhotoPositions(pm.getBooleanValue(
+			// "gui.showallphotopositions", true));
+			// infoPanel.setShowCaptionInStatus(pm.getBooleanValue(
+			// "gui.showcaptioninstatus", true));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/** Saves session settings. */
+	public void storeSession() {
+		PropertyManager pm = PropertyManager.getInstance();
+//		pm.setValue("gui.window.width", frame.getSize().width);
+//		pm.setValue("gui.window.height", frame.getSize().height);
+//		pm.setValue("gui.window.dividerlocation",
+//				splitPane.getDividerLocation());
+		
+		pm.setValue("gui.slideshowsec", slideShowCombo.getValue().getSeconds());
+		pm.setValue("gui.sortbydate", sortByDateBtn.isSelected());
+//		pm.setValue("gui.showallphotopositions",
+//				mapImagePanel.isShowAllPhotoPositions());
+		pm.setValue("gui.fontsize", statusPane.getFont().getSize());
+//		pm.setValue("gui.showcaptioninstatus",
+//				infoPanel.isShowCaptionInStatus());
+//		pm.setValue("gui.selectedtab", tabbedPane.getSelectedIndex());
+//		File file = outputFileChooser.getSelectedFile();
+//		if (file != null)
+//			pm.setValue("gui.outputfile", file.getAbsolutePath());
+//		else if (model.getCurrDirectory() != null)
+//			pm.setValue("gui.outputfile", model.getCurrDirectory());
+		if (model.getSelectedPhoto() != null)
+			pm.setValue("model.currfile", model.getSelectedPhoto());
+//		File file = model.getMapData().getFile();
+//		pm.setValue("model.currmapfile", file != null ? file.getAbsolutePath()
+//				: "");
+		model.saveMapParamLookup();
+		try {
+			pm.saveSessionProperties();
+		} catch (PersistenceException ex) {
+			ErrorHandler.getInstance().handleError(ex);
+		}
+	}
+
 }
