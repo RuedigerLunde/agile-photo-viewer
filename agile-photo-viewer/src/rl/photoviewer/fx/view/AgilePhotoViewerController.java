@@ -10,12 +10,16 @@ import java.util.ResourceBundle;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
@@ -77,6 +81,24 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	private ComboBox<String> ratingCombo;
 
 	@FXML
+	private ListView<String> keywordLst;
+
+	@FXML
+	private ToggleButton notBtn;
+
+	@FXML
+	private Button andBtn;
+
+	@FXML
+	private Button deleteBtn;
+
+	@FXML
+	private TextArea keywordExpressionTxt;
+
+	@FXML
+	private Label statusLabel;
+
+	@FXML
 	private HBox rightPane;
 
 	@FXML
@@ -86,7 +108,6 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	private PVModel model;
 
-	
 	final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
 		public void handle(final KeyEvent keyEvent) {
 			if (keyEvent.getCode() == KeyCode.PLUS) {
@@ -117,9 +138,18 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			public void handle(ActionEvent ev) {
 				String val = ratingCombo.getValue();
 				if (val == "No Rating Filter")
-					model.setVisibility(0, new KeywordExpression());
+					model.setVisibility(0, model.getVisibilityExpression());
 				else
-					model.setVisibility(val.length() - 3, new KeywordExpression());
+					model.setVisibility(val.length() - 3, model.getVisibilityExpression());
+			}
+		});
+
+		keywordLst.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (newValue != null)
+					onKeywordSelected(newValue);
 			}
 		});
 
@@ -159,6 +189,24 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			model.setSortByDate(sortByDateBtn.isSelected());
 		else if (source == undecorateBtn)
 			AgilePhotoViewerApp.changeStage(undecorateBtn.isSelected());
+		else if (source == andBtn) {
+			model.getVisibilityExpression().addClause();
+			notBtn.setSelected(false);
+			keywordLst.getSelectionModel().clearSelection();
+			model.setVisibility(model.getRatingFilter(), model.getVisibilityExpression());
+		} else if (source == deleteBtn) {
+			model.getVisibilityExpression().deleteLastClause();
+			notBtn.setSelected(false);
+			keywordLst.getSelectionModel().clearSelection();
+			model.setVisibility(model.getRatingFilter(), model.getVisibilityExpression());
+		}
+	}
+
+	private void onKeywordSelected(String newKeyword) {
+		KeywordExpression expression = model.getVisibilityExpression();
+			expression.addLiteral(newKeyword, notBtn.isSelected());
+		notBtn.setSelected(false);
+		model.setVisibility(model.getRatingFilter(), expression);
 	}
 
 	@Override
@@ -180,6 +228,9 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				e.printStackTrace(); // should never happen...
 			}
 		}
+		keywordLst.getItems().addAll(model.getAllKeywords());
+		keywordExpressionTxt.setText(model.getVisibilityExpression().toString());
+		statusLabel.setText(model.getVisiblePhotoCount() + " Photo(s) visible.");
 	}
 
 	private void openFileChooser() {

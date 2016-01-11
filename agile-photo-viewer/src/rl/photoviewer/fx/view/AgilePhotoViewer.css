@@ -9,7 +9,6 @@
 
 
 .text-area {
-  /*-fx-font-family: Consolas;*/
   -fx-highlight-fill: #303030;
   /*-fx-highlight-text-fill: green;*/
   -fx-text-fill: white;
@@ -23,3 +22,33 @@
 .toggle-button:selected {
     -fx-background-color: #202020;
 }
+
+.list-cell {
+	-fx-text-fill: white;
+	-fx-background-color: #303030;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: darkblue;
+    -fx-text-fill: white;
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: #505050;
+}
+
+/* 
+.list-cell:even {
+    -fx-background-color: #303030;
+}
+
+.list-cell:odd {
+    -fx-background-color: #303030;
+}
+
+.list-cell:filled:selected:focused, .list-cell:filled:selected {
+    -fx-background-color: darkblue;
+    -fx-text-fill: white;
+}
+*/
+

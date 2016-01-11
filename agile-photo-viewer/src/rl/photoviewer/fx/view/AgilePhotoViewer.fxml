@@ -45,24 +45,31 @@
                                  <content>
                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <columnConstraints>
-                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                              <RowConstraints maxHeight="105.0" minHeight="10.0" prefHeight="23.0" vgrow="SOMETIMES" />
-                                              <RowConstraints maxHeight="197.0" minHeight="10.0" prefHeight="159.0" vgrow="SOMETIMES" />
-                                              <RowConstraints maxHeight="210.0" minHeight="10.0" prefHeight="108.0" vgrow="SOMETIMES" />
-                                            </rowConstraints>
+                                          <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
-                                                <ComboBox fx:id="ratingCombo" prefWidth="1000.0" GridPane.columnSpan="2147483647" />
+                                                <ComboBox fx:id="ratingCombo" prefWidth="1000.0" />
+                                                <ListView fx:id="keywordLst" prefHeight="150.0" />
+                                                <HBox spacing="5.0">
+                                                   <children>
+                                                      <ToggleButton fx:id="notBtn" mnemonicParsing="false" onAction="#onButtonAction" text="not" />
+                                                      <Button fx:id="andBtn" mnemonicParsing="false" onAction="#onButtonAction" text="And" />
+                                                      <Button fx:id="deleteBtn" mnemonicParsing="false" onAction="#onButtonAction" text="Delete" />
+                                                   </children>
+                                                </HBox>
+                                                <Label text="Keyword Expression:">
+                                                   <padding>
+                                                      <Insets left="5.0" />
+                                                   </padding></Label>
+                                                <TextArea fx:id="keywordExpressionTxt" editable="false" prefHeight="100.0" />
+                                                <Label fx:id="statusLabel" text="...">
+                                                   <padding>
+                                                      <Insets left="5.0" />
+                                                   </padding></Label>
                                              </children>
                                              <padding>
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                              </padding>
-                                          </GridPane>
+                                          </VBox>
                                        </children></AnchorPane>
                                  </content>
                               </Tab>

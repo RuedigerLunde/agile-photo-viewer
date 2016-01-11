@@ -68,6 +68,10 @@ public class PVModel extends Observable {
 		notifyObservers();
 	}
 
+	public int getRatingFilter() {
+		return exifDataManager.getRatingFilter();
+	}
+	
 	public KeywordExpression getVisibilityExpression() {
 		return exifDataManager.getVisibilityExpression();
 	}
