@@ -86,15 +86,11 @@
                   </GridPane>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="rightPane" prefHeight="200.0" prefWidth="200.0">
+            <HBox fx:id="rightPane" alignment="CENTER">
                <children>
-                  <ScrollPane fx:id="imageScrollPane" hbarPolicy="NEVER" prefViewportHeight="150.0" prefViewportWidth="200.0" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <content>
-                        <ImageView fx:id="imageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                     </content>
-                  </ScrollPane>
+                  <ImageView fx:id="imageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
                </children>
-            </AnchorPane>
+            </HBox>
          </items>
       </SplitPane>
    </children>

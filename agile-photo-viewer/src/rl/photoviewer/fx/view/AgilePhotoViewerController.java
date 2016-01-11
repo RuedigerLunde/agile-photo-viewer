@@ -8,27 +8,20 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import rl.photoviewer.model.KeywordExpression;
@@ -66,25 +59,16 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	private ComboBox<String> ratingCombo;
 
 	@FXML
-	private AnchorPane rightPane;
-
-	@FXML
-	private ScrollPane imageScrollPane;
+	private HBox rightPane;
 
 	@FXML
 	private ImageView imageView;
 
-	private Image currImage;
-
 	private PVModel model;
-
-	final DoubleProperty zoomProperty = new SimpleDoubleProperty(1);
-	final DoubleProperty transXProperty = new SimpleDoubleProperty(0);
-	final DoubleProperty transYProperty = new SimpleDoubleProperty(0);
+	
 
 	final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
 		public void handle(final KeyEvent keyEvent) {
-			System.out.println("> " + keyEvent.getText());
 			if (keyEvent.getCode() == KeyCode.PLUS) {
 				statusPane.setFont(new Font(statusPane.getFont().getSize() + 1));
 			} else if (keyEvent.getCode() == KeyCode.MINUS) {
@@ -97,18 +81,13 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			// keyEvent.consume();
 		}
 	};
+	
+	private PhotoViewController photoViewController = new PhotoViewController();
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		SplitPane.setResizableWithParent(leftPane, Boolean.FALSE);
-		rightPane.setMinWidth(0);
-		rightPane.boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
-			@Override
-			public void changed(ObservableValue<? extends Bounds> arg0, Bounds b1, Bounds b2) {
-				if (Math.abs(b1.getHeight() - b2.getHeight()) > 5 && Math.abs(b1.getHeight() - b2.getHeight()) > 5)
-					scaleToFit();
-			}
-		});
+
 		ratingCombo.getItems().addAll("No Rating Filter", ">= *", ">= **", ">= ***", ">= ****", ">= *****");
 		ratingCombo.setValue("No Rating Filter");
 		ratingCombo.setOnAction(new EventHandler<ActionEvent>() {
@@ -122,37 +101,8 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			}
 		});
 
-		zoomProperty.addListener(new InvalidationListener() {
-			@Override
-			public void invalidated(javafx.beans.Observable obs) {
-				// imageView.scaleXProperty().set(zoomProperty.get());
-				// imageView.scaleYProperty().set(zoomProperty.get());
-				imageView.setFitWidth(zoomProperty.get() * currImage.getWidth());
-				imageView.setFitHeight(zoomProperty.get() * currImage.getHeight());
-			}
-		});
-
-		imageScrollPane.addEventFilter(ScrollEvent.ANY, new EventHandler<ScrollEvent>() {
-			@Override
-			public void handle(ScrollEvent event) {
-				double hvalue = imageScrollPane.hvalueProperty().get();
-				double vvalue = imageScrollPane.vvalueProperty().get();
-				if (event.getDeltaY() > 0) {
-					zoomProperty.set(zoomProperty.get() * 1.1);
-				} else if (event.getDeltaY() < 0) {
-					zoomProperty.set(zoomProperty.get() / 1.1);
-				}
-				System.out.println(
-						0.5 * imageScrollPane.hvalueProperty().get() + 0.5 * event.getX() / rightPane.getWidth());
-				imageScrollPane.hvalueProperty().set(0.7 * hvalue + 0.3 * event.getX() / rightPane.getWidth());
-				imageScrollPane.vvalueProperty().set(0.7 * vvalue + 0.3 * event.getY() / rightPane.getHeight());
-//				System.out.println(event.getX() + " " + event.getY() + " : " + rightPane.getWidth() + " : "
-//						+ imageScrollPane.hvalueProperty().get() + " Min " + imageScrollPane.getHmin() + " Max "
-//						+ imageScrollPane.getHmax());
-				event.consume();
-			}
-		});
-
+		photoViewController.initialize(imageView, rightPane);
+		
 		splitPane.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
 		try {
 			String home = System.getProperty("user.home");
@@ -177,26 +127,6 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		}
 	}
 
-	private void scaleToFit() {
-		double zoomX = (rightPane.getWidth()) / currImage.getWidth();
-		double zoomY = (rightPane.getHeight()) / currImage.getHeight();
-		if (zoomX < zoomY) {
-			zoomProperty.set(zoomX);
-			imageView.translateYProperty().set((rightPane.getHeight() - zoomX * currImage.getHeight()) / 2.0);
-			imageView.translateXProperty().set(0);
-		} else {
-			zoomProperty.set(zoomY);
-			imageView.translateXProperty().set((rightPane.getWidth() - zoomY * currImage.getWidth()) / 2.0);
-			imageView.translateYProperty().set(0);
-		}
-		// double zoom = Math.min(zoomX, zoomY);
-		// zoomProperty.set(zoom);
-		// imageView.translateXProperty().set(Math.max(((zoomX / zoom) - 1) *
-		// rightPane.getBoundsInParent().getMaxX() / 2, 0));
-		// imageView.translateYProperty().set(Math.max(((zoomY / zoom) - 1) *
-		// rightPane.getBoundsInParent().getMaxY() / 2, 0));
-	}
-
 	@FXML
 	protected void onButtonAction(ActionEvent event) {
 		if (event.getSource() == selectBtn)
@@ -212,17 +142,17 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		if (arg == PVModel.SELECTED_PHOTO_CHANGED) {
+			Image image;
 			try {
 				PhotoMetadata data = model.getSelectedPhotoData();
 				if (data != null) {
-					currImage = new Image(model.getSelectedPhoto().toURI().toURL().toExternalForm());
+					image = new Image(model.getSelectedPhoto().toURI().toURL().toExternalForm());
 					statusPane.setText(data.getCaption());
 				} else {
-					currImage = null;
+					image = null;
 					statusPane.setText("");
 				}
-				imageView.setImage(currImage);
-				scaleToFit();
+				photoViewController.setImage(image);
 				updateInfoPane();
 			} catch (MalformedURLException e) {
 				e.printStackTrace(); // should never happen...
