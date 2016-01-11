@@ -24,7 +24,7 @@
                               <ToggleButton fx:id="slideShowBtn" mnemonicParsing="false" onAction="#onButtonAction" text="Slide Show" />
                               <ComboBox fx:id="slideShowCombo" onAction="#onButtonAction" prefWidth="80.0" promptText="Prompt?" />
                               <ToggleButton fx:id="sortByDateBtn" mnemonicParsing="false" onAction="#onButtonAction" selected="true" text="Sort by Date" />
-                              <ToggleButton mnemonicParsing="false" text="Undecorate" />
+                              <ToggleButton fx:id="undecorateBtn" mnemonicParsing="false" onAction="#onButtonAction" text="Undecorate" />
                            </children>
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

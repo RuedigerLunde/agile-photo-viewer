@@ -61,6 +61,9 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	
 	@FXML
 	private ToggleButton sortByDateBtn;
+	
+	@FXML
+	private ToggleButton undecorateBtn;
 
 	@FXML
 	private TextArea statusPane;
@@ -170,6 +173,8 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				slideShowTimer.stop();
 		} else if (source == sortByDateBtn)
 			model.setSortByDate(sortByDateBtn.isSelected());
+		else if (source == undecorateBtn)
+			AgilePhotoViewerApp.changeStage(undecorateBtn.isSelected());
 	}
 
 	@Override
