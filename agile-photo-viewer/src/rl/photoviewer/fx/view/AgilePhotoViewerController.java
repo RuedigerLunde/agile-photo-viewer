@@ -86,6 +86,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	private PVModel model;
 
+	
 	final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
 		public void handle(final KeyEvent keyEvent) {
 			if (keyEvent.getCode() == KeyCode.PLUS) {
@@ -182,16 +183,15 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	}
 
 	private void openFileChooser() {
-		FileChooser chooser = new FileChooser();
+		FileChooser selectChooser = new FileChooser();
 		File curr = model.getSelectedPhoto();
 		if (curr != null) {
-			chooser.setInitialDirectory(curr.getParentFile());
-			chooser.setInitialFileName(curr.getName());
+			selectChooser.setInitialDirectory(curr.getParentFile());
+			selectChooser.setInitialFileName(curr.getName());
 		}
-		File next = chooser.showOpenDialog(null);
+		File next = selectChooser.showOpenDialog(AgilePhotoViewerApp.getCurrStage());
 		if (next != null)
 			model.selectPhoto(next);
-
 	}
 
 	private void updateInfoPane() {
@@ -252,7 +252,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			sortByDateBtn.setSelected(pm.getBooleanValue("gui.sortbydate", true));
 			model.setSortByDate(sortByDateBtn.isSelected());
 			statusPane.setFont(new Font(pm.getDoubleValue("gui.fontsize", 12)));
-			
+
 			model.loadMapParamLookup();
 			String fileName = pm.getStringValue("model.currfile", null);
 			if (fileName != null && model.getCurrDirectory() == null) {
@@ -260,7 +260,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				if (f.exists())
 					model.selectPhoto(f);
 			}
-			
+
 			// mapImagePanel.setShowAllPhotoPositions(pm.getBooleanValue(
 			// "gui.showallphotopositions", true));
 			// infoPanel.setShowCaptionInStatus(pm.getBooleanValue(
@@ -274,29 +274,30 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	/** Saves session settings. */
 	public void storeSession() {
 		PropertyManager pm = PropertyManager.getInstance();
-//		pm.setValue("gui.window.width", frame.getSize().width);
-//		pm.setValue("gui.window.height", frame.getSize().height);
-//		pm.setValue("gui.window.dividerlocation",
-//				splitPane.getDividerLocation());
-		
+		// pm.setValue("gui.window.width", frame.getSize().width);
+		// pm.setValue("gui.window.height", frame.getSize().height);
+		// pm.setValue("gui.window.dividerlocation",
+		// splitPane.getDividerLocation());
+
 		pm.setValue("gui.slideshowsec", slideShowCombo.getValue().getSeconds());
 		pm.setValue("gui.sortbydate", sortByDateBtn.isSelected());
-//		pm.setValue("gui.showallphotopositions",
-//				mapImagePanel.isShowAllPhotoPositions());
+		// pm.setValue("gui.showallphotopositions",
+		// mapImagePanel.isShowAllPhotoPositions());
 		pm.setValue("gui.fontsize", statusPane.getFont().getSize());
-//		pm.setValue("gui.showcaptioninstatus",
-//				infoPanel.isShowCaptionInStatus());
-//		pm.setValue("gui.selectedtab", tabbedPane.getSelectedIndex());
-//		File file = outputFileChooser.getSelectedFile();
-//		if (file != null)
-//			pm.setValue("gui.outputfile", file.getAbsolutePath());
-//		else if (model.getCurrDirectory() != null)
-//			pm.setValue("gui.outputfile", model.getCurrDirectory());
+		// pm.setValue("gui.showcaptioninstatus",
+		// infoPanel.isShowCaptionInStatus());
+		// pm.setValue("gui.selectedtab", tabbedPane.getSelectedIndex());
+		// File file = outputFileChooser.getSelectedFile();
+		// if (file != null)
+		// pm.setValue("gui.outputfile", file.getAbsolutePath());
+		// else if (model.getCurrDirectory() != null)
+		// pm.setValue("gui.outputfile", model.getCurrDirectory());
 		if (model.getSelectedPhoto() != null)
 			pm.setValue("model.currfile", model.getSelectedPhoto());
-//		File file = model.getMapData().getFile();
-//		pm.setValue("model.currmapfile", file != null ? file.getAbsolutePath()
-//				: "");
+		// File file = model.getMapData().getFile();
+		// pm.setValue("model.currmapfile", file != null ?
+		// file.getAbsolutePath()
+		// : "");
 		model.saveMapParamLookup();
 		try {
 			pm.saveSessionProperties();

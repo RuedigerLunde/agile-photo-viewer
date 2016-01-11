@@ -35,6 +35,10 @@ public class AgilePhotoViewerApp extends Application {
 		}
 	}
 	
+	public static Stage getCurrStage() {
+		return currStage;
+	}
+	
 	public static void changeStage(boolean undecorated) {
 		Stage newStage = new Stage(undecorated ? StageStyle.UNDECORATED :StageStyle.DECORATED);
 		Stage oldStage = currStage;
@@ -43,7 +47,6 @@ public class AgilePhotoViewerApp extends Application {
 		newStage.setY(oldStage.getY());
 		newStage.setWidth(oldStage.getWidth());
 		newStage.setHeight(oldStage.getHeight());
-		System.out.println(oldStage.getX());
 		Scene scene = oldStage.getScene();
 		oldStage.hide();
 		oldStage.setScene(null);
