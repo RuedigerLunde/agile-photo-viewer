@@ -48,7 +48,7 @@
                                           <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
                                                 <ComboBox fx:id="ratingCombo" prefWidth="1000.0" />
-                                                <ListView fx:id="keywordLst" prefHeight="150.0" />
+                                                <ListView fx:id="keywordLst" prefHeight="350.0" />
                                                 <HBox spacing="5.0">
                                                    <children>
                                                       <ToggleButton fx:id="notBtn" mnemonicParsing="false" onAction="#onButtonAction" text="not" />
@@ -60,7 +60,7 @@
                                                    <padding>
                                                       <Insets left="5.0" />
                                                    </padding></Label>
-                                                <TextArea fx:id="keywordExpressionTxt" editable="false" prefHeight="100.0" />
+                                                <TextArea fx:id="keywordExpressionTxt" editable="false" prefHeight="300.0" />
                                                 <Label fx:id="statusLabel" text="...">
                                                    <padding>
                                                       <Insets left="5.0" />
