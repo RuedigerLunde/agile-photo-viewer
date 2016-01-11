@@ -8,6 +8,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -16,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -24,6 +27,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import rl.photoviewer.model.KeywordExpression;
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.model.PhotoMetadata;
@@ -50,6 +54,15 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	private Button nextBtn;
 
 	@FXML
+	private ToggleButton slideShowBtn;
+
+	@FXML
+	private ComboBox<Sec> slideShowCombo;
+	
+	@FXML
+	private ToggleButton sortByDateBtn;
+
+	@FXML
 	private TextArea statusPane;
 
 	@FXML
@@ -64,8 +77,9 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	@FXML
 	private ImageView imageView;
 
+	private Timeline slideShowTimer;
+
 	private PVModel model;
-	
 
 	final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
 		public void handle(final KeyEvent keyEvent) {
@@ -81,13 +95,15 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			// keyEvent.consume();
 		}
 	};
-	
+
 	private PhotoViewController photoViewController = new PhotoViewController();
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		SplitPane.setResizableWithParent(leftPane, Boolean.FALSE);
-
+		slideShowCombo.getItems().addAll(new Sec(2), new Sec(4), new Sec(6), new Sec(8));
+		slideShowCombo.setValue(new Sec(4));
+		
 		ratingCombo.getItems().addAll("No Rating Filter", ">= *", ">= **", ">= ***", ">= ****", ">= *****");
 		ratingCombo.setValue("No Rating Filter");
 		ratingCombo.setOnAction(new EventHandler<ActionEvent>() {
@@ -102,7 +118,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		});
 
 		photoViewController.initialize(imageView, rightPane);
-		
+
 		splitPane.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
 		try {
 			String home = System.getProperty("user.home");
@@ -112,6 +128,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			PropertyManager.setApplicationDataDirectory(propDir);
 			PropertyManager pm = PropertyManager.getInstance();
 			model = new PVModel();
+			model.setSortByDate(sortByDateBtn.isSelected());
 			model.loadMapParamLookup();
 			String fileName = pm.getStringValue("model.currfile", null);
 			if (fileName != null && model.getCurrDirectory() == null) {
@@ -129,14 +146,30 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	@FXML
 	protected void onButtonAction(ActionEvent event) {
-		if (event.getSource() == selectBtn)
+		Object source = event.getSource();
+		if (source == selectBtn)
 			openFileChooser();
-		else if (event.getSource() == firstBtn)
+		else if (source == firstBtn)
 			model.selectFirstPhoto();
-		else if (event.getSource() == prevBtn)
+		else if (source == prevBtn)
 			model.selectPrevPhoto();
-		else if (event.getSource() == nextBtn)
+		else if (source == nextBtn)
 			model.selectNextPhoto();
+		else if (source == slideShowBtn) {
+			if (slideShowBtn.isSelected()) {
+				slideShowTimer = new Timeline(
+						new KeyFrame(Duration.millis(1000 * slideShowCombo.getValue().seconds), ae -> model.selectNextPhoto()));
+				slideShowTimer.setCycleCount(Timeline.INDEFINITE);
+				slideShowTimer.play();
+			} else {
+				slideShowTimer.stop();
+			}
+		} else if (source == slideShowCombo) {
+			slideShowBtn.setSelected(false);
+			if (slideShowTimer != null)
+				slideShowTimer.stop();
+		} else if (source == sortByDateBtn)
+			model.setSortByDate(sortByDateBtn.isSelected());
 	}
 
 	@Override
@@ -197,5 +230,11 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			}
 		}
 		infoPane.setText(text.toString());
+	}
+	
+	private class Sec {
+		int seconds;
+		private Sec(int sec) { seconds = sec; }
+		public String toString() { return seconds + " sec"; }
 	}
 }
