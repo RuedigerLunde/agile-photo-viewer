@@ -59,6 +59,7 @@ public class MapViewController {
 				double newScale = scale * Math.pow(1.01, e.getDeltaY());
 				zoom(new Point2D(e.getX(), e.getY()), newScale);
 			}
+			e.consume();
 		});
 
 		imageView.setOnMouseClicked(e -> {
@@ -69,6 +70,7 @@ public class MapViewController {
 				} else {
 					zoom(new Point2D(e.getX(), e.getY()), 1.0);
 				}
+				e.consume();
 			}
 		});
 	}
@@ -76,8 +78,6 @@ public class MapViewController {
 	public void setImage(Image image) {
 		this.image = image;
 		imageView.setImage(image);
-		imgX = 0.0;
-		imgY = 0.0;
 		enableScaleToFit = true;
 		update();
 	}

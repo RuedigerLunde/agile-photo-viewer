@@ -51,7 +51,7 @@ public class PhotoViewController {
 		imageView.setOnScroll(e -> {
 			if (image != null) {
 				double scale = Math.pow(1.01, e.getDeltaY());
-				zoom(new Point2D(e.getX(), e.getY()), scale);
+				zoom(new Point2D(e.getX(), e.getY()), 1/scale);
 			}
 		});
 
