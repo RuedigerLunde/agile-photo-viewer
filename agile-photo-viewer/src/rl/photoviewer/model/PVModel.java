@@ -22,7 +22,8 @@ public class PVModel extends Observable {
 
 	public final static String METADATA_CHANGED = "MetadataChanged";
 	public final static String SELECTED_PHOTO_CHANGED = "SelectedPhotoChanged";
-
+	public final static String SELECTED_MAP_CHANGED = "SelectedMapChanged";
+	
 	private ExifDataManager exifDataManager;
 	private MapDataManager mapDataManager;
 
@@ -56,7 +57,8 @@ public class PVModel extends Observable {
 			exifDataManager.selectPhoto(fileName);
 		else if (exifDataManager.getVisiblePhotoCount() > 0)
 			exifDataManager.selectFirstPhoto();
-		changeSelectedPhoto();
+		setChanged();
+		notifyObservers(SELECTED_PHOTO_CHANGED);
 		setChanged();
 		notifyObservers(METADATA_CHANGED);
 		return result;
@@ -79,14 +81,16 @@ public class PVModel extends Observable {
 	/** Selects the first photo in the current directory. */
 	public void selectFirstPhoto() {
 		exifDataManager.selectFirstPhoto();
-		changeSelectedPhoto();
+		setChanged();
+		notifyObservers(SELECTED_PHOTO_CHANGED);
 	}
 
 	public void selectPhotoByMetadata(IndexedGeoPoint pos) {
 		if (pos instanceof PhotoMetadata) {
 			PhotoMetadata data = (PhotoMetadata) pos;
 			exifDataManager.selectPhoto(data.getFileName());
-			changeSelectedPhoto();
+			setChanged();
+			notifyObservers(SELECTED_PHOTO_CHANGED);
 		}
 	}
 
@@ -95,7 +99,8 @@ public class PVModel extends Observable {
 	 */
 	public void selectPrevPhoto() {
 		exifDataManager.selectPreviousPhoto();
-		changeSelectedPhoto();
+		setChanged();
+		notifyObservers(SELECTED_PHOTO_CHANGED);
 	}
 
 	/**
@@ -103,7 +108,8 @@ public class PVModel extends Observable {
 	 */
 	public void selectNextPhoto() {
 		exifDataManager.selectNextPhoto();
-		changeSelectedPhoto();
+		setChanged();
+		notifyObservers(SELECTED_PHOTO_CHANGED);
 	}
 
 	/** Changes the order of the photos. Options: Order by name or by date. */
@@ -137,7 +143,8 @@ public class PVModel extends Observable {
 
 	public void deleteSelectedPhoto() {
 		exifDataManager.deleteSelectedPhoto();
-		changeSelectedPhoto();
+		setChanged();
+		notifyObservers(SELECTED_PHOTO_CHANGED);
 	}
 
 	public File getCurrDirectory() {
@@ -170,13 +177,13 @@ public class PVModel extends Observable {
 	public void setMap(File file) {
 		mapDataManager.setMap(file);
 		setChanged();
-		notifyObservers();
+		notifyObservers(SELECTED_MAP_CHANGED);
 	}
 
 	public void clearCurrentMap() {
 		mapDataManager.clearCurrentMap();
 		setChanged();
-		notifyObservers();
+		notifyObservers(SELECTED_MAP_CHANGED);
 	}
 
 	public MapData getMapData() {
@@ -197,25 +204,5 @@ public class PVModel extends Observable {
 		exporter.setDestination(destDir, destFileNameTemplate);
 		int copied = exporter.copyFiles(photos);
 		return copied;
-	}
-
-	/** Accepts null! */
-	private void changeSelectedPhoto() {
-//		Image image = null;
-//		if (file != null) {
-//			try {
-//				image = ImageIO.read(file);
-//			} catch (IOException ex) {
-//				Exception e = new PersistenceException(
-//						"Could not read image from file " + file + ".", ex);
-//				ErrorHandler.getInstance().handleError(e);
-//			}
-//		}
-//		Image save = currImage;
-//		currImage = image;
-		setChanged();
-		notifyObservers(SELECTED_PHOTO_CHANGED);
-//		if (save != null)
-//			save.flush();
 	}
 }

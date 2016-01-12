@@ -15,7 +15,7 @@
                <children>
                   <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <FlowPane hgap="5.0" prefHeight="200.0" prefWidth="200.0" vgap="10.0" GridPane.columnSpan="2147483647" GridPane.rowSpan="2" GridPane.valignment="TOP">
+                        <FlowPane hgap="5.0" onContextMenuRequested="#onContextMenuRequest" prefHeight="200.0" prefWidth="200.0" vgap="10.0" GridPane.columnSpan="2147483647" GridPane.rowSpan="2" GridPane.valignment="TOP">
                            <children>
                               <Button fx:id="selectBtn" mnemonicParsing="false" onAction="#onButtonAction" text="Select" />
                               <Button fx:id="firstBtn" mnemonicParsing="false" onAction="#onButtonAction" text="&lt;&lt;" />
@@ -30,8 +30,8 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </FlowPane>
-                        <TextArea fx:id="statusPane" editable="false" prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
-                        <TabPane prefHeight="69.0" prefWidth="100.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" GridPane.rowSpan="2147483647">
+                        <TextArea fx:id="captionPane" editable="false" prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
+                        <TabPane fx:id="tabPane" prefHeight="69.0" prefWidth="100.0" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" GridPane.rowSpan="2147483647">
                            <tabs>
                               <Tab text="Info">
                                  <content>
@@ -51,7 +51,7 @@
                                                 <ListView fx:id="keywordLst" prefHeight="350.0" />
                                                 <HBox spacing="5.0">
                                                    <children>
-                                                      <ToggleButton fx:id="notBtn" mnemonicParsing="false" onAction="#onButtonAction" text="not" />
+                                                      <ToggleButton fx:id="notBtn" mnemonicParsing="false" onAction="#onButtonAction" text="Not" />
                                                       <Button fx:id="andBtn" mnemonicParsing="false" onAction="#onButtonAction" text="And" />
                                                       <Button fx:id="deleteBtn" mnemonicParsing="false" onAction="#onButtonAction" text="Delete" />
                                                    </children>
@@ -75,7 +75,11 @@
                               </Tab>
                               <Tab text="Map">
                                  <content>
-                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                    <HBox fx:id="mapPane" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <ImageView fx:id="mapView" fitHeight="50.0" fitWidth="50.0" onContextMenuRequested="#onMapMenuRequest" pickOnBounds="true" preserveRatio="true" />
+                                       </children>
+                                    </HBox>
                                  </content>
                               </Tab>
                            </tabs>
@@ -95,7 +99,7 @@
             </AnchorPane>
             <HBox fx:id="rightPane" alignment="CENTER">
                <children>
-                  <ImageView fx:id="imageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="photoView" fitHeight="150.0" fitWidth="200.0" onContextMenuRequested="#onContextMenuRequest" pickOnBounds="true" preserveRatio="true" />
                </children>
             </HBox>
          </items>

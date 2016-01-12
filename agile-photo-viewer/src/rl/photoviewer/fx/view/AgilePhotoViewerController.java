@@ -16,15 +16,20 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -33,6 +38,7 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import rl.photoviewer.model.KeywordExpression;
+import rl.photoviewer.model.MapData;
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.model.PhotoMetadata;
 import rl.util.exceptions.ErrorHandler;
@@ -72,8 +78,11 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	private ToggleButton undecorateBtn;
 
 	@FXML
-	private TextArea statusPane;
+	private TextArea captionPane;
 
+	@FXML
+	private TabPane tabPane;
+	
 	@FXML
 	private TextArea infoPane;
 
@@ -99,11 +108,21 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	private Label statusLabel;
 
 	@FXML
+	private HBox mapPane;
+
+	@FXML
+	private ImageView mapView;
+	
+	@FXML
 	private HBox rightPane;
 
 	@FXML
-	private ImageView imageView;
+	private ImageView photoView;
 
+	private ContextMenu contextMenu;
+	
+	private ContextMenu mapMenu;
+	
 	private Timeline slideShowTimer;
 
 	private PVModel model;
@@ -111,9 +130,9 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
 		public void handle(final KeyEvent keyEvent) {
 			if (keyEvent.getCode() == KeyCode.PLUS) {
-				statusPane.setFont(new Font(statusPane.getFont().getSize() + 1));
+				captionPane.setFont(new Font(captionPane.getFont().getSize() + 1));
 			} else if (keyEvent.getCode() == KeyCode.MINUS) {
-				statusPane.setFont(new Font(statusPane.getFont().getSize() - 1));
+				captionPane.setFont(new Font(captionPane.getFont().getSize() - 1));
 			} else if (keyEvent.getCode() == KeyCode.PAGE_DOWN || keyEvent.getCode() == KeyCode.N) {
 				model.selectNextPhoto();
 			} else if (keyEvent.getCode() == KeyCode.PAGE_UP || keyEvent.getCode() == KeyCode.P) {
@@ -124,6 +143,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	};
 
 	private PhotoViewController photoViewController = new PhotoViewController();
+	private MapViewController mapViewController = new MapViewController();
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -153,7 +173,8 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			}
 		});
 
-		photoViewController.initialize(imageView, rightPane);
+		photoViewController.initialize(photoView, rightPane);
+		mapViewController.initialize(mapView, mapPane);
 
 		splitPane.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
 		model = new PVModel();
@@ -209,6 +230,36 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		model.setVisibility(model.getRatingFilter(), expression);
 	}
 
+	@FXML
+	public void onContextMenuRequest(ContextMenuEvent event) {
+		if (contextMenu == null) {
+			contextMenu = new ContextMenu();
+			MenuItem mi = new MenuItem("Show in Map");
+			contextMenu.getItems().add(mi);
+			mi.setOnAction(e -> {
+				model.setMap(model.getSelectedPhoto());
+			});
+		}
+		contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+			
+		event.consume();
+	}
+	
+	@FXML
+	public void onMapMenuRequest(ContextMenuEvent event) {
+		if (mapMenu == null) {
+			mapMenu = new ContextMenu();
+			MenuItem mi = new MenuItem("Clear Map");
+			mapMenu.getItems().add(mi);
+			mi.setOnAction(e -> {
+				model.clearCurrentMap();
+			});
+		}
+		mapMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+			
+		event.consume();
+	}
+	
 	@Override
 	public void update(Observable o, Object arg) {
 		if (arg == PVModel.SELECTED_PHOTO_CHANGED) {
@@ -217,13 +268,25 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				PhotoMetadata data = model.getSelectedPhotoData();
 				if (data != null) {
 					image = new Image(model.getSelectedPhoto().toURI().toURL().toExternalForm());
-					statusPane.setText(data.getCaption());
+					captionPane.setText(data.getCaption());
 				} else {
 					image = null;
-					statusPane.setText("");
+					captionPane.setText("");
 				}
 				photoViewController.setImage(image);
 				updateInfoPane();
+			} catch (MalformedURLException e) {
+				e.printStackTrace(); // should never happen...
+			}
+		} else if (arg == PVModel.SELECTED_MAP_CHANGED) {
+			Image image = null;
+			try {
+				MapData mapData = model.getMapData();
+				if (mapData.getFile() != null) {
+					image = new Image(mapData.getFile().toURI().toURL().toExternalForm());
+				} 
+				mapViewController.setImage(image);
+				tabPane.getSelectionModel().selectLast(); // select map tab
 			} catch (MalformedURLException e) {
 				e.printStackTrace(); // should never happen...
 			}
@@ -271,22 +334,6 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		infoPane.setText(text.toString());
 	}
 
-	public static class Sec {
-		int seconds;
-
-		private Sec(int sec) {
-			seconds = sec;
-		}
-
-		public int getSeconds() {
-			return seconds;
-		}
-
-		public String toString() {
-			return seconds + " sec";
-		}
-	}
-
 	/**
 	 * Restores view settings according to the settings of the last session.
 	 */
@@ -302,7 +349,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			slideShowCombo.setValue(new Sec(pm.getIntValue("gui.slideshowsec", 5)));
 			sortByDateBtn.setSelected(pm.getBooleanValue("gui.sortbydate", true));
 			model.setSortByDate(sortByDateBtn.isSelected());
-			statusPane.setFont(new Font(pm.getDoubleValue("gui.fontsize", 12)));
+			captionPane.setFont(new Font(pm.getDoubleValue("gui.fontsize", 12)));
 
 			model.loadMapParamLookup();
 			String fileName = pm.getStringValue("model.currfile", null);
@@ -334,7 +381,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		pm.setValue("gui.sortbydate", sortByDateBtn.isSelected());
 		// pm.setValue("gui.showallphotopositions",
 		// mapImagePanel.isShowAllPhotoPositions());
-		pm.setValue("gui.fontsize", statusPane.getFont().getSize());
+		pm.setValue("gui.fontsize", captionPane.getFont().getSize());
 		// pm.setValue("gui.showcaptioninstatus",
 		// infoPanel.isShowCaptionInStatus());
 		// pm.setValue("gui.selectedtab", tabbedPane.getSelectedIndex());
@@ -356,5 +403,20 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			ErrorHandler.getInstance().handleError(ex);
 		}
 	}
+	
+	public static class Sec {
+		int seconds;
 
+		private Sec(int sec) {
+			seconds = sec;
+		}
+
+		public int getSeconds() {
+			return seconds;
+		}
+
+		public String toString() {
+			return seconds + " sec";
+		}
+	}
 }

@@ -30,6 +30,7 @@ public class AgilePhotoViewerApp extends Application {
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("AgilePhotoViewer.css").toExternalForm());
 			// scene.getStylesheets().add(getClass().getResource("DarkTheme.css").toExternalForm());
+			primaryStage.setTitle("Agile Photo Viewer FX");
 			primaryStage.setScene(scene);
 			primaryStage.setOnCloseRequest(windowCloseHandler);
 			primaryStage.show();
@@ -50,6 +51,7 @@ public class AgilePhotoViewerApp extends Application {
 		newStage.setY(oldStage.getY());
 		newStage.setWidth(oldStage.getWidth());
 		newStage.setHeight(oldStage.getHeight());
+		newStage.setTitle(oldStage.getTitle());
 		Scene scene = oldStage.getScene();
 		oldStage.hide();
 		oldStage.setScene(null);
