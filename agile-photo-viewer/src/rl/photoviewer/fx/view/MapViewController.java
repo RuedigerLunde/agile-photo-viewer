@@ -1,7 +1,3 @@
-// This code is strongly inspired by the PlutoExplorer class of James D.
-// https://gist.github.com/james-d/ce5ec1fd44ce6c64e81a
-// https://gist.github.com/james-d
-
 package rl.photoviewer.fx.view;
 
 import javafx.beans.property.ObjectProperty;
@@ -14,22 +10,31 @@ import javafx.scene.layout.Pane;
 
 public class MapViewController {
 
-	private static final int MAX_ZOOM_PIXELS = 4;
-
 	private ImageView imageView;
 
 	private Image image;
 
-	private boolean scaleToFit = true;
+	private Pane container;
+
+	private double imgX;
+	private double imgY;
+	private double scale;
+
+	private boolean enableLimiters = false;
+	private boolean enableScaleToFit = true;
 
 	public void initialize(ImageView imageView, Pane container) {
 		this.imageView = imageView;
+		this.container = container;
 		container.setMinWidth(0);
 		container.setMinHeight(0);
 
 		imageView.setPreserveRatio(true);
 		imageView.fitWidthProperty().bind(container.widthProperty());
 		imageView.fitHeightProperty().bind(container.heightProperty());
+
+		container.widthProperty().addListener(e -> update());
+		container.heightProperty().addListener(e -> update());
 
 		ObjectProperty<Point2D> mouseDown = new SimpleObjectProperty<>();
 
@@ -45,23 +50,25 @@ public class MapViewController {
 				Point2D dragPoint = imageViewToImage(new Point2D(e.getX(), e.getY()));
 				shift(dragPoint.subtract(mouseDown.get()));
 				mouseDown.set(imageViewToImage(new Point2D(e.getX(), e.getY())));
+				e.consume();
 			}
 		});
 
 		imageView.setOnScroll(e -> {
 			if (image != null) {
-				double scale = Math.pow(1.01, e.getDeltaY());
-				zoom(new Point2D(e.getX(), e.getY()), scale);
+				double newScale = scale * Math.pow(1.01, e.getDeltaY());
+				zoom(new Point2D(e.getX(), e.getY()), newScale);
 			}
 		});
 
 		imageView.setOnMouseClicked(e -> {
 			if (e.getClickCount() == 2 && image != null) {
-				if (!scaleToFit)
-					reset();
-				else
-					zoom(new Point2D(e.getX(), e.getY()),
-							imageView.getBoundsInLocal().getWidth() / imageView.getViewport().getWidth());
+				if (!enableScaleToFit) {
+					enableScaleToFit = true;
+					update();
+				} else {
+					zoom(new Point2D(e.getX(), e.getY()), 1.0);
+				}
 			}
 		});
 	}
@@ -69,93 +76,81 @@ public class MapViewController {
 	public void setImage(Image image) {
 		this.image = image;
 		imageView.setImage(image);
-		reset();
+		imgX = 0.0;
+		imgY = 0.0;
+		enableScaleToFit = true;
+		update();
 	}
 
+	public void setLimitersEnabled(boolean state) {
+		enableLimiters = state;
+		update();
+	}
+	
 	// reset to the top left:
-	private void reset() {
-		if (image != null) {
-			imageView.setViewport(new Rectangle2D(0, 0, image.getWidth(), image.getHeight()));
-			scaleToFit = true;
+	private void update() {
+		if (image != null && container.getWidth() > 0) {
+			double scaleFit = computeScaleToFit();
+			if (enableScaleToFit) {
+				scale = scaleFit;
+				imgX = 0;
+				imgY = 0;
+			}
+			if (enableLimiters) {
+				if (scale < scaleFit) {
+					scale = scaleFit;
+					enableScaleToFit = true;
+				}
+				imgX = Math.max(imgX, 0);
+				imgY = Math.max(imgY, 0);
+				if (image.getWidth() - imgX < container.getWidth() / scale)
+					imgX = Math.max(0, image.getWidth() - container.getWidth() / scale);
+				if (image.getHeight() - imgY < container.getHeight() / scale)
+					imgY = Math.max(0, image.getHeight() - container.getHeight() / scale);
+			}
+			imageView.setViewport(
+					new Rectangle2D(imgX, imgY, container.getWidth() / scale, container.getHeight() / scale));
+			// System.out.println(
+			// container.getWidth() + " " + container.getHeight() + " / " + imgX
+			// + " " + imgY + " " + scale);
 		}
 	}
 
 	// shift the viewport of the imageView by the specified delta, clamping so
 	// the viewport does not move off the actual image:
 	private void shift(Point2D delta) {
-		Rectangle2D viewport = imageView.getViewport();
-
-		double width = imageView.getImage().getWidth();
-		double height = imageView.getImage().getHeight();
-
-		double maxX = width - viewport.getWidth();
-		double maxY = height - viewport.getHeight();
-
-		double minX = clamp(viewport.getMinX() - delta.getX(), 0, maxX);
-		double minY = clamp(viewport.getMinY() - delta.getY(), 0, maxY);
-
-		imageView.setViewport(new Rectangle2D(minX, minY, viewport.getWidth(), viewport.getHeight()));
-		scaleToFit = false;
+		imgX -= delta.getX();
+		imgY -= delta.getY();
+		enableScaleToFit = false;
+		update();
 	}
 
-	private void zoom(Point2D point, double scale) {
-
-		Rectangle2D viewport = imageView.getViewport();
-
-		// don't scale so we see one image pixel in more than
-		// MAX_ZOOM_PIXELS image view pixels in both directions (both
-		// should be equal - RLu)
-		double scaleMin = Math.min(imageView.getBoundsInLocal().getWidth() / viewport.getWidth(),
-				imageView.getBoundsInLocal().getHeight() / viewport.getHeight()) / MAX_ZOOM_PIXELS;
-
-		// don't scale so that we're bigger than image dimensions: (both
-		// should be equal - RLu)
-		double scaleMax = Math.max(image.getWidth() / viewport.getWidth(), image.getHeight() / viewport.getHeight());
-
-		scale = clamp(scale, scaleMin, scaleMax);
-
+	private void zoom(Point2D point, double newScale) {
 		Point2D mouse = imageViewToImage(point);
-
-		double newWidth = viewport.getWidth() * scale;
-		double newHeight = viewport.getHeight() * scale;
-
-		// To keep the visual point under the mouse from moving, we need
-		// (x - newViewportMinX) / (x - currentViewportMinX) = scale
-		// where x is the mouse X coordinate in the image
-
-		// solving this for newViewportMinX gives
-
-		// newViewportMinX = x - (x - currentViewportMinX) * scale
-
-		// we then clamp this value so the image never scrolls out
-		// of the imageview:
-
-		double newMinX = clamp(mouse.getX() - (mouse.getX() - viewport.getMinX()) * scale, 0,
-				image.getWidth() - newWidth);
-		double newMinY = clamp(mouse.getY() - (mouse.getY() - viewport.getMinY()) * scale, 0,
-				image.getHeight() - newHeight);
-
-		imageView.setViewport(new Rectangle2D(newMinX, newMinY, newWidth, newHeight));
-		scaleToFit = (scale == scaleMax);
+		if (enableLimiters)
+			newScale = Math.max(newScale, computeScaleToFit());
+		// (mouse.x - imgX) * scale = (mouse.x - newImgX) * newScale;
+		imgX = (imgX - mouse.getX()) * scale / newScale + mouse.getX();
+		imgY = (imgY - mouse.getY()) * scale / newScale + mouse.getY();
+		scale = newScale;
+		enableScaleToFit = false;
+		update();
 	}
 
-	private double clamp(double value, double min, double max) {
-
-		if (value < min)
-			return min;
-		if (value > max)
-			return max;
-		return value;
+	private double computeScaleToFit() {
+		if (image == null)
+			return 0.0;
+		else if (enableLimiters)
+			return Math.max(container.getWidth() / image.getWidth(), container.getHeight() / image.getHeight());
+		else
+			return Math.min(container.getWidth() / image.getWidth(), container.getHeight() / image.getHeight());
 	}
 
 	// convert mouse coordinates in the imageView to coordinates in the actual
 	// image:
 	private Point2D imageViewToImage(Point2D imageViewCoordinates) {
-		double xProportion = imageViewCoordinates.getX() / imageView.getBoundsInLocal().getWidth();
-		double yProportion = imageViewCoordinates.getY() / imageView.getBoundsInLocal().getHeight();
-
-		Rectangle2D viewport = imageView.getViewport();
-		return new Point2D(viewport.getMinX() + xProportion * viewport.getWidth(),
-				viewport.getMinY() + yProportion * viewport.getHeight());
+		double x = imgX + imageViewCoordinates.getX() / scale;
+		double y = imgY + imageViewCoordinates.getY() / scale;
+		return new Point2D(x, y);
 	}
 }

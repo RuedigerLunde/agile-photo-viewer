@@ -82,7 +82,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	@FXML
 	private TabPane tabPane;
-	
+
 	@FXML
 	private TextArea infoPane;
 
@@ -112,7 +112,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	@FXML
 	private ImageView mapView;
-	
+
 	@FXML
 	private HBox rightPane;
 
@@ -120,9 +120,9 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	private ImageView photoView;
 
 	private ContextMenu contextMenu;
-	
+
 	private ContextMenu mapMenu;
-	
+
 	private Timeline slideShowTimer;
 
 	private PVModel model;
@@ -225,7 +225,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	private void onKeywordSelected(String newKeyword) {
 		KeywordExpression expression = model.getVisibilityExpression();
-			expression.addLiteral(newKeyword, notBtn.isSelected());
+		expression.addLiteral(newKeyword, notBtn.isSelected());
 		notBtn.setSelected(false);
 		model.setVisibility(model.getRatingFilter(), expression);
 	}
@@ -238,13 +238,14 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			contextMenu.getItems().add(mi);
 			mi.setOnAction(e -> {
 				model.setMap(model.getSelectedPhoto());
+				tabPane.getSelectionModel().selectLast(); // select map tab
 			});
 		}
 		contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
-			
+
 		event.consume();
 	}
-	
+
 	@FXML
 	public void onMapMenuRequest(ContextMenuEvent event) {
 		if (mapMenu == null) {
@@ -256,10 +257,10 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			});
 		}
 		mapMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
-			
+
 		event.consume();
 	}
-	
+
 	@Override
 	public void update(Observable o, Object arg) {
 		if (arg == PVModel.SELECTED_PHOTO_CHANGED) {
@@ -284,9 +285,8 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				MapData mapData = model.getMapData();
 				if (mapData.getFile() != null) {
 					image = new Image(mapData.getFile().toURI().toURL().toExternalForm());
-				} 
+				}
 				mapViewController.setImage(image);
-				tabPane.getSelectionModel().selectLast(); // select map tab
 			} catch (MalformedURLException e) {
 				e.printStackTrace(); // should never happen...
 			}
@@ -350,6 +350,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			sortByDateBtn.setSelected(pm.getBooleanValue("gui.sortbydate", true));
 			model.setSortByDate(sortByDateBtn.isSelected());
 			captionPane.setFont(new Font(pm.getDoubleValue("gui.fontsize", 12)));
+			tabPane.getSelectionModel().select(pm.getIntValue("gui.selectedtab", 0));
 
 			model.loadMapParamLookup();
 			String fileName = pm.getStringValue("model.currfile", null);
@@ -358,6 +359,9 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				if (f.exists())
 					model.selectPhoto(f);
 			}
+			String map = pm.getStringValue("model.currmapfile", "");
+			if (!map.isEmpty() && new File(map).exists())
+				model.setMap(new File(map));
 
 			// mapImagePanel.setShowAllPhotoPositions(pm.getBooleanValue(
 			// "gui.showallphotopositions", true));
@@ -384,7 +388,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		pm.setValue("gui.fontsize", captionPane.getFont().getSize());
 		// pm.setValue("gui.showcaptioninstatus",
 		// infoPanel.isShowCaptionInStatus());
-		// pm.setValue("gui.selectedtab", tabbedPane.getSelectedIndex());
+		pm.setValue("gui.selectedtab", tabPane.getSelectionModel().getSelectedIndex());
 		// File file = outputFileChooser.getSelectedFile();
 		// if (file != null)
 		// pm.setValue("gui.outputfile", file.getAbsolutePath());
@@ -392,10 +396,8 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		// pm.setValue("gui.outputfile", model.getCurrDirectory());
 		if (model.getSelectedPhoto() != null)
 			pm.setValue("model.currfile", model.getSelectedPhoto());
-		// File file = model.getMapData().getFile();
-		// pm.setValue("model.currmapfile", file != null ?
-		// file.getAbsolutePath()
-		// : "");
+		File file = model.getMapData().getFile();
+		pm.setValue("model.currmapfile", file != null ? file.getAbsolutePath() : "");
 		model.saveMapParamLookup();
 		try {
 			pm.saveSessionProperties();
@@ -403,7 +405,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			ErrorHandler.getInstance().handleError(ex);
 		}
 	}
-	
+
 	public static class Sec {
 		int seconds;
 
