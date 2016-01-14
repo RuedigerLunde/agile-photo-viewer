@@ -19,10 +19,11 @@ public class ImageViewController {
 	private ObjectProperty<ViewParams> viewParams = new SimpleObjectProperty<ViewParams>();
 
 	private boolean enableLimiters = false;
+	private double initScale = -1;
 	private double maxScale = Double.MAX_VALUE;
-	
+
 	private boolean isScaleToFitActive = true;
-	private boolean zoomingOut;
+	private boolean isWaitingForInitScale;
 
 	public void initialize(ImageView imageView, Pane container) {
 		this.imageView = imageView;
@@ -59,7 +60,7 @@ public class ImageViewController {
 		imageView.setOnScroll(e -> {
 			if (image != null) {
 				double newScale = viewParams.get().getScale() * Math.pow(1.01, e.getDeltaY() / 2);
-				zoom(new Point2D(e.getX(), e.getY()), newScale);
+				zoom(viewParams.get().viewToImage(new Point2D(e.getX(), e.getY())), newScale);
 			}
 			e.consume();
 		});
@@ -70,7 +71,7 @@ public class ImageViewController {
 					isScaleToFitActive = true;
 					update(viewParams.get());
 				} else {
-					zoom(new Point2D(e.getX(), e.getY()), 1.0);
+					zoom(viewParams.get().viewToImage(new Point2D(e.getX(), e.getY())), 1.0);
 				}
 				e.consume();
 			}
@@ -81,14 +82,25 @@ public class ImageViewController {
 		this.image = image;
 		imageView.setImage(image);
 		isScaleToFitActive = true;
+		if (initScale >= 0 && image != null)
+			isWaitingForInitScale = true;
 		update(viewParams.get());
+	}
+
+	public ObjectProperty<ViewParams> viewParamsProperty() {
+		return viewParams;
 	}
 
 	public void setLimitersEnabled(boolean state) {
 		enableLimiters = state;
 		update(viewParams.get());
 	}
-	
+
+	public void setInitScale(double scale) {
+		initScale = scale;
+		update(viewParams.get());
+	}
+
 	public void setMaxScale(double scale) {
 		maxScale = scale;
 		update(viewParams.get());
@@ -100,11 +112,9 @@ public class ImageViewController {
 			double scaleFit = computeScaleToFit();
 			if (isScaleToFitActive) {
 				vp.setScale(scaleFit);
-//				vp.setImgX(0);
-//				vp.setImgY(0);
 			} else if (enableLimiters && vp.getScale() <= scaleFit) {
-					vp.setScale(scaleFit);
-					isScaleToFitActive = true;
+				vp.setScale(scaleFit);
+				isScaleToFitActive = true;
 			}
 			if (enableLimiters || isScaleToFitActive) {
 				if (image.getWidth() / image.getHeight() > container.getWidth() / container.getHeight()) {
@@ -117,25 +127,13 @@ public class ImageViewController {
 					vp.clampImgX(-tol, image.getWidth() - vp.viewToImage(container.getWidth()) + tol);
 				}
 			}
-//					if (image.getWidth() - vp.getImgX() < vp.viewToImage(container.getWidth()))
-//						vp.setImgX(Math.max(0, image.getWidth() - vp.viewToImage(container.getWidth())));
-//				} else {
-//				vp.setImgY(Math.max(vp.getImgY(), 0));
-//				if (image.getHeight() - vp.getImgY() < vp.viewToImage(container.getHeight()))
-//					vp.setImgY(Math.max(0, image.getHeight() - vp.viewToImage(container.getHeight())));
-//				}
-//				
-//			if (isScaleToFitActive || zoomingOut) {
-//				if (image.getWidth() < vp.viewToImage(container.getWidth())) {
-//					vp.setImgX((image.getWidth() - vp.viewToImage(container.getWidth())) / 2 );
-//				} else if (image.getHeight() < vp.viewToImage(container.getHeight())) {
-//					vp.setImgY((image.getHeight() - vp.viewToImage(container.getHeight())) / 2 );
-//				}
-//			}
 			viewParams.set(vp);
 			imageView.setViewport(new Rectangle2D(vp.getImgX(), vp.getImgY(), vp.viewToImage(container.getWidth()),
 					vp.viewToImage(container.getHeight())));
-			zoomingOut = false;
+			if (isWaitingForInitScale) {
+				isWaitingForInitScale = false;
+				zoom(new Point2D(image.getWidth() / 2, image.getHeight() / 2), initScale);
+			}
 		}
 	}
 
@@ -149,30 +147,22 @@ public class ImageViewController {
 		update(vp);
 	}
 
-	private void zoom(Point2D point, double newScale) {
-		Point2D mouse = viewParams.get().viewToImage(point);
+	private void zoom(Point2D refPoint, double newScale) {
 		ViewParams vp = viewParams.get().clone();
 		if (enableLimiters)
 			// already necessary here to prevent max zoomed images from moving
 			newScale = Math.max(newScale, computeScaleToFit());
 		newScale = Math.min(newScale, maxScale);
 		// (mouse.x - imgX) * scale = (mouse.x - newImgX) * newScale;
-		vp.setImgX((vp.getImgX() - mouse.getX()) * vp.getScale() / newScale + mouse.getX());
-		vp.setImgY((vp.getImgY() - mouse.getY()) * vp.getScale() / newScale + mouse.getY());
-		
+		vp.setImgX((vp.getImgX() - refPoint.getX()) * vp.getScale() / newScale + refPoint.getX());
+		vp.setImgY((vp.getImgY() - refPoint.getY()) * vp.getScale() / newScale + refPoint.getY());
+
 		vp.setScale(newScale);
 		isScaleToFitActive = false;
-		zoomingOut = vp.getScale() < viewParams.get().getScale();
 		update(vp);
 	}
 
 	private double computeScaleToFit() {
-		if (image == null)
-			return 0.0;
-		// else if (enableLimiters)
-		// return Math.max(container.getWidth() / image.getWidth(),
-		// container.getHeight() / image.getHeight());
-		// else
 		return Math.min(container.getWidth() / image.getWidth(), container.getHeight() / image.getHeight());
 	}
 }

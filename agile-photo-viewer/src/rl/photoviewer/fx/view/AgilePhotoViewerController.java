@@ -16,6 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -181,9 +182,17 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		photoViewController.setLimitersEnabled(true);
 		photoViewController.setMaxScale(4);
 		mapViewController.initialize(mapView, mapPane);
+		mapViewController.setInitScale(1);
 		
 
 		splitPane.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
+		splitPane.setOnScroll(e -> {
+			if (e.getDeltaY() > 0)
+				model.selectNextPhoto();
+			else
+				model.selectPrevPhoto();
+			e.consume();
+		});
 		model = new PVModel();
 		model.addObserver(this);
 		restoreSession();
