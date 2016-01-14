@@ -314,10 +314,11 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			} catch (MalformedURLException e) {
 				e.printStackTrace(); // should never happen...
 			}
+		} else if (arg == PVModel.METADATA_CHANGED) {
+			ObservableList<String> items = FXCollections.observableArrayList(model.getAllKeywords());
+			keywordLst.getSelectionModel().clearSelection();
+			keywordLst.setItems(items);
 		}
-		ObservableList<String> items = FXCollections.observableArrayList(model.getAllKeywords());
-		keywordLst.setItems(items);
-		//keywordLst.getItems().addAll(model.getAllKeywords());
 		keywordExpressionTxt.setText(model.getVisibilityExpression().toString());
 		statusLabel.setText(model.getVisiblePhotoCount() + " Photo(s) visible.");
 	}
