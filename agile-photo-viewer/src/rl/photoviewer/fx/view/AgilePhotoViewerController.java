@@ -16,7 +16,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -28,7 +27,6 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
@@ -37,8 +35,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
@@ -318,6 +314,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				e.printStackTrace(); // should never happen...
 			}
 		}
+		keywordLst.getItems().clear();
 		keywordLst.getItems().addAll(model.getAllKeywords());
 		keywordExpressionTxt.setText(model.getVisibilityExpression().toString());
 		statusLabel.setText(model.getVisiblePhotoCount() + " Photo(s) visible.");
