@@ -12,6 +12,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -179,7 +181,6 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		photoViewController.setMaxScale(4);
 		mapViewController.initialize(mapView, mapPane);
 		mapViewController.setInitScale(1);
-		
 
 		splitPane.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
 		splitPane.setOnScroll(e -> {
@@ -192,17 +193,17 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		model = new PVModel();
 		model.addObserver(this);
 		restoreSession();
-		
-//		Circle circle = new Circle();
-//		circle.setRadius(10);
-//		circle.setFill(Color.TRANSPARENT);
-//		circle.setStroke(Color.RED);
-//        circle.setStrokeWidth(4);
-//        circle.setManaged(false);
-//		circle.setCenterX(100);
-//		circle.setCenterY(50);
-//		circle.setEffect(new Lighting());
-//		mapPane.getChildren().add(circle);
+
+		// Circle circle = new Circle();
+		// circle.setRadius(10);
+		// circle.setFill(Color.TRANSPARENT);
+		// circle.setStroke(Color.RED);
+		// circle.setStrokeWidth(4);
+		// circle.setManaged(false);
+		// circle.setCenterX(100);
+		// circle.setCenterY(50);
+		// circle.setEffect(new Lighting());
+		// mapPane.getChildren().add(circle);
 	}
 
 	@FXML
@@ -314,8 +315,9 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				e.printStackTrace(); // should never happen...
 			}
 		}
-		keywordLst.getItems().clear();
-		keywordLst.getItems().addAll(model.getAllKeywords());
+		ObservableList<String> items = FXCollections.observableArrayList(model.getAllKeywords());
+		keywordLst.setItems(items);
+		//keywordLst.getItems().addAll(model.getAllKeywords());
 		keywordExpressionTxt.setText(model.getVisibilityExpression().toString());
 		statusLabel.setText(model.getVisiblePhotoCount() + " Photo(s) visible.");
 	}
