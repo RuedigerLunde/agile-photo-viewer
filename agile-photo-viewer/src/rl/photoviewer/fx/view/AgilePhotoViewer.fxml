@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.shape.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
@@ -75,11 +76,11 @@
                               </Tab>
                               <Tab text="Map">
                                  <content>
-                                    <HBox fx:id="mapPane" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                                    <StackPane fx:id="mapPane" prefHeight="150.0" prefWidth="200.0">
                                        <children>
                                           <ImageView fx:id="mapView" fitHeight="50.0" fitWidth="50.0" onContextMenuRequested="#onMapMenuRequest" pickOnBounds="true" preserveRatio="true" />
                                        </children>
-                                    </HBox>
+                                    </StackPane>
                                  </content>
                               </Tab>
                            </tabs>
@@ -97,11 +98,15 @@
                   </GridPane>
                </children>
             </AnchorPane>
-            <HBox fx:id="rightPane" alignment="CENTER">
+            <AnchorPane>
                <children>
-                  <ImageView fx:id="photoView" fitHeight="150.0" fitWidth="200.0" onContextMenuRequested="#onContextMenuRequest" pickOnBounds="true" preserveRatio="true" />
+                  <HBox fx:id="rightPane" alignment="CENTER" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                     <children>
+                        <ImageView fx:id="photoView" fitHeight="150.0" fitWidth="200.0" onContextMenuRequested="#onContextMenuRequest" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </HBox>
                </children>
-            </HBox>
+            </AnchorPane>
          </items>
       </SplitPane>
    </children>

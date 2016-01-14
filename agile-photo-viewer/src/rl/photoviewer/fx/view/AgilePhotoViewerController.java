@@ -27,6 +27,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
@@ -34,6 +35,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
@@ -108,7 +112,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	private Label statusLabel;
 
 	@FXML
-	private HBox mapPane;
+	private StackPane mapPane;
 
 	@FXML
 	private ImageView mapView;
@@ -142,8 +146,8 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		}
 	};
 
-	private PhotoViewController photoViewController = new PhotoViewController();
-	private MapViewController mapViewController = new MapViewController();
+	private ImageViewController photoViewController = new ImageViewController();
+	private ImageViewController mapViewController = new ImageViewController();
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -174,12 +178,26 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		});
 
 		photoViewController.initialize(photoView, rightPane);
+		photoViewController.setLimitersEnabled(true);
+		photoViewController.setMaxScale(4);
 		mapViewController.initialize(mapView, mapPane);
+		
 
 		splitPane.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
 		model = new PVModel();
 		model.addObserver(this);
 		restoreSession();
+		
+//		Circle circle = new Circle();
+//		circle.setRadius(10);
+//		circle.setFill(Color.TRANSPARENT);
+//		circle.setStroke(Color.RED);
+//        circle.setStrokeWidth(4);
+//        circle.setManaged(false);
+//		circle.setCenterX(100);
+//		circle.setCenterY(50);
+//		circle.setEffect(new Lighting());
+//		mapPane.getChildren().add(circle);
 	}
 
 	@FXML
