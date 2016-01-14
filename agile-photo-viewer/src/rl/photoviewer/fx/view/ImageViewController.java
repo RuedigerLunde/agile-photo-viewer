@@ -107,8 +107,8 @@ public class ImageViewController {
 	}
 
 	private void update(ViewParams nextParams) {
-		ViewParams vp = nextParams;
 		if (image != null && container.getWidth() > 0) {
+			ViewParams vp = nextParams;
 			double scaleFit = computeScaleToFit();
 			if (isScaleToFitActive) {
 				vp.setScale(scaleFit);
@@ -147,13 +147,18 @@ public class ImageViewController {
 		update(vp);
 	}
 
+	/**
+	 * Performs zooming. Image information at refPoint does not move on the screen.
+	 * @param refPoint Mouse position in image coordinates
+	 * @param newScale Scale to be used next (might be modified during update to fit to layout constraints)
+	 */
 	private void zoom(Point2D refPoint, double newScale) {
 		ViewParams vp = viewParams.get().clone();
 		if (enableLimiters)
 			// already necessary here to prevent max zoomed images from moving
 			newScale = Math.max(newScale, computeScaleToFit());
 		newScale = Math.min(newScale, maxScale);
-		// (mouse.x - imgX) * scale = (mouse.x - newImgX) * newScale;
+		// (refPoint.x - imgX) * scale = (refPoint.x - newImgX) * newScale;
 		vp.setImgX((vp.getImgX() - refPoint.getX()) * vp.getScale() / newScale + refPoint.getX());
 		vp.setImgY((vp.getImgY() - refPoint.getY()) * vp.getScale() / newScale + refPoint.getY());
 
