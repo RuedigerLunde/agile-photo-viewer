@@ -34,6 +34,7 @@ public class AgilePhotoViewerApp extends Application {
 			primaryStage.setScene(scene);
 			primaryStage.setOnCloseRequest(windowCloseHandler);
 			primaryStage.show();
+			controller.restoreSession();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

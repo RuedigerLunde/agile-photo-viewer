@@ -41,14 +41,14 @@ public class ImageViewController {
 
 		ObjectProperty<Point2D> mouseDown = new SimpleObjectProperty<>();
 
-		imageView.setOnMousePressed(e -> {
+		container.setOnMousePressed(e -> {
 			if (image != null) {
 				Point2D mousePress = viewParams.get().viewToImage(new Point2D(e.getX(), e.getY()));
 				mouseDown.set(mousePress);
 			}
 		});
 
-		imageView.setOnMouseDragged(e -> {
+		container.setOnMouseDragged(e -> {
 			if (image != null) {
 				Point2D dragPoint = viewParams.get().viewToImage(new Point2D(e.getX(), e.getY()));
 				shift(dragPoint.subtract(mouseDown.get()));
@@ -57,7 +57,7 @@ public class ImageViewController {
 			}
 		});
 
-		imageView.setOnScroll(e -> {
+		container.setOnScroll(e -> {
 			if (image != null) {
 				double newScale = viewParams.get().getScale() * Math.pow(1.01, e.getDeltaY() / 2);
 				zoom(viewParams.get().viewToImage(new Point2D(e.getX(), e.getY())), newScale);
@@ -65,7 +65,7 @@ public class ImageViewController {
 			e.consume();
 		});
 
-		imageView.setOnMouseClicked(e -> {
+		container.setOnMouseClicked(e -> {
 			if (e.getClickCount() == 2 && image != null) {
 				if (!isScaleToFitActive) {
 					isScaleToFitActive = true;
@@ -78,6 +78,14 @@ public class ImageViewController {
 		});
 	}
 
+	public Pane getContainer() {
+		return container;
+	}
+	
+	public Image getImage() {
+		return image;
+	}
+	
 	public void setImage(Image image) {
 		this.image = image;
 		imageView.setImage(image);
@@ -107,6 +115,8 @@ public class ImageViewController {
 	}
 
 	private void update(ViewParams nextParams) {
+		if (nextParams == viewParams.get())
+			nextParams = nextParams.clone();
 		if (image != null && container.getWidth() > 0) {
 			ViewParams vp = nextParams;
 			double scaleFit = computeScaleToFit();
@@ -137,9 +147,8 @@ public class ImageViewController {
 		}
 	}
 
-	// shift the viewport of the imageView by the specified delta, clamping so
-	// the viewport does not move off the actual image:
-	private void shift(Point2D delta) {
+	// shift the viewport of the imageView by the specified delta (in image coordinates).
+	public void shift(Point2D delta) {
 		ViewParams vp = viewParams.get().clone();
 		vp.setImgX(vp.getImgX() - delta.getX());
 		vp.setImgY(vp.getImgY() - delta.getY());
@@ -152,7 +161,7 @@ public class ImageViewController {
 	 * @param refPoint Mouse position in image coordinates
 	 * @param newScale Scale to be used next (might be modified during update to fit to layout constraints)
 	 */
-	private void zoom(Point2D refPoint, double newScale) {
+	public void zoom(Point2D refPoint, double newScale) {
 		ViewParams vp = viewParams.get().clone();
 		if (enableLimiters)
 			// already necessary here to prevent max zoomed images from moving

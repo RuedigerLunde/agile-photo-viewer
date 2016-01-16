@@ -16,7 +16,7 @@
                <children>
                   <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <FlowPane hgap="5.0" onContextMenuRequested="#onContextMenuRequest" prefHeight="200.0" prefWidth="200.0" vgap="10.0" GridPane.columnSpan="2147483647" GridPane.rowSpan="2" GridPane.valignment="TOP">
+                        <FlowPane fx:id="ctrlPane" hgap="5.0" onContextMenuRequested="#onContextMenuRequest" prefHeight="200.0" prefWidth="200.0" vgap="10.0" GridPane.columnSpan="2147483647" GridPane.rowSpan="2" GridPane.valignment="TOP">
                            <children>
                               <Button fx:id="selectBtn" mnemonicParsing="false" onAction="#onButtonAction" text="Select" />
                               <Button fx:id="firstBtn" mnemonicParsing="false" onAction="#onButtonAction" text="&lt;&lt;" />

@@ -35,6 +35,7 @@ import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
@@ -56,6 +57,9 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	@FXML
 	private AnchorPane leftPane;
 
+	@FXML
+	private FlowPane ctrlPane;
+	
 	@FXML
 	private Button selectBtn;
 
@@ -126,10 +130,6 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	private ContextMenu mapMenu;
 
-	private Timeline slideShowTimer;
-
-	private PVModel model;
-
 	final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
 		public void handle(final KeyEvent keyEvent) {
 			if (keyEvent.getCode() == KeyCode.PLUS) {
@@ -147,7 +147,12 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	private ImageViewController photoViewController = new ImageViewController();
 	private ImageViewController mapViewController = new ImageViewController();
+	private MapDataViewController mapDataViewController = new MapDataViewController();
 
+	private Timeline slideShowTimer;
+
+	private PVModel model;
+	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		SplitPane.setResizableWithParent(leftPane, Boolean.FALSE);
@@ -181,9 +186,10 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		photoViewController.setMaxScale(4);
 		mapViewController.initialize(mapView, mapPane);
 		mapViewController.setInitScale(1);
+		
 
 		splitPane.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
-		splitPane.setOnScroll(e -> {
+		ctrlPane.setOnScroll(e -> {
 			if (e.getDeltaY() > 0)
 				model.selectNextPhoto();
 			else
@@ -192,18 +198,8 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		});
 		model = new PVModel();
 		model.addObserver(this);
-		restoreSession();
-
-		// Circle circle = new Circle();
-		// circle.setRadius(10);
-		// circle.setFill(Color.TRANSPARENT);
-		// circle.setStroke(Color.RED);
-		// circle.setStrokeWidth(4);
-		// circle.setManaged(false);
-		// circle.setCenterX(100);
-		// circle.setCenterY(50);
-		// circle.setEffect(new Lighting());
-		// mapPane.getChildren().add(circle);
+		mapDataViewController.initialize(mapViewController, model);
+		mapViewController.viewParamsProperty().addListener(e -> mapDataViewController.update(null));
 	}
 
 	@FXML
@@ -246,45 +242,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			model.setVisibility(model.getRatingFilter(), model.getVisibilityExpression());
 		}
 	}
-
-	private void onKeywordSelected(String newKeyword) {
-		KeywordExpression expression = model.getVisibilityExpression();
-		expression.addLiteral(newKeyword, notBtn.isSelected());
-		notBtn.setSelected(false);
-		model.setVisibility(model.getRatingFilter(), expression);
-	}
-
-	@FXML
-	public void onContextMenuRequest(ContextMenuEvent event) {
-		if (contextMenu == null) {
-			contextMenu = new ContextMenu();
-			MenuItem mi = new MenuItem("Show in Map");
-			contextMenu.getItems().add(mi);
-			mi.setOnAction(e -> {
-				model.setMap(model.getSelectedPhoto());
-				tabPane.getSelectionModel().selectLast(); // select map tab
-			});
-		}
-		contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
-
-		event.consume();
-	}
-
-	@FXML
-	public void onMapMenuRequest(ContextMenuEvent event) {
-		if (mapMenu == null) {
-			mapMenu = new ContextMenu();
-			MenuItem mi = new MenuItem("Clear Map");
-			mapMenu.getItems().add(mi);
-			mi.setOnAction(e -> {
-				model.clearCurrentMap();
-			});
-		}
-		mapMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
-
-		event.consume();
-	}
-
+	
 	@Override
 	public void update(Observable o, Object arg) {
 		if (arg == PVModel.SELECTED_PHOTO_CHANGED) {
@@ -319,10 +277,56 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			keywordLst.getSelectionModel().clearSelection();
 			keywordLst.setItems(items);
 		}
+		mapDataViewController.update(arg);
 		keywordExpressionTxt.setText(model.getVisibilityExpression().toString());
 		statusLabel.setText(model.getVisiblePhotoCount() + " Photo(s) visible.");
 	}
 
+
+	private void onKeywordSelected(String newKeyword) {
+		KeywordExpression expression = model.getVisibilityExpression();
+		expression.addLiteral(newKeyword, notBtn.isSelected());
+		notBtn.setSelected(false);
+		model.setVisibility(model.getRatingFilter(), expression);
+	}
+
+	@FXML
+	public void onContextMenuRequest(ContextMenuEvent event) {
+		if (contextMenu == null) {
+			contextMenu = new ContextMenu();
+			MenuItem mi = new MenuItem("Show in Map");
+			contextMenu.getItems().add(mi);
+			mi.setOnAction(e -> {
+				model.setMap(model.getSelectedPhoto());
+				tabPane.getSelectionModel().selectLast(); // select map tab
+			});
+		}
+		contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+
+		event.consume();
+	}
+
+	@FXML
+	public void onMapMenuRequest(ContextMenuEvent event) {
+		if (mapMenu == null) {
+			mapMenu = new ContextMenu();
+			MenuItem mi = new MenuItem("Set Refpoint Here");
+			mapMenu.getItems().add(mi);
+			mi.setOnAction(e -> {
+				// model.clearCurrentMap();
+			});
+			mi = new MenuItem("Clear Map");
+			mapMenu.getItems().add(mi);
+			mi.setOnAction(e -> {
+				model.clearCurrentMap();
+			});
+		}
+		mapMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+
+		event.consume();
+	}
+
+	
 	private void openFileChooser() {
 		FileChooser selectChooser = new FileChooser();
 		File curr = model.getSelectedPhoto();
@@ -381,15 +385,15 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 			model.loadMapParamLookup();
 			String fileName = pm.getStringValue("model.currfile", null);
+			String map = pm.getStringValue("model.currmapfile", "");
+			if (!map.isEmpty() && new File(map).exists())
+				model.setMap(new File(map));
 			if (fileName != null && model.getCurrDirectory() == null) {
 				File f = new File(fileName);
 				if (f.exists())
 					model.selectPhoto(f);
 			}
-			String map = pm.getStringValue("model.currmapfile", "");
-			if (!map.isEmpty() && new File(map).exists())
-				model.setMap(new File(map));
-
+			
 			// mapImagePanel.setShowAllPhotoPositions(pm.getBooleanValue(
 			// "gui.showallphotopositions", true));
 			// infoPanel.setShowCaptionInStatus(pm.getBooleanValue(

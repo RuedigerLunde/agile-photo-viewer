@@ -80,7 +80,7 @@ public class ViewParams implements Cloneable {
 	
 	public Point2D imageToView(Point2D coordsImage) {
 		double x = (coordsImage.getX() - imgX) * scale;
-		double y = (coordsImage.getY() - imgX) * scale;
+		double y = (coordsImage.getY() - imgY) * scale;
 		return new Point2D(x, y);
 	}
 

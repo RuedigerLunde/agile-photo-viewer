@@ -48,7 +48,7 @@ public class PVModel extends Observable {
 			dir = file.getParentFile();
 			fileName = file.getName();
 		}
-		if (!dir.equals(getCurrDirectory())) {
+		if (getCurrDirectory() != null && !dir.equals(getCurrDirectory())) {
 			setMap(null);
 			result = true;
 		}
@@ -58,9 +58,9 @@ public class PVModel extends Observable {
 		else if (exifDataManager.getVisiblePhotoCount() > 0)
 			exifDataManager.selectFirstPhoto();
 		setChanged();
-		notifyObservers(SELECTED_PHOTO_CHANGED);
-		setChanged();
 		notifyObservers(METADATA_CHANGED);
+		setChanged();
+		notifyObservers(SELECTED_PHOTO_CHANGED);
 		return result;
 	}
 
