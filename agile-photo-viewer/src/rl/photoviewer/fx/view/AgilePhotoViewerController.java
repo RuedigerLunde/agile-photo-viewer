@@ -125,7 +125,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	@FXML
 	private ImageView photoView;
 
-	private ContextMenu contextMenu;
+	private ContextMenu photoContextMenu;
 
 	private ImageViewController photoViewController = new ImageViewController();
 	private ImageViewController mapViewController = new ImageViewController();
@@ -178,13 +178,13 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				model.selectNextPhoto();
 			else
 				model.selectPrevPhoto();
-			e.consume();
+			// e.consume();
 		});
 		
-		rootPane.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+		rightPane.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
 			@Override
 			public void handle(ContextMenuEvent event) {
-				onContextMenuRequest(event);
+				onPhotoContextMenuRequest(event);
 			}
 		});
 		
@@ -295,19 +295,19 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	}
 
 	@FXML
-	protected void onContextMenuRequest(ContextMenuEvent event) {
-		if (contextMenu == null) {
-			contextMenu = new ContextMenu();
+	protected void onPhotoContextMenuRequest(ContextMenuEvent event) {
+		if (photoContextMenu == null) {
+			photoContextMenu = new ContextMenu();
 			MenuItem mi = new MenuItem("Use as Map");
-			contextMenu.getItems().add(mi);
+			photoContextMenu.getItems().add(mi);
 			mi.setOnAction(e -> {
 				model.setMap(model.getSelectedPhoto());
 				tabPane.getSelectionModel().selectLast(); // select map tab
 			});
 		}
-		contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+		photoContextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
 
-		event.consume();
+		//event.consume();
 	}
 
 	private void openFileChooser() {

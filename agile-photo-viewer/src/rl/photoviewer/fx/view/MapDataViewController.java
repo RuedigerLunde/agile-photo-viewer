@@ -13,6 +13,7 @@ import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Lighting;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -43,17 +44,20 @@ public class MapDataViewController {
 		});
 
 		viewController.getContainer().setOnMouseClicked(e -> {
-			if (e.getClickCount() == 1 && model.getMapData().hasData()) {
-				ViewParams viewParams = imageViewController.viewParamsProperty().get();
-				Point2D posImg = viewParams.viewToImage(new Point2D(e.getX(), e.getY()));
-				double radius = viewParams.viewToImage(20);
-				double tolerance = viewParams.viewToImage(5);
+			if (e.getButton() == MouseButton.PRIMARY && model.getMapData().hasData()
+					&& !imageViewController.isMouseDragged()) {
+				ViewParams vp = imageViewController.viewParamsProperty().get();
+				Point2D posImg = vp.viewToImage(new Point2D(e.getX(), e.getY()));
+				double radius = vp.viewToImage(20);
+				double tolerance = vp.viewToImage(5);
 				Set<? extends IndexedGeoPoint> geoPoints = model.getVisiblePhotoPositions();
 				IndexedGeoPoint pt = model.getMapData().findPhotoPositionAt(geoPoints, posImg.getX(), posImg.getY(),
 						radius, tolerance);
 				if (pt != null)
 					model.selectPhotoByMetadata(pt);
-				e.consume();
+				// e.consume();
+			} else {
+				imageViewController.onMouseClicked(e);
 			}
 		});
 	}
@@ -94,8 +98,6 @@ public class MapDataViewController {
 
 		int j = 0;
 		for (GeoRefPoint refPoint : mapData.getRefPoints()) {
-			// double[] pos = mapData.latLonToImagePos(grp.getLat(),
-			// grp.getLon());
 			Point2D posRefMarker = viewParams.imageToView(new Point2D(refPoint.getXImage(), refPoint.getYImage()));
 			Shape refMarker = refPointMarkers.get(j++);
 			refMarker.setLayoutX(posRefMarker.getX());

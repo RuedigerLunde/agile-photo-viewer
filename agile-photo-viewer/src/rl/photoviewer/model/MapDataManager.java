@@ -4,7 +4,6 @@
  */
 package rl.photoviewer.model;
 
-import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

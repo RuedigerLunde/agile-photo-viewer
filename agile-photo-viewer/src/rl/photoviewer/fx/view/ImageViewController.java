@@ -6,6 +6,8 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
 public class ImageViewController {
@@ -17,6 +19,8 @@ public class ImageViewController {
 	private Image image;
 
 	private ObjectProperty<ViewParams> viewParams = new SimpleObjectProperty<ViewParams>();
+	private Point2D lastMousePosition;
+	private boolean mouseDragged;
 
 	private boolean enableLimiters = false;
 	private double initScale = -1;
@@ -39,20 +43,22 @@ public class ImageViewController {
 		container.widthProperty().addListener(e -> update(viewParams.get()));
 		container.heightProperty().addListener(e -> update(viewParams.get()));
 
-		ObjectProperty<Point2D> mouseDown = new SimpleObjectProperty<>();
-
 		container.setOnMousePressed(e -> {
 			if (image != null) {
-				Point2D mousePress = viewParams.get().viewToImage(new Point2D(e.getX(), e.getY()));
-				mouseDown.set(mousePress);
+				//Point2D mousePress = viewParams.get().viewToImage(new Point2D(e.getX(), e.getY()));
+				lastMousePosition = new Point2D(e.getX(), e.getY()); //(mousePress);
+				mouseDragged = false;
 			}
 		});
 
 		container.setOnMouseDragged(e -> {
 			if (image != null) {
-				Point2D dragPoint = viewParams.get().viewToImage(new Point2D(e.getX(), e.getY()));
-				shift(dragPoint.subtract(mouseDown.get()));
-				mouseDown.set(viewParams.get().viewToImage(new Point2D(e.getX(), e.getY())));
+				Point2D mouse = new Point2D(e.getX(), e.getY());
+				double deltaX = viewParams.get().viewToImage(e.getX() - lastMousePosition.getX());
+				double deltaY = viewParams.get().viewToImage(e.getY() - lastMousePosition.getY());
+				shift(new Point2D(deltaX, deltaY));
+				lastMousePosition = mouse;
+				mouseDragged = true;
 				e.consume();
 			}
 		});
@@ -65,17 +71,19 @@ public class ImageViewController {
 			e.consume();
 		});
 
-		container.setOnMouseClicked(e -> {
-			if (e.getClickCount() == 2 && image != null) {
-				if (!isScaleToFitActive) {
-					isScaleToFitActive = true;
-					update(viewParams.get());
-				} else {
-					zoom(viewParams.get().viewToImage(new Point2D(e.getX(), e.getY())), 1.0);
-				}
-				e.consume();
+		container.setOnMouseClicked(e -> onMouseClicked(e));
+	}
+	
+	public void onMouseClicked(MouseEvent event) {
+		if (event.getButton() == MouseButton.MIDDLE && image != null) {
+			if (!isScaleToFitActive) {
+				isScaleToFitActive = true;
+				update(viewParams.get());
+			} else {
+				zoom(viewParams.get().viewToImage(new Point2D(event.getX(), event.getY())), 1.0);
 			}
-		});
+			// e.consume();
+		}
 	}
 
 	public Pane getContainer() {
@@ -97,6 +105,10 @@ public class ImageViewController {
 
 	public ObjectProperty<ViewParams> viewParamsProperty() {
 		return viewParams;
+	}
+	
+	public boolean isMouseDragged() {
+		return mouseDragged;
 	}
 
 	public void setLimitersEnabled(boolean state) {
