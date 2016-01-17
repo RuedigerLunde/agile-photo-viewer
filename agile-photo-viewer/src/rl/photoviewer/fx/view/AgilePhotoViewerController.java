@@ -3,7 +3,6 @@ package rl.photoviewer.fx.view;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
@@ -52,14 +51,14 @@ import rl.util.persistence.PropertyManager;
 public class AgilePhotoViewerController implements Initializable, Observer {
 
 	@FXML
-	private SplitPane splitPane;
+	private AnchorPane rootPane;
 
 	@FXML
 	private AnchorPane leftPane;
 
 	@FXML
 	private FlowPane ctrlPane;
-	
+
 	@FXML
 	private Button selectBtn;
 
@@ -128,23 +127,6 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	private ContextMenu contextMenu;
 
-	private ContextMenu mapMenu;
-
-	final EventHandler<KeyEvent> keyEventHandler = new EventHandler<KeyEvent>() {
-		public void handle(final KeyEvent keyEvent) {
-			if (keyEvent.getCode() == KeyCode.PLUS) {
-				captionPane.setFont(new Font(captionPane.getFont().getSize() + 1));
-			} else if (keyEvent.getCode() == KeyCode.MINUS) {
-				captionPane.setFont(new Font(captionPane.getFont().getSize() - 1));
-			} else if (keyEvent.getCode() == KeyCode.PAGE_DOWN || keyEvent.getCode() == KeyCode.N) {
-				model.selectNextPhoto();
-			} else if (keyEvent.getCode() == KeyCode.PAGE_UP || keyEvent.getCode() == KeyCode.P) {
-				model.selectPrevPhoto();
-			}
-			// keyEvent.consume();
-		}
-	};
-
 	private ImageViewController photoViewController = new ImageViewController();
 	private ImageViewController mapViewController = new ImageViewController();
 	private MapDataViewController mapDataViewController = new MapDataViewController();
@@ -152,7 +134,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	private Timeline slideShowTimer;
 
 	private PVModel model;
-	
+
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		SplitPane.setResizableWithParent(leftPane, Boolean.FALSE);
@@ -173,7 +155,6 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		});
 
 		keywordLst.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (newValue != null)
@@ -186,9 +167,12 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		photoViewController.setMaxScale(4);
 		mapViewController.initialize(mapView, mapPane);
 		mapViewController.setInitScale(1);
-		
 
-		splitPane.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
+		rootPane.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+			public void handle(final KeyEvent keyEvent) {
+				onKeyPressed(keyEvent);
+			}
+		});
 		ctrlPane.setOnScroll(e -> {
 			if (e.getDeltaY() > 0)
 				model.selectNextPhoto();
@@ -196,10 +180,70 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				model.selectPrevPhoto();
 			e.consume();
 		});
+		
+		rootPane.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+			@Override
+			public void handle(ContextMenuEvent event) {
+				onContextMenuRequest(event);
+			}
+		});
+		
 		model = new PVModel();
 		model.addObserver(this);
 		mapDataViewController.initialize(mapViewController, model);
 		mapViewController.viewParamsProperty().addListener(e -> mapDataViewController.update(null));
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		if (arg == PVModel.SELECTED_PHOTO_CHANGED) {
+			Image image;
+			try {
+				PhotoMetadata data = model.getSelectedPhotoData();
+				if (data != null) {
+					image = new Image(model.getSelectedPhoto().toURI().toURL().toExternalForm());
+					captionPane.setText(data.getCaption());
+				} else {
+					image = null;
+					captionPane.setText("");
+				}
+				photoViewController.setImage(image);
+				updateInfoPane();
+			} catch (MalformedURLException e) {
+				e.printStackTrace(); // should never happen...
+			}
+		} else if (arg == PVModel.SELECTED_MAP_CHANGED) {
+			Image image = null;
+			try {
+				MapData mapData = model.getMapData();
+				if (mapData.getFile() != null) {
+					image = new Image(mapData.getFile().toURI().toURL().toExternalForm());
+				}
+				mapViewController.setImage(image);
+			} catch (MalformedURLException e) {
+				e.printStackTrace(); // should never happen...
+			}
+		} else if (arg == PVModel.METADATA_CHANGED) {
+			ObservableList<String> items = FXCollections.observableArrayList(model.getAllKeywords());
+			keywordLst.getSelectionModel().clearSelection();
+			keywordLst.setItems(items);
+		}
+		mapDataViewController.update(arg);
+		keywordExpressionTxt.setText(model.getVisibilityExpression().toString());
+		statusLabel.setText(model.getVisiblePhotoCount() + " Photo(s) visible.");
+	}
+
+	public void onKeyPressed(KeyEvent keyEvent) {
+		if (keyEvent.getCode() == KeyCode.PLUS) {
+			captionPane.setFont(new Font(captionPane.getFont().getSize() + 1));
+		} else if (keyEvent.getCode() == KeyCode.MINUS) {
+			captionPane.setFont(new Font(captionPane.getFont().getSize() - 1));
+		} else if (keyEvent.getCode() == KeyCode.PAGE_DOWN || keyEvent.getCode() == KeyCode.N) {
+			model.selectNextPhoto();
+		} else if (keyEvent.getCode() == KeyCode.PAGE_UP || keyEvent.getCode() == KeyCode.P) {
+			model.selectPrevPhoto();
+		}
+		// keyEvent.consume();
 	}
 
 	@FXML
@@ -242,46 +286,6 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			model.setVisibility(model.getRatingFilter(), model.getVisibilityExpression());
 		}
 	}
-	
-	@Override
-	public void update(Observable o, Object arg) {
-		if (arg == PVModel.SELECTED_PHOTO_CHANGED) {
-			Image image;
-			try {
-				PhotoMetadata data = model.getSelectedPhotoData();
-				if (data != null) {
-					image = new Image(model.getSelectedPhoto().toURI().toURL().toExternalForm());
-					captionPane.setText(data.getCaption());
-				} else {
-					image = null;
-					captionPane.setText("");
-				}
-				photoViewController.setImage(image);
-				updateInfoPane();
-			} catch (MalformedURLException e) {
-				e.printStackTrace(); // should never happen...
-			}
-		} else if (arg == PVModel.SELECTED_MAP_CHANGED) {
-			Image image = null;
-			try {
-				MapData mapData = model.getMapData();
-				if (mapData.getFile() != null) {
-					image = new Image(mapData.getFile().toURI().toURL().toExternalForm());
-				}
-				mapViewController.setImage(image);
-			} catch (MalformedURLException e) {
-				e.printStackTrace(); // should never happen...
-			}
-		} else if (arg == PVModel.METADATA_CHANGED) {
-			ObservableList<String> items = FXCollections.observableArrayList(model.getAllKeywords());
-			keywordLst.getSelectionModel().clearSelection();
-			keywordLst.setItems(items);
-		}
-		mapDataViewController.update(arg);
-		keywordExpressionTxt.setText(model.getVisibilityExpression().toString());
-		statusLabel.setText(model.getVisiblePhotoCount() + " Photo(s) visible.");
-	}
-
 
 	private void onKeywordSelected(String newKeyword) {
 		KeywordExpression expression = model.getVisibilityExpression();
@@ -291,10 +295,10 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	}
 
 	@FXML
-	public void onContextMenuRequest(ContextMenuEvent event) {
+	protected void onContextMenuRequest(ContextMenuEvent event) {
 		if (contextMenu == null) {
 			contextMenu = new ContextMenu();
-			MenuItem mi = new MenuItem("Show in Map");
+			MenuItem mi = new MenuItem("Use as Map");
 			contextMenu.getItems().add(mi);
 			mi.setOnAction(e -> {
 				model.setMap(model.getSelectedPhoto());
@@ -306,27 +310,6 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		event.consume();
 	}
 
-	@FXML
-	public void onMapMenuRequest(ContextMenuEvent event) {
-		if (mapMenu == null) {
-			mapMenu = new ContextMenu();
-			MenuItem mi = new MenuItem("Set Refpoint Here");
-			mapMenu.getItems().add(mi);
-			mi.setOnAction(e -> {
-				// model.clearCurrentMap();
-			});
-			mi = new MenuItem("Clear Map");
-			mapMenu.getItems().add(mi);
-			mi.setOnAction(e -> {
-				model.clearCurrentMap();
-			});
-		}
-		mapMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
-
-		event.consume();
-	}
-
-	
 	private void openFileChooser() {
 		FileChooser selectChooser = new FileChooser();
 		File curr = model.getSelectedPhoto();
@@ -340,29 +323,9 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	}
 
 	private void updateInfoPane() {
-		StringBuffer text = new StringBuffer();
 		PhotoMetadata data = model.getSelectedPhotoData();
-		if (data != null) {
-			text.append("File:\n  " + data.getFileName());
-			if (data.getCaption() != null)
-				text.append("\nCaption:\n  " + data.getCaption());
-			if (data.getRating() != 0)
-				text.append("\nRating:\n  " + "******".substring(0, data.getRating()));
-			if (data.getDate() != null)
-				text.append("\nDate:\n  " + data.getDate());
-			if (data.getModel() != null)
-				text.append("\nModel:\n  " + data.getModel());
-			if (!Double.isNaN(data.getLat())) {
-				DecimalFormat df = new DecimalFormat("###.####");
-				text.append("\nLat:\n  " + df.format(data.getLat()) + "\nLon:\n  " + df.format(data.getLon()));
-			}
-			if (!data.getKeywords().isEmpty()) {
-				text.append("\nKeywords:");
-				for (String key : data.getKeywords())
-					text.append("\n  " + key);
-			}
-		}
-		infoPane.setText(text.toString());
+		if (data != null)
+			infoPane.setText(data.toString());
 	}
 
 	/**
@@ -393,7 +356,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				if (f.exists())
 					model.selectPhoto(f);
 			}
-			
+
 			// mapImagePanel.setShowAllPhotoPositions(pm.getBooleanValue(
 			// "gui.showallphotopositions", true));
 			// infoPanel.setShowCaptionInStatus(pm.getBooleanValue(

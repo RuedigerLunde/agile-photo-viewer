@@ -124,7 +124,7 @@ public class PVView implements Observer {
 		tabbedPane.addTab("Info", infoPanel);
 		visibilityPanel = new VisibilityPanel(model, controller);
 		tabbedPane.addTab("Visibility", visibilityPanel);
-		mapImagePanel = new MapImagePanel(model.getMapData(), controller);
+		mapImagePanel = new MapImagePanel(model, controller);
 		mapImagePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
 		tabbedPane.addTab("Map", mapImagePanel);
 		

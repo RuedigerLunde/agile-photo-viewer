@@ -6,6 +6,7 @@ package rl.photoviewer.model;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -36,25 +37,37 @@ public class PhotoMetadata implements IndexedGeoPoint {
 	private String caption;
 	private int rating;
 	private Date date;
+	private String exposureTime;
+	private double aperture = Double.NaN;
+	private String focalLength;
+	private String iso;
+	private String lensModel;
 	private String model;
 	private int orientation;
-	private double lat;
-	private double lon;
+	private double lat = Double.NaN;
+	private double lon = Double.NaN;
 	private List<String> keywords;
 
 	public PhotoMetadata(File file) {
 		fileName = file.getName();
-		lat = Double.NaN;
-		lon = Double.NaN;
 		keywords = Collections.emptyList();
 	}
 
 	public PhotoMetadata(File file, Metadata metadata) {
 		this(file);
-		ExifSubIFDDirectory dir1 = metadata
-				.getDirectory(ExifSubIFDDirectory.class);
-		if (dir1 != null)
+		ExifSubIFDDirectory dir1 = metadata.getDirectory(ExifSubIFDDirectory.class);
+		if (dir1 != null) {
 			date = dir1.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
+			exposureTime = dir1.getString(ExifSubIFDDirectory.TAG_EXPOSURE_TIME);
+			try {
+				aperture = dir1.getDouble(ExifSubIFDDirectory.TAG_APERTURE);
+			} catch (MetadataException e) {
+				// no aperture data available - ignore...
+			}
+			focalLength = dir1.getString(ExifSubIFDDirectory.TAG_35MM_FILM_EQUIV_FOCAL_LENGTH);
+			iso = dir1.getString(ExifSubIFDDirectory.TAG_ISO_EQUIVALENT);
+			lensModel = dir1.getString(ExifSubIFDDirectory.TAG_LENS_MODEL);
+		}
 		ExifIFD0Directory dir2 = metadata.getDirectory(ExifIFD0Directory.class);
 		if (dir2 != null) {
 			model = dir2.getString(ExifIFD0Directory.TAG_MODEL);
@@ -79,10 +92,8 @@ public class PhotoMetadata implements IndexedGeoPoint {
 			if (caption != null) {
 				// fix UTF8 bug in library of Drew Noakes.
 				String oldEn = System.getProperty("file.encoding");
-				String newEn = dir4
-						.getString(IptcDirectory.TAG_CODED_CHARACTER_SET);
-				if (oldEn != null && newEn != null
-						&& newEn.equals('\u001b' + "%G")) {
+				String newEn = dir4.getString(IptcDirectory.TAG_CODED_CHARACTER_SET);
+				if (oldEn != null && newEn != null && newEn.equals('\u001b' + "%G")) {
 					try {
 						byte[] cap = caption.getBytes(oldEn);
 						caption = new String(cap, "UTF8");
@@ -119,7 +130,7 @@ public class PhotoMetadata implements IndexedGeoPoint {
 	public String getCaption() {
 		return caption;
 	}
-	
+
 	public int getRating() {
 		return rating;
 	}
@@ -128,8 +139,28 @@ public class PhotoMetadata implements IndexedGeoPoint {
 		return date;
 	}
 
+	public String getExposureTime() {
+		return exposureTime;
+	}
+
+	public double getAperture() {
+		return aperture;
+	}
+
+	public String getFocalLength() {
+		return focalLength;
+	}
+
+	public String getIso() {
+		return iso;
+	}
+
 	public String getModel() {
 		return model;
+	}
+
+	public String getLensModel() {
+		return lensModel;
 	}
 
 	/** Latitude. Value NaN indicates no latitude value available. */
@@ -149,7 +180,7 @@ public class PhotoMetadata implements IndexedGeoPoint {
 	public int getOrientation() {
 		return orientation;
 	}
-	
+
 	/** Returns 0 if data is null. */
 	public static int getOrientation(PhotoMetadata data) {
 		int result = 0;
@@ -158,9 +189,41 @@ public class PhotoMetadata implements IndexedGeoPoint {
 		return result;
 	}
 
+	public String toString() {
+		StringBuffer text = new StringBuffer();
+		text.append("File:\n  " + getFileName());
+		if (getCaption() != null)
+			text.append("\nCaption:\n  " + getCaption());
+		if (getRating() != 0)
+			text.append("\nRating:\n  " + "******".substring(0, getRating()));
+		if (getDate() != null)
+			text.append("\nDate:\n  " + getDate());
+		if (getExposureTime() != null && !Double.isNaN(getAperture())) {
+			DecimalFormat df = new DecimalFormat("##.#");
+			text.append("\nExposure:\n  " + getExposureTime() + " at f / " + df.format(getAperture()));
+		}
+		if (getFocalLength() != null)
+			text.append("\nFocal Length:\n  " + getFocalLength());
+		if (getIso() != null)
+			text.append("\nIso:\n  " + getIso());
+		if (getModel() != null)
+			text.append("\nModel:\n  " + getModel());
+		if (getLensModel() != null)
+			text.append("\nLens Model:\n  " + getLensModel());
+		if (!Double.isNaN(getLat())) {
+			DecimalFormat df = new DecimalFormat("###.####");
+			text.append("\nLat:\n  " + df.format(getLat()) + "\nLon:\n  " + df.format(getLon()));
+		}
+		if (!getKeywords().isEmpty()) {
+			text.append("\nKeywords:");
+			for (String key : getKeywords())
+				text.append("\n  " + key);
+		}
+		return text.toString();
+	}
+
 	/** Compares the file names. */
-	public static class SortByFileNameComparator implements
-			Comparator<PhotoMetadata> {
+	public static class SortByFileNameComparator implements Comparator<PhotoMetadata> {
 		@Override
 		public int compare(PhotoMetadata obj1, PhotoMetadata obj2) {
 			return obj1.getFileName().compareTo(obj2.getFileName());
@@ -168,8 +231,7 @@ public class PhotoMetadata implements IndexedGeoPoint {
 	}
 
 	/** Compares photo dates (Exif) if available. */
-	public static class SortByDateComparator implements
-			Comparator<PhotoMetadata> {
+	public static class SortByDateComparator implements Comparator<PhotoMetadata> {
 		@Override
 		public int compare(PhotoMetadata obj1, PhotoMetadata obj2) {
 			if (obj1.date != null && obj2.getDate() != null)

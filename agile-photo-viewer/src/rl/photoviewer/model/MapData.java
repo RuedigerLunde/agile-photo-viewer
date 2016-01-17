@@ -6,8 +6,7 @@ package rl.photoviewer.model;
 
 import java.io.File;
 import java.util.List;
-
-import rl.photoviewer.model.MapDataManager.GeoRefPoint;
+import java.util.Set;
 
 /**
  * Abstraction of the <code>MapDataManager</code> which focuses on read access
@@ -23,12 +22,12 @@ public interface MapData {
 
 	public File getFile();
 
-	public void addRefPoint(GeoRefPoint refPoint); // remove from this
-													// interface?
-
-	public void removeRefPoint(int index); // remove from this interface?
-
 	public List<GeoRefPoint> getRefPoints();
+
+	public GeoRefPoint findRefPointAt(double xImg, double yImg, double radius);
+
+	public IndexedGeoPoint findPhotoPositionAt(Set<? extends IndexedGeoPoint> photoPositions, double xImg, double yImg,
+			double radius, double tolerance);
 
 	public double[] latLonToImagePos(double lat, double lon);
 

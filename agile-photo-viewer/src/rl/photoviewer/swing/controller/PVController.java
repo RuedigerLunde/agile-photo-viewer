@@ -12,6 +12,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import rl.photoviewer.model.KeywordExpression;
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.swing.view.Commands;
 import rl.photoviewer.swing.view.HelpDialog;
+import rl.photoviewer.swing.view.MapImagePanel;
 import rl.photoviewer.swing.view.PVView;
 import rl.photoviewer.swing.view.VisibilityPanel;
 import rl.util.exceptions.ErrorHandler;
@@ -151,8 +153,12 @@ public class PVController extends MouseAdapter implements Controller {
 		} else if (e.getSource() == view.getMapImagePanel()
 				&& e.getButton() == MouseEvent.BUTTON1
 				&& e.getClickCount() == 1) {
-			IndexedGeoPoint gpoint = view.getMapImagePanel()
-					.getNextPhotoPosition(e.getX(), e.getY());
+			MapImagePanel mip = view.getMapImagePanel();
+			Point2D mouseImg = mip.viewToImage(new Point2D.Double(e.getX(), e.getY()));
+			double radius = mip.viewToImage(20);
+			double tolerance = mip.viewToImage(5);
+			IndexedGeoPoint gpoint = model.getMapData().findPhotoPositionAt(model.getVisiblePhotoPositions(), 
+					mouseImg.getX(), mouseImg.getY(), radius, tolerance);
 			if (gpoint != null)
 				model.selectPhotoByMetadata(gpoint);
 		}

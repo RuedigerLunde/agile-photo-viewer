@@ -62,7 +62,11 @@ public class ImagePanel extends JPanel {
 	}
 
 	public void setImage(File imageFile, int orientation) {
-		if (imageFile != null && !imageFile.equals(this.imageFile)) {
+		if (imageFile == null) {
+			image = null;
+			this.imageFile = null;
+			repaint();
+		} else if (!imageFile.equals(this.imageFile)) {
 			Image save = this.image;
 			try {
 				image = ImageIO.read(imageFile);

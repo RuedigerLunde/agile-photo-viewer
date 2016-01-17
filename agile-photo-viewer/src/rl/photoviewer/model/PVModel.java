@@ -23,6 +23,7 @@ public class PVModel extends Observable {
 	public final static String METADATA_CHANGED = "MetadataChanged";
 	public final static String SELECTED_PHOTO_CHANGED = "SelectedPhotoChanged";
 	public final static String SELECTED_MAP_CHANGED = "SelectedMapChanged";
+	public final static String MAP_DATA_CHANGED = "MapDataChanged";
 	
 	private ExifDataManager exifDataManager;
 	private MapDataManager mapDataManager;
@@ -197,6 +198,20 @@ public class PVModel extends Observable {
 	public void saveMapParamLookup() {
 		mapDataManager.saveMapParamLookup();
 	}
+	
+	public void addMapRefPoint(GeoRefPoint refPoint) {
+		mapDataManager.addRefPoint(refPoint);
+		setChanged();
+		notifyObservers(MAP_DATA_CHANGED);
+	}
+
+	public void removeMapRefPoint(GeoRefPoint refPoint) {
+		mapDataManager.removeRefPoint(refPoint);
+		setChanged();
+		notifyObservers(MAP_DATA_CHANGED);
+	}
+
+	
 
 	public int exportPhotos(List<File> photos, File destDir,
 			String destFileNameTemplate) {

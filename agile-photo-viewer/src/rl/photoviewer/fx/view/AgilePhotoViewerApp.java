@@ -1,5 +1,7 @@
 package rl.photoviewer.fx.view;
 
+import java.util.Locale;
+
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -23,6 +25,7 @@ public class AgilePhotoViewerApp extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
+			Locale.setDefault(Locale.ENGLISH);
 			FXMLLoader loader = new FXMLLoader();
 			Pane root = loader.load(getClass().getResource("AgilePhotoViewer.fxml").openStream());
 			currStage = primaryStage;

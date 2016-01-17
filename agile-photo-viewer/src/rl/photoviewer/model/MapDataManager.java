@@ -4,6 +4,7 @@
  */
 package rl.photoviewer.model;
 
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import rl.util.exceptions.ErrorHandler;
 import rl.util.exceptions.PersistenceException;
@@ -48,8 +50,7 @@ public class MapDataManager implements MapData {
 			}
 			if (!mapFile.exists()) {
 				clearCurrentMap();
-				Exception e = new PersistenceException(
-					"Could not read map image from file " + mapFile + ".");
+				Exception e = new PersistenceException("Could not read map image from file " + mapFile + ".");
 				ErrorHandler.getInstance().handleError(e);
 			}
 		}
@@ -85,9 +86,9 @@ public class MapDataManager implements MapData {
 			params.refPoints.add(refPoint);
 	}
 
-	public void removeRefPoint(int index) {
+	public void removeRefPoint(GeoRefPoint refPoint) {
 		if (params != null)
-			params.refPoints.remove(index);
+			params.refPoints.remove(refPoint);
 	}
 
 	public List<GeoRefPoint> getRefPoints() {
@@ -95,6 +96,49 @@ public class MapDataManager implements MapData {
 			return Collections.unmodifiableList(params.refPoints);
 		}
 		return Collections.emptyList();
+	}
+
+	public GeoRefPoint findRefPointAt(double xImg, double yImg, double radius) {
+		double nextDist = Double.MAX_VALUE;
+		GeoRefPoint result = null;
+		for (GeoRefPoint p : getRefPoints()) {
+			double dist = distance(p.getXImage(), p.getYImage(), xImg, yImg);
+			if (dist < nextDist) {
+				nextDist = dist;
+				result = p;
+			}
+		}
+		if (nextDist > radius)
+			result = null;
+		return result;
+	}
+
+	public IndexedGeoPoint findPhotoPositionAt(Set<? extends IndexedGeoPoint> photoPositions, double xImg, double yImg,
+			double radius, double tolerance) {
+		double nextDist = Double.MAX_VALUE;
+		IndexedGeoPoint result = null;
+		if (hasData()) {
+			for (IndexedGeoPoint pt : photoPositions) {
+				if (Double.isNaN(pt.getLat()))
+					continue;
+				double[] ptImg = latLonToImagePos(pt.getLat(), pt.getLon());
+				double dist = distance(ptImg[0], ptImg[1], xImg, yImg);
+				if (dist < nextDist)
+					nextDist = dist;
+			}
+		}
+		if (nextDist != Double.MAX_VALUE) {
+			// get first photo of a bunch of photos at almost same distance.
+			for (IndexedGeoPoint pt : photoPositions) {
+				if (Double.isNaN(pt.getLat()))
+					continue;
+				double[] ptImg = latLonToImagePos(pt.getLat(), pt.getLon());
+				double dist = distance(ptImg[0], ptImg[1], xImg, yImg);
+				if (dist <= nextDist + tolerance && (result == null || pt.getIndex() < result.getIndex()))
+					result = pt;
+			}
+		}
+		return result;
 	}
 
 	public double[] latLonToImagePos(final double lat, final double lon) {
@@ -107,16 +151,14 @@ public class MapDataManager implements MapData {
 			p3 = params.refPoints.get(2);
 			return convertWith3Samples(lat, lon, p1, p2, p3);
 		} else { // find points closest to lat lon position
-			List<GeoRefPoint> points = new ArrayList<GeoRefPoint>(
-					params.refPoints);
+			List<GeoRefPoint> points = new ArrayList<GeoRefPoint>(params.refPoints);
 			Collections.sort(points, new Comparator<GeoRefPoint>() {
 				@Override
 				public int compare(GeoRefPoint o1, GeoRefPoint o2) {
 					double[] dist = new double[2];
 					for (int i = 0; i < 2; i++) {
 						GeoRefPoint o = (i == 0) ? o1 : o2;
-						dist[i] = (o.lat - lat) * (o.lat - lat) + (o.lon - lon)
-								* (o.lon - lon);
+						dist[i] = (o.getLat() - lat) * (o.getLat() - lat) + (o.getLon() - lon) * (o.getLon() - lon);
 					}
 					if (dist[0] < dist[1])
 						return -1;
@@ -133,33 +175,32 @@ public class MapDataManager implements MapData {
 		}
 	}
 
-	public double[] convertWith2Samples(double lat, double lon, GeoRefPoint p1,
-			GeoRefPoint p2) {
-		double xImage = (lon - p1.lon) / (p2.lon - p1.lon)
-				* (p2.xImage - p1.xImage) + p1.xImage;
-		double yImage = (lat - p1.lat) / (p2.lat - p1.lat)
-				* (p2.yImage - p1.yImage) + p1.yImage;
+	private double distance(double x1, double y1, double x2, double y2) {
+		return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+	}
+
+	private double[] convertWith2Samples(double lat, double lon, GeoRefPoint p1, GeoRefPoint p2) {
+		double xImage = (lon - p1.getLon()) / (p2.getLon() - p1.getLon()) * (p2.getXImage() - p1.getXImage())
+				+ p1.getXImage();
+		double yImage = (lat - p1.getLat()) / (p2.getLat() - p1.getLat()) * (p2.getYImage() - p1.getYImage())
+				+ p1.getYImage();
 		return new double[] { xImage, yImage };
 	}
 
-	public double[] convertWith3Samples(double lat, double lon, GeoRefPoint p1,
-			GeoRefPoint p2, GeoRefPoint p3) {
+	private double[] convertWith3Samples(double lat, double lon, GeoRefPoint p1, GeoRefPoint p2, GeoRefPoint p3) {
 		double[] result = new double[2];
 		for (int i = 0; i < 2; i++) {
-			double[] v1 = new double[] { p1.lat, p1.lon,
-					(i == 0) ? p1.xImage : p1.yImage };
-			double[] v2 = new double[] { p2.lat, p2.lon,
-					(i == 0) ? p2.xImage : p2.yImage };
-			double[] v3 = new double[] { p3.lat, p3.lon,
-					(i == 0) ? p3.xImage : p3.yImage };
+			double[] v1 = new double[] { p1.getLat(), p1.getLon(), (i == 0) ? p1.getXImage() : p1.getYImage() };
+			double[] v2 = new double[] { p2.getLat(), p2.getLon(), (i == 0) ? p2.getXImage() : p2.getYImage() };
+			double[] v3 = new double[] { p3.getLat(), p3.getLon(), (i == 0) ? p3.getXImage() : p3.getYImage() };
 			double[] a = new double[3];
 			for (int j = 0; j < 3; j++)
 				a[j] = v2[j] - v1[j];
 			double[] b = new double[3];
 			for (int j = 0; j < 3; j++)
 				b[j] = v3[j] - v1[j];
-			double[] n = new double[] { a[1] * b[2] - a[2] * b[1],
-					a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0] };
+			double[] n = new double[] { a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2],
+					a[0] * b[1] - a[1] * b[0] };
 			double d = 0;
 			for (int j = 0; j < 3; j++)
 				d += v1[j] * n[j];
@@ -181,8 +222,7 @@ public class MapDataManager implements MapData {
 
 	public void saveMapParamLookup() {
 		try {
-			File file = PropertyManager.getInstance().getPropertyFile(
-					MAP_PARAM_LOOKUP_FILE_NAME);
+			File file = PropertyManager.getInstance().getPropertyFile(MAP_PARAM_LOOKUP_FILE_NAME);
 			FileOutputStream fos = new FileOutputStream(file);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			oos.writeObject(mapParamLookup);
@@ -193,8 +233,7 @@ public class MapDataManager implements MapData {
 	}
 
 	public void loadMapParamLookup() {
-		File file = PropertyManager.getInstance().getPropertyFile(
-				MAP_PARAM_LOOKUP_FILE_NAME);
+		File file = PropertyManager.getInstance().getPropertyFile(MAP_PARAM_LOOKUP_FILE_NAME);
 		if (file.exists())
 			try {
 				FileInputStream fis = new FileInputStream(file);
@@ -215,39 +254,7 @@ public class MapDataManager implements MapData {
 		return null;
 	}
 
-	public static class GeoRefPoint implements Serializable {
-		private static final long serialVersionUID = 1L;
-		private double xImage;
-		private double yImage;
-		private double lat;
-		private double lon;
-
-		public GeoRefPoint(double xImage, double yImage, double lat, double lon) {
-			this.xImage = xImage;
-			this.yImage = yImage;
-			this.lat = lat;
-			this.lon = lon;
-		}
-
-		public double getXImage() {
-			return xImage;
-		}
-
-		public double getYImage() {
-			return yImage;
-		}
-
-		public double getLat() {
-			return lat;
-		}
-
-		public double getLon() {
-			return lon;
-		}
-	}
-
-	public static class MapParams implements Comparable<MapParams>,
-			Serializable {
+	public static class MapParams implements Comparable<MapParams>, Serializable {
 		private static final long serialVersionUID = 2L;
 		File file; // never null!
 		List<GeoRefPoint> refPoints = new ArrayList<GeoRefPoint>();

@@ -21,11 +21,12 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import rl.photoviewer.model.GeoRefPoint;
 import rl.photoviewer.model.IndexedGeoPoint;
 import rl.photoviewer.model.MapData;
-import rl.photoviewer.model.MapDataManager.GeoRefPoint;
-import rl.photoviewer.swing.controller.Controller;
+import rl.photoviewer.model.PVModel;
 import rl.photoviewer.model.PhotoMetadata;
+import rl.photoviewer.swing.controller.Controller;
 
 /**
  * Extended version of the <code>ImagePanel</code> for showing map images and
@@ -37,7 +38,7 @@ public class MapImagePanel extends ImagePanel {
 	private static final long serialVersionUID = 1L;
 
 	private Controller controller;
-	private MapData mapData;
+	private PVModel model;
 
 	Set<? extends IndexedGeoPoint> allPhotoPositions;
 	private PhotoMetadata photoData; // caution: may be null
@@ -46,8 +47,8 @@ public class MapImagePanel extends ImagePanel {
 
 	private boolean showAllPhotoPositions;
 
-	public MapImagePanel(MapData mapData, Controller controller) {
-		this.mapData = mapData;
+	public MapImagePanel(PVModel model, Controller controller) {
+		this.model = model;
 		this.controller = controller;
 		addMouseListener(new MyMouseAdapter());
 		addMouseListener(controller);
@@ -65,8 +66,8 @@ public class MapImagePanel extends ImagePanel {
 	public void update(PhotoMetadata photoData,
 			Set<? extends IndexedGeoPoint> allPhotoPositions) {
 		this.allPhotoPositions = allPhotoPositions;
-		if (imageFile != mapData.getFile()) {
-			setImage(mapData.getFile(), 0);
+		if (imageFile != model.getMapData().getFile()) {
+			setImage(model.getMapData().getFile(), 0);
 		}
 		if (image != null && photoData != null) {
 			this.photoData = photoData;
@@ -78,8 +79,8 @@ public class MapImagePanel extends ImagePanel {
 	}
 
 	protected void adjustForPhoto() {
-		if (mapData.hasData() && photoData != null) {
-			double[] mp = mapData.latLonToImagePos(photoData.getLat(),
+		if (model.getMapData().hasData() && photoData != null) {
+			double[] mp = model.getMapData().latLonToImagePos(photoData.getLat(),
 					photoData.getLon());
 			Point2D mPos = imageToView(new Point2D.Double(mp[0], mp[1]));
 			int moveX = 0;
@@ -116,6 +117,7 @@ public class MapImagePanel extends ImagePanel {
 
 	public void paintImage(Graphics g) {
 		super.paintImage(g);
+		MapData mapData = model.getMapData();
 		int viewW = getWidth() - border.left - border.right;
 		int viewH = getHeight() - border.top - border.bottom;
 		g.setClip(border.left, border.top, viewW, viewH);
@@ -179,61 +181,15 @@ public class MapImagePanel extends ImagePanel {
 		}
 	}
 
-	public IndexedGeoPoint getNextPhotoPosition(int x, int y) {
-		Point2D posIm = viewToImage(new Point2D.Double(x, y));
-		double nextDist = Double.MAX_VALUE;
-		double resultDist = Double.MAX_VALUE;
-		IndexedGeoPoint result = null;
-		if (mapData.hasData())
-			for (IndexedGeoPoint pt : allPhotoPositions) {
-				if (Double.isNaN(pt.getLat()))
-					continue;
-				double[] pposIm = mapData.latLonToImagePos(pt.getLat(),
-						pt.getLon());
-				double dist = dist(pposIm[0], pposIm[1], posIm.getX(),
-						posIm.getY())
-						* scaleFactor;
-				if (dist < nextDist)
-					nextDist = dist;
-				// get first photo of a bunch of photos at almost same position.
-				if (dist < nextDist + 5
-						&& (resultDist >= nextDist + 5 || pt.getIndex() < result
-								.getIndex())) {
-					resultDist = dist;
-					result = pt;
-				}
-			}
-		return result;
-	}
-
-	private int getRefPointIndexAt(int x, int y) {
-		Point2D posIm = viewToImage(new Point2D.Double(x, y));
-		double nextDist = Double.MAX_VALUE;
-		int nextIndex = -1;
-		int index = -1;
-		for (GeoRefPoint p : mapData.getRefPoints()) {
-			index++;
-			double dist = dist(p.getXImage(), p.getYImage(), posIm.getX(),
-					posIm.getY());
-			if (dist < nextDist) {
-				nextDist = dist;
-				nextIndex = index;
-			}
-		}
-		if (nextDist * scaleFactor > 10.0)
-			nextIndex = -1;
-		return nextIndex;
-	}
-
-	private double dist(double x1, double y1, double x2, double y2) {
-		return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+	public double viewToImage(double distance) {
+		return distance / scaleFactor;
 	}
 
 	private class MyPopup extends JPopupMenu implements ActionListener {
 		private static final long serialVersionUID = 1L;
 		int mouseX;
 		int mouseY;
-		int nextRefPointIndex;
+		GeoRefPoint nextRefPoint;
 		JMenuItem refPointItem;
 		JCheckBoxMenuItem allPositionsCheckBox;
 
@@ -247,7 +203,7 @@ public class MapImagePanel extends ImagePanel {
 			add(allPositionsCheckBox);
 			addSeparator();
 			JMenuItem item;
-			for (File file : mapData.getAllMapFiles()) {
+			for (File file : model.getMapData().getAllMapFiles()) {
 				item = new JMenuItem(file.getName());
 				item.setActionCommand("LoadMap " + file.getAbsolutePath());
 				item.addActionListener(controller);
@@ -259,8 +215,9 @@ public class MapImagePanel extends ImagePanel {
 		public void show(Component invoker, int x, int y) {
 			mouseX = x;
 			mouseY = y;
-			nextRefPointIndex = getRefPointIndexAt(mouseX, mouseY);
-			refPointItem.setText((nextRefPointIndex == -1 ? "Set" : "Remove")
+			Point2D posIm = viewToImage(new Point2D.Double(x, y));
+			nextRefPoint = model.getMapData().findRefPointAt(posIm.getX(), posIm.getY(), viewToImage(20));
+			refPointItem.setText((nextRefPoint == null ? "Set" : "Remove")
 					+ " Reference Point Here");
 			allPositionsCheckBox.setSelected(isShowAllPhotoPositions());
 			super.show(invoker, x, y);
@@ -269,19 +226,19 @@ public class MapImagePanel extends ImagePanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == refPointItem) {
-				if (nextRefPointIndex != -1) {
-					mapData.removeRefPoint(nextRefPointIndex);
+				if (nextRefPoint != null) {
+					model.removeMapRefPoint(nextRefPoint);
 					photoChanged = true;
 				} else {
 					Point2D posIm = viewToImage(new Point2D.Double(mouseX,
 							mouseY));
-					mapData.addRefPoint(new GeoRefPoint(posIm.getX(), posIm
+					model.addMapRefPoint(new GeoRefPoint(posIm.getX(), posIm
 							.getY(), photoData.getLat(), photoData.getLon()));
 				}
 			} else if (e.getSource() == allPositionsCheckBox) {
 				setShowAllPhotoPositions(allPositionsCheckBox.isSelected());
+				MapImagePanel.this.repaint();
 			}
-			MapImagePanel.this.repaint();
 		}
 	}
 

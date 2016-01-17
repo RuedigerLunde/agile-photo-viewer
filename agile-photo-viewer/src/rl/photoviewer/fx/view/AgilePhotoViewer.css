@@ -37,6 +37,11 @@
     -fx-background-color: #505050;
 }
 
+.context-menu {
+  -fx-background-color: #505050;
+  -fx-border-color: #303030;
+  -fx-text-fill: white;
+}
 /* 
 .list-cell:even {
     -fx-background-color: #303030;
