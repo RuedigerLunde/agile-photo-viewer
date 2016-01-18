@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2013-2016 Ruediger Lunde
+ * Licensed under the GNU General Public License, Version 3
+ */
 package rl.photoviewer.fx.view;
 
 import java.util.ArrayList;
@@ -9,15 +13,10 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.effect.BlurType;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Lighting;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import rl.photoviewer.model.GeoRefPoint;
 import rl.photoviewer.model.IndexedGeoPoint;
@@ -25,14 +24,24 @@ import rl.photoviewer.model.MapData;
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.model.PhotoMetadata;
 
+/**
+ * Controller which is responsible for handling user events for a map image pane.
+ * It strongly cooperates with an <code>ImageViewController</code> and adds functionality
+ * for showing and editing markers representing geo-located images within the map image.
+ * 
+ * @author Ruediger Lunde
+ *
+ */
 public class MapDataViewController {
+	private final static int SELECTION_RADIUS = 20;
 	private ImageViewController imageViewController;
 	private PVModel model;
 
-	private Circle currPhotoMarker;
+	private Shape currPhotoMarker;
 	private List<Shape> refPointMarkers = new ArrayList<Shape>();
 	private List<Shape> photoMarkers = new ArrayList<Shape>();
 	private MapContextMenu mapMenu = new MapContextMenu();
+	private MarkerFactory markerFactory = new MarkerFactory();
 
 	public void initialize(ImageViewController viewController, PVModel model) {
 		this.imageViewController = viewController;
@@ -43,23 +52,11 @@ public class MapDataViewController {
 			mapMenu.show();
 		});
 
-		viewController.getContainer().setOnMouseClicked(e -> {
-			if (e.getButton() == MouseButton.PRIMARY && model.getMapData().hasData()
-					&& !imageViewController.isMouseDragged()) {
-				ViewParams vp = imageViewController.viewParamsProperty().get();
-				Point2D posImg = vp.viewToImage(new Point2D(e.getX(), e.getY()));
-				double radius = vp.viewToImage(20);
-				double tolerance = vp.viewToImage(5);
-				Set<? extends IndexedGeoPoint> geoPoints = model.getVisiblePhotoPositions();
-				IndexedGeoPoint pt = model.getMapData().findPhotoPositionAt(geoPoints, posImg.getX(), posImg.getY(),
-						radius, tolerance);
-				if (pt != null)
-					model.selectPhotoByMetadata(pt);
-				// e.consume();
-			} else {
-				imageViewController.onMouseClicked(e);
-			}
-		});
+		viewController.getContainer().setOnMouseClicked(e -> onMouseClicked(e));
+	}
+	
+	public void setMarkerFactory(MarkerFactory factory) {
+		markerFactory = factory;
 	}
 
 	public void update(Object arg) {
@@ -73,7 +70,7 @@ public class MapDataViewController {
 
 		if (photoCount > 0) {
 			while (photoCount > photoMarkers.size()) {
-				Shape photoMarker = createPhotoMarker();
+				Shape photoMarker = markerFactory.createPhotoMarker();
 				photoMarkers.add(photoMarker);
 				container.getChildren().add(photoMarker);
 			}
@@ -91,7 +88,7 @@ public class MapDataViewController {
 		while (mapData.getRefPoints().size() < refPointMarkers.size())
 			container.getChildren().remove(refPointMarkers.remove(refPointMarkers.size() - 1));
 		while (mapData.getRefPoints().size() > refPointMarkers.size()) {
-			Shape refMarker = createRefPointMarker();
+			Shape refMarker = markerFactory.createRefPointMarker();
 			refPointMarkers.add(refMarker);
 			container.getChildren().add(refMarker);
 		}
@@ -107,7 +104,7 @@ public class MapDataViewController {
 		PhotoMetadata currData = model.getSelectedPhotoData();
 		if (mapData.hasData() && currData != null && !Double.isNaN(currData.getLat())) {
 			if (currPhotoMarker == null) {
-				currPhotoMarker = createCurrPhotoMarker();
+				currPhotoMarker = markerFactory.createCurrPhotoMarker();
 				container.getChildren().add(currPhotoMarker);
 			}
 			double[] posCurrPhoto = mapData.latLonToImagePos(currData.getLat(), currData.getLon());
@@ -115,7 +112,7 @@ public class MapDataViewController {
 			currPhotoMarker.setLayoutX(posCurrPhotoMarker.getX());
 			currPhotoMarker.setLayoutY(posCurrPhotoMarker.getY());
 			if (arg == PVModel.SELECTED_PHOTO_CHANGED) {
-				double dist = currPhotoMarker.getRadius() * 2;
+				double dist = SELECTION_RADIUS * 2;
 				double deltaX = posCurrPhotoMarker.getX() >= dist ? 0 : dist - posCurrPhotoMarker.getX();
 				if (posCurrPhotoMarker.getX() > container.getWidth() - dist)
 					deltaX = container.getWidth() - dist - posCurrPhotoMarker.getX();
@@ -131,35 +128,23 @@ public class MapDataViewController {
 			currPhotoMarker = null;
 		}
 	}
-
-	protected Circle createCurrPhotoMarker() {
-		Circle result = new Circle();
-		result.setRadius(20);
-		result.setFill(Color.TRANSPARENT);
-		result.setStroke(Color.RED);
-		result.setStrokeWidth(5);
-		result.setManaged(false);
-		result.setEffect(new Lighting());
-		return result;
-	}
-
-	protected Shape createPhotoMarker() {
-		Rectangle result = new Rectangle(-3, -3, 6, 6);
-		result.setFill(Color.WHITE);
-		result.setManaged(false);
-		result.setEffect(new DropShadow(BlurType.TWO_PASS_BOX, Color.rgb(20, 20, 20), 5, 0, 2, 2));
-		return result;
-	}
-
-	protected Shape createRefPointMarker() {
-		Circle result = new Circle();
-		result.setRadius(10);
-		result.setFill(Color.TRANSPARENT);
-		result.setStroke(Color.GREEN);
-		result.setStrokeWidth(5);
-		result.setManaged(false);
-		result.setEffect(new Lighting());
-		return result;
+	
+	public void onMouseClicked(MouseEvent event) {
+		if (event.getButton() == MouseButton.PRIMARY && model.getMapData().hasData()
+				&& !imageViewController.isMouseDragged()) {
+			ViewParams vp = imageViewController.viewParamsProperty().get();
+			Point2D posImg = vp.viewToImage(new Point2D(event.getX(), event.getY()));
+			double radius = vp.viewToImage(SELECTION_RADIUS);
+			double tolerance = vp.viewToImage(5);
+			Set<? extends IndexedGeoPoint> geoPoints = model.getVisiblePhotoPositions();
+			IndexedGeoPoint pt = model.getMapData().findPhotoPositionAt(geoPoints, posImg.getX(), posImg.getY(),
+					radius, tolerance);
+			if (pt != null)
+				model.selectPhotoByMetadata(pt);
+			// e.consume();
+		} else {
+			imageViewController.onMouseClicked(event);
+		}
 	}
 
 	private class MapContextMenu {
@@ -187,7 +172,7 @@ public class MapDataViewController {
 			this.trigger = trigger;
 			ViewParams viewParams = imageViewController.viewParamsProperty().get();
 			Point2D posImg = viewParams.viewToImage(new Point2D(trigger.getX(), trigger.getY()));
-			double radius = viewParams.viewToImage(20);
+			double radius = viewParams.viewToImage(SELECTION_RADIUS);
 			refPoint = model.getMapData().findRefPointAt(posImg.getX(), posImg.getY(), radius);
 			photoData = model.getSelectedPhotoData();
 			if (photoData != null && Double.isNaN(photoData.getLat()))

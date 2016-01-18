@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2013-2016 Ruediger Lunde
+ * Licensed under the GNU General Public License, Version 3
+ */
 package rl.photoviewer.fx.view;
 
 import java.util.Locale;
@@ -11,6 +15,15 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
+/**
+ * Central class for creating and running the Agile Photo Viewer FX application.
+ * This version of the photo viewer shares the model with the Swing version but
+ * uses JavaFX for graphics. The architecture of the viewer strictly follows the
+ * model - view - view-model pattern.
+ * 
+ * @author Ruediger Lunde
+ * 
+ */
 public class AgilePhotoViewerApp extends Application {
 	private static Stage currStage;
 	private static AgilePhotoViewerController controller;
@@ -21,7 +34,7 @@ public class AgilePhotoViewerApp extends Application {
 				controller.storeSession();
 		}
 	};
-	
+
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -43,10 +56,18 @@ public class AgilePhotoViewerApp extends Application {
 		}
 	}
 
+	/**
+	 * Provides the currently used state. The controller uses it for showing
+	 * dialogs.
+	 */
 	public static Stage getCurrStage() {
 		return currStage;
 	}
 
+	/**
+	 * Transfers the scene to a new stage. So it is possible to toggle between
+	 * decorated and undecorated stages.
+	 */
 	public static void changeStage(boolean undecorated) {
 		Stage newStage = new Stage(undecorated ? StageStyle.UNDECORATED : StageStyle.DECORATED);
 		Stage oldStage = currStage;
@@ -65,6 +86,7 @@ public class AgilePhotoViewerApp extends Application {
 		currStage.show();
 	}
 
+	/** Launches the photo viewer application */
 	public static void main(String[] args) {
 		launch(args);
 	}

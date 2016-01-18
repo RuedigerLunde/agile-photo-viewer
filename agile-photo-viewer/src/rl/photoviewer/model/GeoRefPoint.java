@@ -1,7 +1,17 @@
+/*
+ * Copyright (C) 2013-2016 Ruediger Lunde
+ * Licensed under the GNU General Public License, Version 3
+ */
 package rl.photoviewer.model;
 
 import java.io.Serializable;
 
+/**
+ * Relates a point defined by image coordinates to a point defined by
+ * geographical lat-lon coordinates. Given two or more of these reference
+ * points, arbitrary geographical coordinates can be translated to image
+ * coordinates.
+ */
 public class GeoRefPoint implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private double xImage;

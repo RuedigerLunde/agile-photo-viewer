@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Ruediger Lunde
+ * Copyright (C) 2013-2016 Ruediger Lunde
  * Licensed under the GNU General Public License, Version 3
  */
 package rl.photoviewer.model;
@@ -34,6 +34,7 @@ public class MapDataManager implements MapData {
 
 	private static final String MAP_PARAM_LOOKUP_FILE_NAME = "MapParamLookup.ser";
 
+	private final static int MAX_LOOKUP_SIZE = 20;
 	private MapParams params;
 	private List<MapParams> mapParamLookup = new ArrayList<MapParams>();
 
@@ -45,12 +46,17 @@ public class MapDataManager implements MapData {
 				params = new MapParams();
 				params.file = mapFile;
 				mapParamLookup.add(params);
-				Collections.sort(mapParamLookup);
 			}
 			if (!mapFile.exists()) {
 				clearCurrentMap();
 				Exception e = new PersistenceException("Could not read map image from file " + mapFile + ".");
 				ErrorHandler.getInstance().handleError(e);
+			} else {
+				mapParamLookup.remove(params);
+				mapParamLookup.add(0, params);
+				while (mapParamLookup.size() > MAX_LOOKUP_SIZE) {
+					mapParamLookup.remove(mapParamLookup.size() - 1);
+				}
 			}
 		}
 	}
@@ -126,7 +132,7 @@ public class MapDataManager implements MapData {
 					nextDist = dist;
 			}
 		}
-		if (nextDist != Double.MAX_VALUE) {
+		if (nextDist <= radius) {
 			// get first photo of a bunch of photos at almost same distance.
 			for (IndexedGeoPoint pt : photoPositions) {
 				if (Double.isNaN(pt.getLat()))
@@ -253,15 +259,9 @@ public class MapDataManager implements MapData {
 		return null;
 	}
 
-	public static class MapParams implements Comparable<MapParams>, Serializable {
+	public static class MapParams implements Serializable {
 		private static final long serialVersionUID = 2L;
 		File file; // never null!
 		List<GeoRefPoint> refPoints = new ArrayList<GeoRefPoint>();
-
-		@Override
-		public int compareTo(MapParams params) {
-			return file.getName().compareTo(params.file.getName());
-		}
-
 	}
 }

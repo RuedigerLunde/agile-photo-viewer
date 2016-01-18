@@ -1,7 +1,11 @@
+/*
+ * Copyright (C) 2013-2016 Ruediger Lunde
+ * Licensed under the GNU General Public License, Version 3
+ */
 package rl.photoviewer.model;
 
 /**
- * Interface for latitude longitude pairs.
+ * Interface for ordered latitude longitude pairs.
  * 
  * @author Ruediger Lunde
  */

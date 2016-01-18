@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Ruediger Lunde
+ * Copyright (C) 2013-2016 Ruediger Lunde
  * Licensed under the GNU General Public License, Version 3
  */
 package rl.photoviewer.swing.view;

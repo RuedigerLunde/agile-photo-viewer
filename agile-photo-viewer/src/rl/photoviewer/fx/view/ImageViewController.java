@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2013-2016 Ruediger Lunde
+ * Licensed under the GNU General Public License, Version 3
+ */
 package rl.photoviewer.fx.view;
 
 import javafx.beans.property.ObjectProperty;
@@ -10,6 +14,13 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
+/**
+ * Controller which is responsible for handling user events for an image pane.
+ * It provides functions like zooming and panning.
+ * 
+ * @author Ruediger Lunde
+ *
+ */
 public class ImageViewController {
 
 	private Pane container;
@@ -45,8 +56,9 @@ public class ImageViewController {
 
 		container.setOnMousePressed(e -> {
 			if (image != null) {
-				//Point2D mousePress = viewParams.get().viewToImage(new Point2D(e.getX(), e.getY()));
-				lastMousePosition = new Point2D(e.getX(), e.getY()); //(mousePress);
+				// Point2D mousePress = viewParams.get().viewToImage(new
+				// Point2D(e.getX(), e.getY()));
+				lastMousePosition = new Point2D(e.getX(), e.getY()); // (mousePress);
 				mouseDragged = false;
 			}
 		});
@@ -73,7 +85,7 @@ public class ImageViewController {
 
 		container.setOnMouseClicked(e -> onMouseClicked(e));
 	}
-	
+
 	public void onMouseClicked(MouseEvent event) {
 		if (event.getButton() == MouseButton.MIDDLE && image != null) {
 			if (!isScaleToFitActive) {
@@ -89,11 +101,11 @@ public class ImageViewController {
 	public Pane getContainer() {
 		return container;
 	}
-	
+
 	public Image getImage() {
 		return image;
 	}
-	
+
 	public void setImage(Image image) {
 		this.image = image;
 		imageView.setImage(image);
@@ -106,7 +118,7 @@ public class ImageViewController {
 	public ObjectProperty<ViewParams> viewParamsProperty() {
 		return viewParams;
 	}
-	
+
 	public boolean isMouseDragged() {
 		return mouseDragged;
 	}
@@ -159,7 +171,8 @@ public class ImageViewController {
 		}
 	}
 
-	// shift the viewport of the imageView by the specified delta (in image coordinates).
+	// shift the viewport of the imageView by the specified delta (in image
+	// coordinates).
 	public void shift(Point2D delta) {
 		ViewParams vp = viewParams.get().clone();
 		vp.setImgX(vp.getImgX() - delta.getX());
@@ -169,9 +182,14 @@ public class ImageViewController {
 	}
 
 	/**
-	 * Performs zooming. Image information at refPoint does not move on the screen.
-	 * @param refPoint Mouse position in image coordinates
-	 * @param newScale Scale to be used next (might be modified during update to fit to layout constraints)
+	 * Performs zooming. Image information at refPoint does not move on the
+	 * screen.
+	 * 
+	 * @param refPoint
+	 *            Mouse position in image coordinates
+	 * @param newScale
+	 *            Scale to be used next (might be modified during update to fit
+	 *            to layout constraints)
 	 */
 	public void zoom(Point2D refPoint, double newScale) {
 		ViewParams vp = viewParams.get().clone();

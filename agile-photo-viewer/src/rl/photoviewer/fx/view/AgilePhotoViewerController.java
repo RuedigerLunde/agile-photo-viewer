@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2013-2016 Ruediger Lunde
+ * Licensed under the GNU General Public License, Version 3
+ */
 package rl.photoviewer.fx.view;
 
 import java.io.File;
@@ -48,6 +52,13 @@ import rl.util.exceptions.ErrorHandler;
 import rl.util.exceptions.PersistenceException;
 import rl.util.persistence.PropertyManager;
 
+/**
+ * Controller which is responsible for handling all kinds of user events. It
+ * mediates between view and model.
+ * 
+ * @author Ruediger Lunde
+ *
+ */
 public class AgilePhotoViewerController implements Initializable, Observer {
 
 	@FXML
@@ -180,14 +191,14 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				model.selectPrevPhoto();
 			// e.consume();
 		});
-		
+
 		rightPane.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
 			@Override
 			public void handle(ContextMenuEvent event) {
 				onPhotoContextMenuRequest(event);
 			}
 		});
-		
+
 		model = new PVModel();
 		model.addObserver(this);
 		mapDataViewController.initialize(mapViewController, model);
@@ -307,7 +318,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		}
 		photoContextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
 
-		//event.consume();
+		// event.consume();
 	}
 
 	private void openFileChooser() {
