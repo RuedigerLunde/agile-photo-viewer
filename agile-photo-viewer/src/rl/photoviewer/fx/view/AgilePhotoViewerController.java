@@ -5,7 +5,6 @@
 package rl.photoviewer.fx.view;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Observable;
@@ -54,7 +53,6 @@ import rl.photoviewer.model.KeywordExpression;
 import rl.photoviewer.model.MapData;
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.model.PhotoMetadata;
-import rl.photoviewer.swing.view.HelpDialog;
 import rl.util.exceptions.ErrorHandler;
 import rl.util.exceptions.PersistenceException;
 import rl.util.persistence.PropertyManager;
