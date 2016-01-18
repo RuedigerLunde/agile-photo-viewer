@@ -149,6 +149,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	private ImageViewController mapViewController = new ImageViewController();
 	private MapDataViewController mapDataViewController = new MapDataViewController();
 
+	private File exportPath;
 	private Timeline slideShowTimer;
 
 	private PVModel model;
@@ -266,7 +267,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	protected void onButtonAction(ActionEvent event) {
 		Object source = event.getSource();
 		if (source == selectBtn)
-			openFileChooser();
+			onSelectAction(event);
 		else if (source == firstBtn)
 			model.selectFirstPhoto();
 		else if (source == prevBtn)
@@ -336,12 +337,30 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				alert.show();
 			});
 
+			MenuItem exportItem = new MenuItem("Export Visible Photos");
+			exportItem.setOnAction(e -> {
+				FileChooser exportChooser = new FileChooser();
+				if (exportPath != null) {
+					exportChooser.setInitialDirectory(exportPath.getParentFile());
+					exportChooser.setInitialFileName("default");
+				}
+				File file = exportChooser.showSaveDialog(AgilePhotoViewerApp.getCurrStage());
+				if (file != null) {
+					statusLabel.setText("Exporting...");
+					String name = file.getName().equals("default") ? null : file.getName();
+					exportPath = file;
+					int copied = model.exportPhotos(model.getVisiblePhotos(), exportPath.getParentFile(), name);
+					String txt = copied < model.getVisiblePhotoCount() ? " out of " + model.getVisiblePhotoCount() : "";
+					statusLabel.setText(copied + txt + " photo(s) exported.");
+				}
+			});
+
 			MenuItem exitItem = new MenuItem("Exit");
 			exitItem.setOnAction(e -> {
 				storeSession();
 				Platform.exit();
 			});
-			ctrlContextMenu.getItems().addAll(aboutItem, exitItem);
+			ctrlContextMenu.getItems().addAll(aboutItem, exportItem, exitItem);
 		}
 		ctrlContextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
 
@@ -364,7 +383,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		// event.consume();
 	}
 
-	private void openFileChooser() {
+	private void onSelectAction(ActionEvent event) {
 		FileChooser selectChooser = new FileChooser();
 		File curr = model.getSelectedPhoto();
 		if (curr != null) {
@@ -400,12 +419,15 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			captionPane.setFont(new Font(pm.getDoubleValue("gui.fontsize", 12)));
 			infoPane.setFont(new Font(Math.max(12, captionPane.getFont().getSize() / 2)));
 			tabPane.getSelectionModel().select(pm.getIntValue("gui.selectedtab", 0));
+			String exp = pm.getStringValue("gui.outputfile", null);
+			if (exp != null)
+				exportPath = new File(exp);
 
 			model.loadMapParamLookup();
-			String fileName = pm.getStringValue("model.currfile", null);
 			String map = pm.getStringValue("model.currmapfile", "");
 			if (!map.isEmpty() && new File(map).exists())
 				model.setMap(new File(map));
+			String fileName = pm.getStringValue("model.currfile", null);
 			if (fileName != null && model.getCurrDirectory() == null) {
 				File f = new File(fileName);
 				if (f.exists())
@@ -438,11 +460,8 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		// pm.setValue("gui.showcaptioninstatus",
 		// infoPanel.isShowCaptionInStatus());
 		pm.setValue("gui.selectedtab", tabPane.getSelectionModel().getSelectedIndex());
-		// File file = outputFileChooser.getSelectedFile();
-		// if (file != null)
-		// pm.setValue("gui.outputfile", file.getAbsolutePath());
-		// else if (model.getCurrDirectory() != null)
-		// pm.setValue("gui.outputfile", model.getCurrDirectory());
+		if (exportPath != null)
+			pm.setValue("gui.outputfile", exportPath.getAbsolutePath());
 		if (model.getSelectedPhoto() != null)
 			pm.setValue("model.currfile", model.getSelectedPhoto());
 		File file = model.getMapData().getFile();
