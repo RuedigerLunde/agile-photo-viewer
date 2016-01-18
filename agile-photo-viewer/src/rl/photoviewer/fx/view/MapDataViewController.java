@@ -4,6 +4,7 @@
  */
 package rl.photoviewer.fx.view;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,7 @@ import rl.photoviewer.model.PhotoMetadata;
  */
 public class MapDataViewController {
 	private final static int SELECTION_RADIUS = 20;
+	private final static int TOLERANCE = 8;
 	private ImageViewController imageViewController;
 	private PVModel model;
 
@@ -135,7 +137,7 @@ public class MapDataViewController {
 			ViewParams vp = imageViewController.viewParamsProperty().get();
 			Point2D posImg = vp.viewToImage(new Point2D(event.getX(), event.getY()));
 			double radius = vp.viewToImage(SELECTION_RADIUS);
-			double tolerance = vp.viewToImage(5);
+			double tolerance = vp.viewToImage(TOLERANCE);
 			Set<? extends IndexedGeoPoint> geoPoints = model.getVisiblePhotoPositions();
 			IndexedGeoPoint pt = model.getMapData().findPhotoPositionAt(geoPoints, posImg.getX(), posImg.getY(),
 					radius, tolerance);
@@ -152,28 +154,37 @@ public class MapDataViewController {
 		ContextMenuEvent trigger;
 		GeoRefPoint refPoint;
 		PhotoMetadata photoData;
+		File map1;
+		File map2;
 		MenuItem refPointItem;
-		MenuItem clearMapItem;
+		MenuItem openMap1Item;
+		MenuItem openMap2Item;
+		MenuItem closeMapItem;
 
 		MapContextMenu() {
-			menu = new ContextMenu();
 			refPointItem = new MenuItem("Refpoint");
-			menu.getItems().add(refPointItem);
 			refPointItem.setOnAction(e -> onMenuItemAction(e));
-			clearMapItem = new MenuItem("Clear Map");
-			menu.getItems().add(clearMapItem);
-			clearMapItem.setOnAction(e -> {
-				model.clearCurrentMap();
+			openMap1Item = new MenuItem("Open");
+			openMap1Item.setOnAction(e -> model.setMap(map1));
+			openMap2Item = new MenuItem("Open");
+			openMap2Item.setOnAction(e -> model.setMap(map2));
+			closeMapItem = new MenuItem("Close Map");
+			closeMapItem.setOnAction(e -> {
+				model.setMap(null);
 			});
+			
+			menu = new ContextMenu();
+			menu.getItems().addAll(refPointItem, openMap1Item, openMap2Item, closeMapItem);
 		}
 
 		public void prepare(ContextMenuEvent trigger) {
 			menu.hide();
 			this.trigger = trigger;
+			MapData mapData = model.getMapData();
 			ViewParams viewParams = imageViewController.viewParamsProperty().get();
 			Point2D posImg = viewParams.viewToImage(new Point2D(trigger.getX(), trigger.getY()));
 			double radius = viewParams.viewToImage(SELECTION_RADIUS);
-			refPoint = model.getMapData().findRefPointAt(posImg.getX(), posImg.getY(), radius);
+			refPoint = mapData.findRefPointAt(posImg.getX(), posImg.getY(), radius);
 			photoData = model.getSelectedPhotoData();
 			if (photoData != null && Double.isNaN(photoData.getLat()))
 				photoData = null;
@@ -184,8 +195,20 @@ public class MapDataViewController {
 				refPointItem.setText("Add Reference Point");
 				refPointItem.setId("AddRefPointItem");
 			}
+			
+			File[] mapFiles = model.getMapData().getAllMapFiles();
+			int idx = mapData.getFile() == null ? -1 : 0;
+			while (++idx < mapFiles.length && !mapFiles[idx].exists());
+			map1 = (idx < mapFiles.length) ? mapFiles[idx] : null;
+			while (++idx < mapFiles.length && !mapFiles[idx].exists());
+			map2 = (idx < mapFiles.length) ? mapFiles[idx] : null;
+			openMap1Item.setText("Open " + (map1 != null ? map1.getName() : ""));
+			openMap2Item.setText("Open " + (map2 != null ? map2.getName() : ""));
+			
 			refPointItem.setDisable(imageViewController.getImage() == null || refPoint == null && photoData == null);
-			clearMapItem.setDisable(imageViewController.getImage() == null);
+			openMap1Item.setDisable(map1 == null);
+			openMap2Item.setDisable(map2 == null);
+			closeMapItem.setDisable(imageViewController.getImage() == null);
 		}
 
 		public void show() {

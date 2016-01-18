@@ -5,6 +5,7 @@
 package rl.photoviewer.fx.view;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Observable;
@@ -22,12 +23,15 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
@@ -42,12 +46,15 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import rl.photoviewer.model.KeywordExpression;
 import rl.photoviewer.model.MapData;
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.model.PhotoMetadata;
+import rl.photoviewer.swing.view.HelpDialog;
 import rl.util.exceptions.ErrorHandler;
 import rl.util.exceptions.PersistenceException;
 import rl.util.persistence.PropertyManager;
@@ -136,6 +143,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	@FXML
 	private ImageView photoView;
 
+	private ContextMenu ctrlContextMenu;
 	private ContextMenu photoContextMenu;
 
 	private ImageViewController photoViewController = new ImageViewController();
@@ -192,12 +200,8 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			// e.consume();
 		});
 
-		rightPane.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-			@Override
-			public void handle(ContextMenuEvent event) {
-				onPhotoContextMenuRequest(event);
-			}
-		});
+		ctrlPane.setOnContextMenuRequested(e -> onControlContextMenuRequest(e));
+		rightPane.setOnContextMenuRequested(e -> onPhotoContextMenuRequest(e));
 
 		model = new PVModel();
 		model.addObserver(this);
@@ -303,6 +307,44 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		expression.addLiteral(newKeyword, notBtn.isSelected());
 		notBtn.setSelected(false);
 		model.setVisibility(model.getRatingFilter(), expression);
+	}
+
+	protected void onControlContextMenuRequest(ContextMenuEvent event) {
+		if (ctrlContextMenu == null) {
+			ctrlContextMenu = new ContextMenu();
+			MenuItem aboutItem = new MenuItem("About");
+			aboutItem.setOnAction(e -> {
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("About");
+				alert.setHeaderText("Agile Photo Viewer FX");
+
+				final WebView browser = new WebView();
+				final WebEngine webEngine = browser.getEngine();
+				ScrollPane scrollPane = new ScrollPane();
+				scrollPane.setContent(browser);
+				alert.getDialogPane().setContent(scrollPane);
+
+				java.net.URL helpURL = getClass().getResource("About.html");
+				if (helpURL != null) {
+					webEngine.load(helpURL.toExternalForm());
+				} else {
+					Exception ex = new PersistenceException("Couldn't find file: About.html");
+					ErrorHandler.getInstance().handleError(ex);
+				}
+
+				alert.show();
+			});
+
+			MenuItem exitItem = new MenuItem("Exit");
+			exitItem.setOnAction(e -> {
+				storeSession();
+				AgilePhotoViewerApp.getCurrStage().close();
+			});
+			ctrlContextMenu.getItems().addAll(aboutItem, exitItem);
+		}
+		ctrlContextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+
+		// event.consume();
 	}
 
 	@FXML
