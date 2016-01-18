@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -338,7 +339,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			MenuItem exitItem = new MenuItem("Exit");
 			exitItem.setOnAction(e -> {
 				storeSession();
-				AgilePhotoViewerApp.getCurrStage().close();
+				Platform.exit();
 			});
 			ctrlContextMenu.getItems().addAll(aboutItem, exitItem);
 		}
