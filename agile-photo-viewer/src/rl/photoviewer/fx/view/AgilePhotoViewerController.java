@@ -157,7 +157,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		SplitPane.setResizableWithParent(leftPane, Boolean.FALSE);
-		slideShowCombo.getItems().addAll(new Sec(2), new Sec(4), new Sec(6), new Sec(8));
+		slideShowCombo.getItems().addAll(new Sec(2), new Sec(4), new Sec(6), new Sec(8), new Sec(12), new Sec(20));
 		slideShowCombo.setValue(new Sec(4));
 
 		ratingCombo.getItems().addAll("No Rating Filter", ">= *", ">= **", ">= ***", ">= ****", ">= *****");
@@ -251,8 +251,10 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	public void onKeyPressed(KeyEvent keyEvent) {
 		if (keyEvent.getCode() == KeyCode.PLUS) {
 			captionPane.setFont(new Font(captionPane.getFont().getSize() + 1));
+			infoPane.setFont(new Font(Math.max(12, captionPane.getFont().getSize() / 2)));
 		} else if (keyEvent.getCode() == KeyCode.MINUS) {
 			captionPane.setFont(new Font(captionPane.getFont().getSize() - 1));
+			infoPane.setFont(new Font(Math.max(12, captionPane.getFont().getSize() / 2)));
 		} else if (keyEvent.getCode() == KeyCode.PAGE_DOWN || keyEvent.getCode() == KeyCode.N) {
 			model.selectNextPhoto();
 		} else if (keyEvent.getCode() == KeyCode.PAGE_UP || keyEvent.getCode() == KeyCode.P) {
@@ -397,6 +399,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			sortByDateBtn.setSelected(pm.getBooleanValue("gui.sortbydate", true));
 			model.setSortByDate(sortByDateBtn.isSelected());
 			captionPane.setFont(new Font(pm.getDoubleValue("gui.fontsize", 12)));
+			infoPane.setFont(new Font(Math.max(12, captionPane.getFont().getSize() / 2)));
 			tabPane.getSelectionModel().select(pm.getIntValue("gui.selectedtab", 0));
 
 			model.loadMapParamLookup();
