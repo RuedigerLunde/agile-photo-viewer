@@ -239,14 +239,12 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		keywordExpressionTxt.setText(model.getVisibilityExpression().toString());
 		statusLabel.setText(model.getVisiblePhotoCount() + " Photo(s) visible.");
 	}
-
+	
 	public void onKeyPressed(KeyEvent keyEvent) {
 		if (keyEvent.getCode() == KeyCode.PLUS) {
-			captionPane.setFont(new Font(captionPane.getFont().getSize() + 1));
-			infoPane.setFont(new Font(Math.max(12, captionPane.getFont().getSize() / 2)));
+			setFontSize(captionPane.getFont().getSize() + 2);
 		} else if (keyEvent.getCode() == KeyCode.MINUS) {
-			captionPane.setFont(new Font(captionPane.getFont().getSize() - 1));
-			infoPane.setFont(new Font(Math.max(12, captionPane.getFont().getSize() / 2)));
+			setFontSize(captionPane.getFont().getSize() - 2);
 		} else if (keyEvent.getCode() == KeyCode.PAGE_DOWN || keyEvent.getCode() == KeyCode.N) {
 			model.selectNextPhoto();
 		} else if (keyEvent.getCode() == KeyCode.PAGE_UP || keyEvent.getCode() == KeyCode.P) {
@@ -394,6 +392,14 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			infoPane.setText(data.toString());
 	}
 
+	private void setFontSize(double size) {
+		captionPane.setFont(new Font(size));
+		infoPane.setFont(new Font(Math.max(12, size / 2)));
+		keywordLst.setStyle("-fx-font-size:" + Math.max(12, size / 2) + ";");
+		keywordExpressionTxt.setFont(new Font(Math.max(12, size / 2)));
+		statusLabel.setFont(new Font(Math.max(12, size / 2)));
+	}
+	
 	/**
 	 * Restores view settings according to the settings of the last session.
 	 */
@@ -409,8 +415,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			slideShowCombo.setValue(new Sec(pm.getIntValue("gui.slideshowsec", 5)));
 			sortByDateBtn.setSelected(pm.getBooleanValue("gui.sortbydate", true));
 			model.setSortByDate(sortByDateBtn.isSelected());
-			captionPane.setFont(new Font(pm.getDoubleValue("gui.fontsize", 12)));
-			infoPane.setFont(new Font(Math.max(12, captionPane.getFont().getSize() / 2)));
+			setFontSize(pm.getDoubleValue("gui.fontsize", 12));
 			tabPane.getSelectionModel().select(pm.getIntValue("gui.selectedtab", 0));
 			String exp = pm.getStringValue("gui.outputfile", null);
 			if (exp != null)
