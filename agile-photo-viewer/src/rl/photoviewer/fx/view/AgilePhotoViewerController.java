@@ -25,7 +25,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -67,6 +66,10 @@ import rl.util.persistence.PropertyManager;
  */
 public class AgilePhotoViewerController implements Initializable, Observer {
 
+	static final int INFO_TAB_INDEX = 0;
+	static final int VISIBILITY_TAB_INDEX = 1;
+	static final int MAP_TAB_INDEX = 2;
+
 	@FXML
 	private AnchorPane rootPane;
 
@@ -76,17 +79,12 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	@FXML
 	private FlowPane ctrlPane;
 
-	@FXML
-	private Button selectBtn;
-
-	@FXML
-	private Button firstBtn;
-
-	@FXML
-	private Button prevBtn;
-
-	@FXML
-	private Button nextBtn;
+	static final String SELECT_BTN = "selectBtn";
+	static final String FIRST_BTN = "firstBtn";
+	static final String PREV_BTN = "prevBtn";
+	static final String NEXT_BTN = "nextBtn";
+	static final String AND_BTN = "andBtn";
+	static final String DELETE_BTN = "deleteBtn";
 
 	@FXML
 	private ToggleButton slideShowBtn;
@@ -117,12 +115,6 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	@FXML
 	private ToggleButton notBtn;
-
-	@FXML
-	private Button andBtn;
-
-	@FXML
-	private Button deleteBtn;
 
 	@FXML
 	private TextArea keywordExpressionTxt;
@@ -265,14 +257,14 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	@FXML
 	protected void onButtonAction(ActionEvent event) {
-		Object source = event.getSource();
-		if (source == selectBtn)
+		Node source = (Node) event.getSource();
+		if (source.getId().equals(SELECT_BTN))
 			onSelectAction(event);
-		else if (source == firstBtn)
+		else if (source.getId().equals(FIRST_BTN))
 			model.selectFirstPhoto();
-		else if (source == prevBtn)
+		else if (source.getId().equals(PREV_BTN))
 			model.selectPrevPhoto();
-		else if (source == nextBtn)
+		else if (source.getId().equals(NEXT_BTN))
 			model.selectNextPhoto();
 		else if (source == slideShowBtn) {
 			if (slideShowBtn.isSelected()) {
@@ -291,12 +283,12 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			model.setSortByDate(sortByDateBtn.isSelected());
 		else if (source == undecorateBtn)
 			AgilePhotoViewerApp.changeStage(undecorateBtn.isSelected());
-		else if (source == andBtn) {
+		else if (source.getId().equals(AND_BTN)) {
 			model.getVisibilityExpression().addClause();
 			notBtn.setSelected(false);
 			keywordLst.getSelectionModel().clearSelection();
 			model.setVisibility(model.getRatingFilter(), model.getVisibilityExpression());
-		} else if (source == deleteBtn) {
+		} else if (source.getId().equals(DELETE_BTN)) {
 			model.getVisibilityExpression().deleteLastClause();
 			notBtn.setSelected(false);
 			keywordLst.getSelectionModel().clearSelection();
@@ -346,7 +338,8 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				}
 				File file = exportChooser.showSaveDialog(AgilePhotoViewerApp.getCurrStage());
 				if (file != null) {
-					statusLabel.setText("Exporting...");
+					tabPane.getSelectionModel().select(VISIBILITY_TAB_INDEX);
+					statusLabel.setText("Exporting " + model.getVisiblePhotoCount() + " photo(s) ...");
 					String name = file.getName().equals("default") ? null : file.getName();
 					exportPath = file;
 					int copied = model.exportPhotos(model.getVisiblePhotos(), exportPath.getParentFile(), name);
@@ -375,7 +368,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			photoContextMenu.getItems().add(mi);
 			mi.setOnAction(e -> {
 				model.setMap(model.getSelectedPhoto());
-				tabPane.getSelectionModel().selectLast(); // select map tab
+				tabPane.getSelectionModel().select(MAP_TAB_INDEX);
 			});
 		}
 		photoContextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());

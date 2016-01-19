@@ -19,7 +19,7 @@ public abstract class Commands {
 	public static String FULL_SCREEN_CMD = "FullScreenCmd";
 	public static String DECORATION_CMD = "DecorationCmd";
 	public static String SORT_BY_DATE_CMD = "SortByDateCmd";
-	public static String HELP_CMD = "HelpCmd";
+	public static String ABOUT_CMD = "HelpCmd";
 	public static String USE_PHOTO_AS_MAP_CMD = "UsePhotoAsMapCmd";
 	public static String CLEAR_MAP_CMD = "ClearMapCmd";
 	public static String EXPORT_CMD = "ExportCmd";

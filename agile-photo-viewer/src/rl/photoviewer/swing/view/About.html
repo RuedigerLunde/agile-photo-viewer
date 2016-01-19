@@ -2,69 +2,67 @@
 <html>
 <body>
 
-<h1>Agile Photo Viewer</h1>
-<h2>Version 1.2 (24-May-2015)</h2>
+<h1>Agile Photo Viewer Swing</h1>
+<h2>Version 1.0 (18-Januar-2016)</h2>
 
-<p>This lightweight pure-java photo viewer provides the following features:
+<p>This is the Swing version of the lightweight pure-java Agile Photo Viewer.
+It provides the following features:
 <ul>
 <li>Show picture locations in map image (haven't seen this feature elsewhere...)</li>
-<li>Display Exif-Tags, especially caption, rating, date, camera model, position, and keywords
-(using the library of Drew Noakes, see http://drewnoakes.com/code/exif/)</li>
+<li>Display Exif-Tags, especially caption, rating, date, exposure, vocal length, iso, camera model,
+position, and keywords (using the library of Drew Noakes, see http://drewnoakes.com/code/exif/)</li>
 <li>Control picture visibility by rating and keyword (with flexible positive and negative 
 selection criteria)</li>
 <li>Select picture by map position</li>
 <li>Sort pictures by name and date</li>
 <li>Export visible pictures with new indexed names preserving chosen order
 (useful when using different cameras)</li>
-<li>Support full-screen mode (some functions disabled)</li>
+<li>Support undecorated mode (more flexible than full-screen mode)</li>
 <li>Support presenter mouse</li>
 </ul>
 </p>
 
 <p><b>To install</b>, just copy the executable jar on your hard disk drive.
-Make sure that your Java is up to date. Additionally, there is a starter (cmd-file)
-available which starts the viewer with additional heap space from a shell
-showing error messages if any.</p>
+Make sure that your Java is up to date. By default, the FX Version of the viewer
+is started. Additionally, two starter files (cmd-files) are available, which
+allow to choose between FX and Swing Version. Each of them starts the viewer
+with additional heap space from a shell showing error messages if any.</p>
 
 <p><b>To start</b>, double-click the jar or cmd file, press 'Select' and select a
-picture file or a directory with pictures in the file chooser. You can zoom
-into the picture by mouse-wheel and mouse-drag. Check sharpness with mouse-middle.
+picture file in the file chooser. You can zoom into the picture by mouse-wheel and
+pan with mouse-drag. Check sharpness with mouse-middle.
 The viewer is directory-based. You can move back and forth with the
-control panel buttons.  If you don't want to see all pictures
-in the current directory, specify a rating filter or a keyword expression in the
-Visibility Panel. Select what you want to see and what you don't using the 'Negate'-Button.
-The Info Panel shows you some metadata about the current picture. Picture captions
-can additionally be displayed in the status area using
-the context menu of the Info Panel (recommended). Text size can be adjusted
-via the Control Panel context menu. If an extreme high resolution display is used, exit
-and restart the application to reuse text size settings also for menus and buttons.
+control panel buttons, keys 'n' and 'p', or the mouse wheel (focus in control pane). 
+If you don't want to see all pictures in the current directory,
+specify a rating filter or a keyword expression in the Visibility Panel.
+Select what you want to see and what you don't using the 'Not'-Button.
+The Info Panel shows you some metadata about the current picture. Text size for caption
+display can be adjusted via the Control Panel context menu or keys plus and minus.
 Lightroom and Picasa are suitable tools to add captions
 and keywords ('poster', 'private', 'people', 'historic', ...) to your pictures.
-When pressing 'Exit', your personal settings are saved in your home directory
+When exiting the application, your personal settings are saved in your home directory
 ('.agilephotoviewer').</p>
 
 <p><b>To export pictures</b> via the context menu of the control panel,
-you can either just specify the destination directory or provide also
+you can either just specify the destination directory (no renaming) or provide also
 a file name like '2012-Scotland-0005'. The first copied picture will
 then be named '2012-Scotland-0006.jpg' if it is a jpg file.</p>
 
-<p><b>To use the Map Panel</b>, try the following:
+<p><b>To use the Map View</b>, try the following:
 <ul>
 <li>Navigate to a picture showing a map (e.g. a photo of a map or a screenshot of
-Google Earth possibly including track data) and press 'Use Photo as Map' in the
-context menu of the Control Panel.</li>
+Google Earth possibly including track data) and press 'Use as Map' in the
+context menu of the Photo View (Swing Version: Context menu of Control Panel).</li>
 <li>Navigate to a (correctly!) geotagged picture and mark its position on the
-map with 'Set Reference Point Here' (context menu of the Map Panel). Repeat with
+map with 'Add Reference Point' (context menu of the Map View). Repeat with
 another picture. Now a red marker should follow the locations of the pictures shown
-in the photo panel. Accuracy improves when at least three reference points
+in the Photo View. Accuracy improves when at least three reference points
 (placed in a triangle) are set. Reference points can be removed by
-'Remove Reference Point Here' (mouse-right on the reference point's position).
-Additionally, the context menu provides and option to show all visible picture
-positions in the map (recommended).
+'Remove Reference Point' (mouse-right on the reference point's position).
 By mouse-left on the map you load the picture next to the current
-mouse position into the Photo Panel.</li>
+mouse position into the Photo View.</li>
 <li>Previously prepared map images can be opened using the context menu of the
-Map Panel.</li>
+Map View.</li>
 </ul>
 </p>
 

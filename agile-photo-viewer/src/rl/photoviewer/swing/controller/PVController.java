@@ -24,7 +24,7 @@ import rl.photoviewer.model.IndexedGeoPoint;
 import rl.photoviewer.model.KeywordExpression;
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.swing.view.Commands;
-import rl.photoviewer.swing.view.HelpDialog;
+import rl.photoviewer.swing.view.AboutDialog;
 import rl.photoviewer.swing.view.MapImagePanel;
 import rl.photoviewer.swing.view.PVView;
 import rl.photoviewer.swing.view.VisibilityPanel;
@@ -83,8 +83,8 @@ public class PVController extends MouseAdapter implements Controller {
 				toggleFullScreen();
 			} else if (e.getActionCommand() == Commands.DECORATION_CMD) {
 				updateDecoration();
-			} else if (e.getActionCommand() == Commands.HELP_CMD) {
-				HelpDialog.showHelpDialog(view.getFrame());
+			} else if (e.getActionCommand() == Commands.ABOUT_CMD) {
+				AboutDialog.showAboutDialog(view.getFrame());
 			} else if (e.getActionCommand() == Commands.USE_PHOTO_AS_MAP_CMD) {
 				model.setMap(model.getSelectedPhoto());
 				view.selectMapTab();

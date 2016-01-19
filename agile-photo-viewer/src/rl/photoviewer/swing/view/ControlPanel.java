@@ -89,8 +89,8 @@ public class ControlPanel extends JPanel {
 		integrate(undecorateButton, controller);
 
 		popup = new JPopupMenu();
-		helpMenuItem = new JMenuItem("Help");
-		helpMenuItem.setActionCommand(Commands.HELP_CMD);
+		helpMenuItem = new JMenuItem("About");
+		helpMenuItem.setActionCommand(Commands.ABOUT_CMD);
 		helpMenuItem.addActionListener(controller);
 		popup.add(helpMenuItem);
 

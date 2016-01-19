@@ -16,32 +16,30 @@ import rl.util.exceptions.ErrorHandler;
 import rl.util.exceptions.PersistenceException;
 
 /**
- * Shows a help dialog with version information, feature list, and some advises
+ * Shows an about dialog with version information, feature list, and some advises
  * for users which are new to the software.
  * 
  * @author Ruediger Lunde
  */
-public class HelpDialog {
+public class AboutDialog {
 
 	/**
-	 * Tries to load the help information from a HTML file and shows it in a dialog.
+	 * Tries to load the about information from a HTML file and shows it in a
+	 * dialog.
 	 */
-	public static void showHelpDialog(JFrame parent) {
+	public static void showAboutDialog(JFrame parent) {
 		JEditorPane editorPane = new JEditorPane();
 		editorPane.setEditable(false);
-		java.net.URL helpURL = HelpDialog.class
-				.getResource("PhotoViewerHelp.html");
+		java.net.URL helpURL = AboutDialog.class.getResource("About.html");
 		if (helpURL != null) {
 			try {
 				editorPane.setPage(helpURL);
 			} catch (IOException e) {
-				Exception ex = new PersistenceException(
-						"Attempted to read a bad URL: " + helpURL);
+				Exception ex = new PersistenceException("Attempted to read a bad URL: " + helpURL);
 				ErrorHandler.getInstance().handleError(ex);
 			}
 		} else {
-			Exception ex = new PersistenceException(
-					"Couldn't find file: PhotoViewerHelp.html");
+			Exception ex = new PersistenceException("Couldn't find file: About.html");
 			ErrorHandler.getInstance().handleError(ex);
 		}
 		JScrollPane scroller = new JScrollPane(editorPane);
