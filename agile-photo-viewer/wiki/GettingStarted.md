@@ -2,7 +2,7 @@
 
 
 <h1>Agile Photo Viewer</h1>
-<h2>Version 1.0 (18-Januar-2016)</h2>
+<h2>Version 2.0 (18-Januar-2016)</h2>
 
 <p>This is the lightweight pure-java Agile Photo Viewer.
 It provides the following features:

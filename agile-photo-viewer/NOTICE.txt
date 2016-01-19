@@ -1,11 +1,11 @@
 Agile Photo Viewer
 
-This photo viewer allows to present geotagged photos together with a prepared
+This photo viewer allows to present geo-tagged photos together with a prepared
 map image. It is especially useful for presentation on 16:9 displays. Photos
 can be selected by keyword, ordered by name or Exif-date, and exported using new
 indexed names. 
 
-Copyright (C) 2013-2015  Ruediger Lunde
+Copyright (C) 2013-2016  Ruediger Lunde
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
