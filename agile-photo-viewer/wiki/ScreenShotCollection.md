@@ -7,7 +7,8 @@ The currently selected photo is shown on the right of the splitbar. Zooming is p
 ![https://github.com/RuedigerLunde/agile-photo-viewer/blob/master/agile-photo-viewer/wiki/pics/AgilePhotoViewer-P1.jpg](https://github.com/RuedigerLunde/agile-photo-viewer/blob/master/agile-photo-viewer/wiki/pics/AgilePhotoViewer-P1.jpg)
 
 
-Visibility of photos can be controlled using the Keyword Panel. Visibility Expression 'true' means that all photos in the current directory are visible.
+Visibility of photos can be controlled using the Visibility Panel. The rating filter (first combo-box) reduces visibility to those photos having at least the specified number of stars. The controls below can be used to specify a logical expression. Keyword Expression 'poster or highlight' reduces visibility to
+those photos, which have at least keyword 'poster' or 'highlight'. 'true' means that all photos in the current directory are visible.
 
 ![https://github.com/RuedigerLunde/agile-photo-viewer/blob/master/agile-photo-viewer/wiki/pics/AgilePhotoViewer-P3.jpg](https://github.com/RuedigerLunde/agile-photo-viewer/blob/master/agile-photo-viewer/wiki/pics/AgilePhotoViewer-P3.jpg)
 
