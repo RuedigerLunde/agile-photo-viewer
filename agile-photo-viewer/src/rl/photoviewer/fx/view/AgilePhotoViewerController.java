@@ -69,6 +69,13 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	static final int INFO_TAB_INDEX = 0;
 	static final int VISIBILITY_TAB_INDEX = 1;
 	static final int MAP_TAB_INDEX = 2;
+	
+	static final String SELECT_BTN = "selectBtn";
+	static final String FIRST_BTN = "firstBtn";
+	static final String PREV_BTN = "prevBtn";
+	static final String NEXT_BTN = "nextBtn";
+	static final String AND_BTN = "andBtn";
+	static final String DELETE_BTN = "deleteBtn";
 
 	@FXML
 	private AnchorPane rootPane;
@@ -78,13 +85,6 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 
 	@FXML
 	private FlowPane ctrlPane;
-
-	static final String SELECT_BTN = "selectBtn";
-	static final String FIRST_BTN = "firstBtn";
-	static final String PREV_BTN = "prevBtn";
-	static final String NEXT_BTN = "nextBtn";
-	static final String AND_BTN = "andBtn";
-	static final String DELETE_BTN = "deleteBtn";
 
 	@FXML
 	private ToggleButton slideShowBtn;
@@ -141,6 +141,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	private ImageViewController mapViewController = new ImageViewController();
 	private MapDataViewController mapDataViewController = new MapDataViewController();
 
+	private double defaultFontSize = 12; // set when calling initialize...
 	private File exportPath;
 	private Timeline slideShowTimer;
 
@@ -149,6 +150,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		SplitPane.setResizableWithParent(leftPane, Boolean.FALSE);
+		defaultFontSize = statusLabel.getFont().getSize();
 		slideShowCombo.getItems().addAll(new Sec(2), new Sec(4), new Sec(6), new Sec(8), new Sec(12), new Sec(20));
 		slideShowCombo.setValue(new Sec(4));
 
@@ -242,9 +244,9 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	
 	public void onKeyPressed(KeyEvent keyEvent) {
 		if (keyEvent.getCode() == KeyCode.PLUS) {
-			setFontSize(captionPane.getFont().getSize() + 2);
+			setCaptionFontSize(captionPane.getFont().getSize() + 2);
 		} else if (keyEvent.getCode() == KeyCode.MINUS) {
-			setFontSize(captionPane.getFont().getSize() - 2);
+			setCaptionFontSize(captionPane.getFont().getSize() - 2);
 		} else if (keyEvent.getCode() == KeyCode.PAGE_DOWN || keyEvent.getCode() == KeyCode.N) {
 			model.selectNextPhoto();
 		} else if (keyEvent.getCode() == KeyCode.PAGE_UP || keyEvent.getCode() == KeyCode.P) {
@@ -392,12 +394,13 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			infoPane.setText(data.toString());
 	}
 
-	private void setFontSize(double size) {
+	private void setCaptionFontSize(double size) {
 		captionPane.setFont(new Font(size));
-		infoPane.setFont(new Font(Math.max(12, size / 2)));
-		keywordLst.setStyle("-fx-font-size:" + Math.max(12, size / 2) + ";");
-		keywordExpressionTxt.setFont(new Font(Math.max(12, size / 2)));
-		statusLabel.setFont(new Font(Math.max(12, size / 2)));
+		double fontSize2 = Math.max(defaultFontSize, size / 2);
+		infoPane.setFont(new Font(fontSize2));
+		keywordLst.setStyle("-fx-font-size:" + fontSize2 + ";");
+		keywordExpressionTxt.setFont(new Font(fontSize2));
+		statusLabel.setFont(new Font(fontSize2));
 	}
 	
 	/**
@@ -415,7 +418,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			slideShowCombo.setValue(new Sec(pm.getIntValue("gui.slideshowsec", 5)));
 			sortByDateBtn.setSelected(pm.getBooleanValue("gui.sortbydate", true));
 			model.setSortByDate(sortByDateBtn.isSelected());
-			setFontSize(pm.getDoubleValue("gui.fontsize", 12));
+			setCaptionFontSize(pm.getDoubleValue("gui.fontsize", defaultFontSize * 2));
 			tabPane.getSelectionModel().select(pm.getIntValue("gui.selectedtab", 0));
 			String exp = pm.getStringValue("gui.outputfile", null);
 			if (exp != null)
