@@ -23,7 +23,7 @@
                               <Button fx:id="prevBtn" mnemonicParsing="false" onAction="#onButtonAction" text="&lt;" />
                               <Button fx:id="nextBtn" mnemonicParsing="false" onAction="#onButtonAction" text="&gt;" />
                               <ToggleButton fx:id="slideShowBtn" mnemonicParsing="false" onAction="#onButtonAction" text="Slide Show" />
-                              <ComboBox fx:id="slideShowCombo" onAction="#onButtonAction" prefWidth="80.0" promptText="Prompt?" />
+                              <ComboBox fx:id="slideShowCombo" onAction="#onButtonAction" promptText="Prompt?" />
                               <ToggleButton fx:id="sortByDateBtn" mnemonicParsing="false" onAction="#onButtonAction" selected="true" text="Sort by Date" />
                               <ToggleButton fx:id="undecorateBtn" mnemonicParsing="false" onAction="#onButtonAction" text="Undecorate" />
                            </children>
