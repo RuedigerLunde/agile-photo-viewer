@@ -45,7 +45,6 @@ public class AgilePhotoViewerApp extends Application {
 			controller = (AgilePhotoViewerController) loader.getController();
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("AgilePhotoViewer.css").toExternalForm());
-			// scene.getStylesheets().add(getClass().getResource("DarkTheme.css").toExternalForm());
 			primaryStage.setTitle("Agile Photo Viewer FX");
 			primaryStage.setScene(scene);
 			primaryStage.setOnCloseRequest(windowCloseHandler);

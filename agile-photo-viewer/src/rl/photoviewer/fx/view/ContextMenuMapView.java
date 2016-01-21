@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2013-2016 Ruediger Lunde
+ * Licensed under the GNU General Public License, Version 3
+ */
 package rl.photoviewer.fx.view;
 
 import java.io.File;
@@ -13,7 +17,13 @@ import rl.photoviewer.model.MapData;
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.model.PhotoMetadata;
 
-public class ContextMenuMap {
+/**
+ * This class provides a context menu for the Map View.
+ * 
+ * @author Ruediger Lunde
+ *
+ */
+public class ContextMenuMapView {
 	PVModel model;
 	ImageViewController imageViewController;
 
@@ -28,12 +38,12 @@ public class ContextMenuMap {
 	MenuItem openMap2Item;
 	MenuItem closeMapItem;
 
-	public ContextMenuMap(ImageViewController imageViewController, PVModel model) {
+	public ContextMenuMapView(ImageViewController imageViewController, PVModel model) {
 		this.model = model;
 		this.imageViewController = imageViewController;
 		
 		refPointItem = new MenuItem("Refpoint");
-		refPointItem.setOnAction(e -> onMenuItemAction(e));
+		refPointItem.setOnAction(e -> onRefPointAction(e));
 		openMap1Item = new MenuItem("Open");
 		openMap1Item.setOnAction(e -> model.setMap(map1));
 		openMap2Item = new MenuItem("Open");
@@ -47,7 +57,14 @@ public class ContextMenuMap {
 		menu.getItems().addAll(refPointItem, openMap1Item, openMap2Item, closeMapItem);
 	}
 
-	public void prepare() {
+	public void show(ContextMenuEvent event) {
+		trigger = event;
+		prepare();
+		menu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+		event.consume();
+	}
+	
+	private void prepare() {
 		menu.hide();
 		MapData mapData = model.getMapData();
 		ViewParams viewParams = imageViewController.viewParamsProperty().get();
@@ -80,14 +97,7 @@ public class ContextMenuMap {
 		closeMapItem.setDisable(imageViewController.getImage() == null);
 	}
 
-	public void show(ContextMenuEvent event) {
-		trigger = event;
-		prepare();
-		menu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
-		event.consume();
-	}
-
-	public void onMenuItemAction(ActionEvent event) {
+	private void onRefPointAction(ActionEvent event) {
 		MenuItem source = (MenuItem) event.getSource();
 		if (source.getId().equals("RemoveRefPointItem")) {
 			model.removeMapRefPoint(refPoint);

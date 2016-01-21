@@ -129,7 +129,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	private ImageView photoView;
 
 	private ContextMenuControlPane ctrlPaneMenu;
-	private ContextMenuMap mapMenu;
+	private ContextMenuMapView mapMenu;
 	private ContextMenu photoViewMenu;
 
 	private ImageViewController photoViewController = new ImageViewController();
@@ -207,7 +207,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		ctrlPaneMenu = new ContextMenuControlPane(this, model);
 		ctrlPane.setOnContextMenuRequested(e -> ctrlPaneMenu.show(e));
 		
-		mapMenu = new ContextMenuMap(mapViewController, model);
+		mapMenu = new ContextMenuMapView(mapViewController, model);
 		mapPane.setOnContextMenuRequested(e -> mapMenu.show(e));
 	}
 
