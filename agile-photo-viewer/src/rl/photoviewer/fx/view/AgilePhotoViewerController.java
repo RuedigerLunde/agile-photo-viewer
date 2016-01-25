@@ -207,7 +207,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		ctrlPaneMenu = new ContextMenuControlPane(this, model);
 		ctrlPane.setOnContextMenuRequested(e -> ctrlPaneMenu.show(e));
 		
-		mapMenu = new ContextMenuMapView(mapViewController, model);
+		mapMenu = new ContextMenuMapView(mapDataViewController, model);
 		mapPane.setOnContextMenuRequested(e -> mapMenu.show(e));
 	}
 
@@ -256,10 +256,13 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	}
 
 	public void onKeyPressed(KeyEvent keyEvent) {
-		if (keyEvent.getCode() == KeyCode.PLUS) {
-			setCaptionFontSize(captionPane.getFont().getSize() + 2);
+		if (keyEvent.getCode() == KeyCode.F) {
+			AgilePhotoViewerApp.getCurrStage()
+			.setFullScreen(!AgilePhotoViewerApp.getCurrStage().isFullScreen());
+		} else if (keyEvent.getCode() == KeyCode.PLUS) {
+			setCaptionFontSize(getCaptionFontSize() + 2);
 		} else if (keyEvent.getCode() == KeyCode.MINUS) {
-			setCaptionFontSize(captionPane.getFont().getSize() - 2);
+			setCaptionFontSize(getCaptionFontSize() - 2);
 		} else if (keyEvent.getCode() == KeyCode.PAGE_DOWN
 				|| keyEvent.getCode() == KeyCode.N) {
 			model.selectNextPhoto();
@@ -358,13 +361,18 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			infoPane.setText(data.toString());
 	}
 
-	private void setCaptionFontSize(double size) {
+	public double getCaptionFontSize() {
+		return captionPane.getFont().getSize();
+	}
+	
+	public void setCaptionFontSize(double size) {
 		captionPane.setFont(new Font(size));
 		double fontSize2 = Math.max(defaultFontSize, size / 2);
 		infoPane.setFont(new Font(fontSize2));
 		keywordLst.setStyle("-fx-font-size:" + fontSize2 + ";");
 		keywordExpressionTxt.setFont(new Font(fontSize2));
 		statusLabel.setFont(new Font(fontSize2));
+		mapDataViewController.setMaxMarkerSize(size * 1.5);
 	}
 
 	public void setStatus(String message) {

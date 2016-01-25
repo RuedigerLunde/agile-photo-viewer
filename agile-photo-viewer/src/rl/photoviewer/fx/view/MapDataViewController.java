@@ -28,8 +28,7 @@ import rl.photoviewer.model.PhotoMetadata;
  *
  */
 public class MapDataViewController {
-	final static int SELECTION_RADIUS = 20;
-	final static int TOLERANCE = 8;
+	private final static double TOLERANCE = 0.25;
 	private ImageViewController imageViewController;
 	private PVModel model;
 
@@ -45,10 +44,37 @@ public class MapDataViewController {
 		viewController.getContainer().setOnMouseClicked(e -> onMouseClicked(e));
 	}
 	
+	public ImageViewController getImageViewController() {
+		return imageViewController;
+	}
+	
 	public void setMarkerFactory(MarkerFactory factory) {
 		markerFactory = factory;
 	}
 
+	public double getMaxMarkerSize() {
+		return markerFactory.getMaxMarkerSize();
+	}
+	
+	
+	/**
+	 * Changes size of all markers and also the radius for photo selection (half of the size).
+	 * @param size Default is 40
+	 */
+	public void setMaxMarkerSize(double size) {
+		markerFactory.setMaxMarkerSize(size);
+		
+		Pane container = imageViewController.getContainer();
+		while (!photoMarkers.isEmpty())
+			container.getChildren().remove(photoMarkers.remove(photoMarkers.size() - 1));
+		while (!refPointMarkers.isEmpty())
+			container.getChildren().remove(refPointMarkers.remove(refPointMarkers.size() - 1));
+		container.getChildren().remove(currPhotoMarker);
+		currPhotoMarker = null;
+		
+		update(null);
+	}
+	
 	public void update(Object arg) {
 		Pane container = imageViewController.getContainer();
 		ViewParams viewParams = imageViewController.viewParamsProperty().get();
@@ -102,7 +128,7 @@ public class MapDataViewController {
 			currPhotoMarker.setLayoutX(posCurrPhotoMarker.getX());
 			currPhotoMarker.setLayoutY(posCurrPhotoMarker.getY());
 			if (arg == PVModel.SELECTED_PHOTO_CHANGED) {
-				double dist = SELECTION_RADIUS * 2;
+				double dist = getMaxMarkerSize() * 1.5;
 				double deltaX = posCurrPhotoMarker.getX() >= dist ? 0 : dist - posCurrPhotoMarker.getX();
 				if (posCurrPhotoMarker.getX() > container.getWidth() - dist)
 					deltaX = container.getWidth() - dist - posCurrPhotoMarker.getX();
@@ -124,8 +150,8 @@ public class MapDataViewController {
 				&& !imageViewController.isMouseDragged()) {
 			ViewParams vp = imageViewController.viewParamsProperty().get();
 			Point2D posImg = vp.viewToImage(new Point2D(event.getX(), event.getY()));
-			double radius = vp.viewToImage(SELECTION_RADIUS);
-			double tolerance = vp.viewToImage(TOLERANCE);
+			double radius = vp.viewToImage(getMaxMarkerSize() / 2);
+			double tolerance = vp.viewToImage(radius * TOLERANCE);
 			Set<? extends IndexedGeoPoint> geoPoints = model.getVisiblePhotoPositions();
 			IndexedGeoPoint pt = model.getMapData().findPhotoPositionAt(geoPoints, posImg.getX(), posImg.getY(),
 					radius, tolerance);
