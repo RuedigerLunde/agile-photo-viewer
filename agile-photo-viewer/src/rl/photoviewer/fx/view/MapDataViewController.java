@@ -28,7 +28,7 @@ import rl.photoviewer.model.PhotoMetadata;
  *
  */
 public class MapDataViewController {
-	private final static double TOLERANCE = 0.25;
+	private final static double TOLERANCE = 0.3;
 	private ImageViewController imageViewController;
 	private PVModel model;
 
@@ -151,7 +151,7 @@ public class MapDataViewController {
 			ViewParams vp = imageViewController.viewParamsProperty().get();
 			Point2D posImg = vp.viewToImage(new Point2D(event.getX(), event.getY()));
 			double radius = vp.viewToImage(getMaxMarkerSize() / 2);
-			double tolerance = vp.viewToImage(radius * TOLERANCE);
+			double tolerance = radius * TOLERANCE;
 			Set<? extends IndexedGeoPoint> geoPoints = model.getVisiblePhotoPositions();
 			IndexedGeoPoint pt = model.getMapData().findPhotoPositionAt(geoPoints, posImg.getX(), posImg.getY(),
 					radius, tolerance);
