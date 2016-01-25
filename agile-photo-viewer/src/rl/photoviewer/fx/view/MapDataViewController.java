@@ -28,7 +28,7 @@ import rl.photoviewer.model.PhotoMetadata;
  *
  */
 public class MapDataViewController {
-	private final static double TOLERANCE = 0.3;
+	private final static double TOLERANCE = 0.4;
 	private ImageViewController imageViewController;
 	private PVModel model;
 
