@@ -40,9 +40,9 @@ public class ContextMenuControlPane {
 	private ContextMenu menu;
 	private MenuItem aboutItem;
 	private CheckMenuItem fullScreenItem;
-	private MenuItem exportItem;
 	private MenuItem increaseFontSizeItem;
 	private MenuItem decreaseFontSizeItem;
+	private MenuItem exportItem;
 	MenuItem exitItem;
 
 	public ContextMenuControlPane(AgilePhotoViewerController mainController,
@@ -59,9 +59,6 @@ public class ContextMenuControlPane {
 				.setFullScreen(fullScreenItem.isSelected()));
 		fullScreenItem.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN));
 
-		exportItem = new MenuItem("Export Visible Photos");
-		exportItem.setOnAction(e -> onExportAction(e));
-
 		increaseFontSizeItem = new MenuItem("Increase Font Size");
 		increaseFontSizeItem.setOnAction(e -> mainController
 				.setCaptionFontSize(mainController.getCaptionFontSize() + 2));
@@ -72,12 +69,15 @@ public class ContextMenuControlPane {
 				.setCaptionFontSize(mainController.getCaptionFontSize() - 2));
 		decreaseFontSizeItem.setAccelerator(new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN));
 		
+		exportItem = new MenuItem("Export Visible Photos");
+		exportItem.setOnAction(e -> onExportAction(e));
+		
 		exitItem = new MenuItem("Exit");
 		exitItem.setOnAction(e -> {
 			mainController.storeSession();
 			Platform.exit();
 		});
-		menu.getItems().addAll(aboutItem, fullScreenItem, exportItem, increaseFontSizeItem, decreaseFontSizeItem, exitItem);
+		menu.getItems().addAll(aboutItem, fullScreenItem, increaseFontSizeItem, decreaseFontSizeItem, exportItem, exitItem);
 	}
 
 	public void show(ContextMenuEvent event) {
