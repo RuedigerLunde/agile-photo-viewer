@@ -15,8 +15,9 @@ visualisation, and the controller component for translating user events into
 operations on model state.
 
 The newer GUI (package 'rl.photoviewer.fx.view') relies on JavaFX. The architecture
-follows the model-view-presenter pattern. Again, class 'AgilePhotoViewerApp' contains the
+is inspired by the model-view-presenter pattern. Again, class 'AgilePhotoViewerApp' contains the
 static main method which creates the application object. The view layout is defined
 by an XML file which was produced with the 'SceneBuilder' application
-(file 'AgilePhotoViewer.fxml'). A cascading style sheet (file 'AgilePhotoViewer.css') is used to draw the standard GUI components using a night theme. A presenter component
+(file 'AgilePhotoViewer.fxml'). A cascading style sheet (file 'AgilePhotoViewer.css') is used to
+draw the standard GUI components using a night theme. A presenter component
 (class AgilePhotoViewerController) mediates between view and model.
