@@ -129,9 +129,9 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 	private MapViewMenu mapMenu;
 	private ContextMenu photoViewMenu;
 
-	private ImageViewCtrl photoViewController = new ImageViewCtrl();
-	private ImageViewCtrl mapViewController = new ImageViewCtrl();
-	private MapDataViewCtrl mapDataViewController = new MapDataViewCtrl();
+	private ImageViewCtrl photoViewCtrl = new ImageViewCtrl();
+	private ImageViewCtrl mapViewCtrl = new ImageViewCtrl();
+	private MapDataViewCtrl mapDataViewCtrl = new MapDataViewCtrl();
 
 	private double defaultFontSize = 12; // set when calling initialize...
 	protected File exportPath;
@@ -161,11 +161,11 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 				onKeywordSelected(n);
 		});
 
-		photoViewController.initialize(photoView, rightPane);
-		photoViewController.setLimitersEnabled(true);
-		photoViewController.setMaxScale(4);
-		mapViewController.initialize(mapView, mapPane);
-		mapViewController.setInitScale(1);
+		photoViewCtrl.initialize(photoView, rightPane);
+		photoViewCtrl.setLimitersEnabled(true);
+		photoViewCtrl.setMaxScale(4);
+		mapViewCtrl.initialize(mapView, mapPane);
+		mapViewCtrl.setInitScale(1);
 
 		rootPane.addEventHandler(KeyEvent.KEY_PRESSED, this::onKeyPressed);
 		controlPane.setOnScroll(e -> {
@@ -178,15 +178,15 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 
 		model = new PVModel();
 		model.addObserver(this);
-		mapDataViewController.initialize(mapViewController, model);
-		mapViewController.viewParamsProperty().addListener(e -> mapDataViewController.update(null));
+		mapDataViewCtrl.initialize(mapViewCtrl, model);
+		mapViewCtrl.viewParamsProperty().addListener(e -> mapDataViewCtrl.update(null));
 
 		rightPane.setOnContextMenuRequested(this::onPhotoContextMenuRequest);
 
 		controlPaneMenu = new ControlPaneMenu(this, model);
 		controlPane.setOnContextMenuRequested(controlPaneMenu::show);
 
-		mapMenu = new MapViewMenu(mapDataViewController, model);
+		mapMenu = new MapViewMenu(mapDataViewCtrl, model);
 		mapPane.setOnContextMenuRequested(mapMenu::show);
 	}
 
@@ -203,7 +203,7 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 					image = null;
 					captionPane.setText("");
 				}
-				photoViewController.setImage(image);
+				photoViewCtrl.setImage(image);
 				updateInfoPane();
 			} catch (MalformedURLException e) {
 				e.printStackTrace(); // should never happen...
@@ -215,7 +215,7 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 				if (mapData.getFile() != null) {
 					image = new Image(mapData.getFile().toURI().toURL().toExternalForm());
 				}
-				mapViewController.setImage(image);
+				mapViewCtrl.setImage(image);
 			} catch (MalformedURLException e) {
 				e.printStackTrace(); // should never happen...
 			}
@@ -224,7 +224,7 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 			keywordLst.getSelectionModel().clearSelection();
 			keywordLst.setItems(items);
 		}
-		mapDataViewController.update(arg);
+		mapDataViewCtrl.update(arg);
 		keywordExpressionTxt.setText(model.getVisibilityExpression().toString());
 		statusLabel.setText(model.getVisiblePhotoCount() + " Photo(s) visible.");
 	}
@@ -337,7 +337,7 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 		keywordLst.setStyle("-fx-font-size:" + fontSize2 + ";");
 		keywordExpressionTxt.setFont(new Font(fontSize2));
 		statusLabel.setFont(new Font(fontSize2));
-		mapDataViewController.setMaxMarkerSize(size * 1.5);
+		mapDataViewCtrl.setMaxMarkerSize(size * 1.5);
 	}
 
 	public void setStatus(String message) {
