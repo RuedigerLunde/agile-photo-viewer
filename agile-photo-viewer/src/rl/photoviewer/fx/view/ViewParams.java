@@ -57,6 +57,7 @@ public class ViewParams implements Cloneable {
 		this.scale = scale;
 	}
 
+	/** Adjusts imgX if necessary to fit into the specified interval. */
 	public void clampImgX(double min, double max) {
 		if (imgX < min)
 			imgX = min;
@@ -64,6 +65,7 @@ public class ViewParams implements Cloneable {
 			imgX = max;
 	}
 	
+	/** Adjusts imgY if necessary to fit into the specified interval. */
 	public void clampImgY(double min, double max) {
 		if (imgY < min)
 			imgY = min;
@@ -71,6 +73,7 @@ public class ViewParams implements Cloneable {
 			imgY = max;
 	}
 	
+	/** Adjusts scale if necessary to fit into the specified interval. */
 	public void clampScale(double min, double max) {
 		if (scale < min)
 			scale = min;
