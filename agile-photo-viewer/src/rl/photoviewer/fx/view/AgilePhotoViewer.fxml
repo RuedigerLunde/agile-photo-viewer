@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="rl.photoviewer.fx.view.AgilePhotoViewerController">
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="rl.photoviewer.fx.view.AgilePhotoViewerCtrl">
    <children>
       <SplitPane fx:id="splitPane" dividerPositions="0.2" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <items>
@@ -16,7 +16,7 @@
                <children>
                   <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <FlowPane fx:id="ctrlPane" hgap="5.0" prefHeight="200.0" prefWidth="200.0" vgap="10.0" GridPane.columnSpan="2147483647" GridPane.rowSpan="2" GridPane.valignment="TOP">
+                        <FlowPane fx:id="controlPane" hgap="5.0" prefHeight="200.0" prefWidth="200.0" vgap="10.0" GridPane.columnSpan="2147483647" GridPane.rowSpan="2" GridPane.valignment="TOP">
                            <children>
                               <Button fx:id="selectBtn" mnemonicParsing="false" onAction="#onButtonAction" text="Select" />
                               <Button fx:id="firstBtn" mnemonicParsing="false" onAction="#onButtonAction" text="&lt;&lt;" />

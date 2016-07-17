@@ -26,7 +26,7 @@ import javafx.stage.WindowEvent;
  */
 public class AgilePhotoViewerApp extends Application {
 	private static Stage currStage;
-	private static AgilePhotoViewerController controller;
+	private static AgilePhotoViewerCtrl controller;
 	private static EventHandler<WindowEvent> windowCloseHandler = new EventHandler<WindowEvent>() {
 		@Override
 		public void handle(WindowEvent event) {
@@ -42,7 +42,7 @@ public class AgilePhotoViewerApp extends Application {
 			FXMLLoader loader = new FXMLLoader();
 			Pane root = loader.load(getClass().getResource("AgilePhotoViewer.fxml").openStream());
 			currStage = primaryStage;
-			controller = (AgilePhotoViewerController) loader.getController();
+			controller = (AgilePhotoViewerCtrl) loader.getController();
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("AgilePhotoViewer.css").toExternalForm());
 			primaryStage.setTitle("Agile Photo Viewer FX");

@@ -21,7 +21,7 @@ import javafx.scene.layout.Pane;
  * @author Ruediger Lunde
  *
  */
-public class ImageViewController {
+public class ImageViewCtrl {
 
 	private Pane container;
 

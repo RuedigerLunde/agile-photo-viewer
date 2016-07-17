@@ -32,9 +32,9 @@ import rl.util.exceptions.PersistenceException;
  * @author Ruediger Lunde
  *
  */
-public class ContextMenuControlPane {
+public class ControlPaneMenu {
 
-	AgilePhotoViewerController mainController;
+	AgilePhotoViewerCtrl mainController;
 	PVModel model;
 
 	private ContextMenu menu;
@@ -45,14 +45,14 @@ public class ContextMenuControlPane {
 	private MenuItem exportItem;
 	MenuItem exitItem;
 
-	public ContextMenuControlPane(AgilePhotoViewerController mainController,
+	public ControlPaneMenu(AgilePhotoViewerCtrl mainController,
 			PVModel model) {
 		this.model = model;
 		this.mainController = mainController;
 
 		menu = new ContextMenu();
 		aboutItem = new MenuItem("About");
-		aboutItem.setOnAction(e -> onAboutAction(e));
+		aboutItem.setOnAction(this::onAboutAction);
 
 		fullScreenItem = new CheckMenuItem("Full Sceen Mode");
 		fullScreenItem.setOnAction(e -> AgilePhotoViewerApp.getCurrStage()
@@ -70,7 +70,7 @@ public class ContextMenuControlPane {
 		decreaseFontSizeItem.setAccelerator(new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN));
 		
 		exportItem = new MenuItem("Export Visible Photos");
-		exportItem.setOnAction(e -> onExportAction(e));
+		exportItem.setOnAction(this::onExportAction);
 		
 		exitItem = new MenuItem("Exit");
 		exitItem.setOnAction(e -> {

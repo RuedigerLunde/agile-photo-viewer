@@ -13,12 +13,9 @@ import java.util.ResourceBundle;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -58,18 +55,18 @@ import rl.util.persistence.PropertyManager;
  * @author Ruediger Lunde
  *
  */
-public class AgilePhotoViewerController implements Initializable, Observer {
+public class AgilePhotoViewerCtrl implements Initializable, Observer {
 
 	static final int INFO_TAB_INDEX = 0;
 	static final int VISIBILITY_TAB_INDEX = 1;
 	static final int MAP_TAB_INDEX = 2;
 
-	static final String SELECT_BTN = "selectBtn";
-	static final String FIRST_BTN = "firstBtn";
-	static final String PREV_BTN = "prevBtn";
-	static final String NEXT_BTN = "nextBtn";
-	static final String AND_BTN = "andBtn";
-	static final String DELETE_BTN = "deleteBtn";
+	static final String SELECT_BTN_ID = "selectBtn";
+	static final String FIRST_BTN_ID = "firstBtn";
+	static final String PREV_BTN_ID = "prevBtn";
+	static final String NEXT_BTN_ID = "nextBtn";
+	static final String AND_BTN_ID = "andBtn";
+	static final String DELETE_BTN_ID = "deleteBtn";
 
 	@FXML
 	private AnchorPane rootPane;
@@ -78,7 +75,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	private AnchorPane leftPane;
 
 	@FXML
-	private FlowPane ctrlPane;
+	private FlowPane controlPane;
 
 	@FXML
 	private ToggleButton slideShowBtn;
@@ -128,13 +125,13 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	@FXML
 	private ImageView photoView;
 
-	private ContextMenuControlPane ctrlPaneMenu;
-	private ContextMenuMapView mapMenu;
+	private ControlPaneMenu controlPaneMenu;
+	private MapViewMenu mapMenu;
 	private ContextMenu photoViewMenu;
 
-	private ImageViewController photoViewController = new ImageViewController();
-	private ImageViewController mapViewController = new ImageViewController();
-	private MapDataViewController mapDataViewController = new MapDataViewController();
+	private ImageViewCtrl photoViewController = new ImageViewCtrl();
+	private ImageViewCtrl mapViewController = new ImageViewCtrl();
+	private MapDataViewCtrl mapDataViewController = new MapDataViewCtrl();
 
 	private double defaultFontSize = 12; // set when calling initialize...
 	protected File exportPath;
@@ -146,35 +143,23 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		SplitPane.setResizableWithParent(leftPane, Boolean.FALSE);
 		defaultFontSize = statusLabel.getFont().getSize();
-		slideShowCombo.getItems().addAll(new Sec(2), new Sec(4), new Sec(6),
-				new Sec(8), new Sec(12), new Sec(20));
+		slideShowCombo.getItems().addAll(new Sec(2), new Sec(4), new Sec(6), new Sec(8), new Sec(12), new Sec(20));
 		slideShowCombo.setValue(new Sec(4));
 
-		ratingCombo.getItems().addAll("No Rating Filter", ">= *", ">= **",
-				">= ***", ">= ****", ">= *****");
+		ratingCombo.getItems().addAll("No Rating Filter", ">= *", ">= **", ">= ***", ">= ****", ">= *****");
 		ratingCombo.setValue("No Rating Filter");
-		ratingCombo.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent ev) {
-				String val = ratingCombo.getValue();
-				if (val == "No Rating Filter")
-					model.setVisibility(0, model.getVisibilityExpression());
-				else
-					model.setVisibility(val.length() - 3,
-							model.getVisibilityExpression());
-			}
+		ratingCombo.setOnAction(ev -> {
+			String val = ratingCombo.getValue();
+			if (val.equals("No Rating Filter"))
+				model.setVisibility(0, model.getVisibilityExpression());
+			else
+				model.setVisibility(val.length() - 3, model.getVisibilityExpression());
 		});
 
-		keywordLst.getSelectionModel().selectedItemProperty()
-				.addListener(new ChangeListener<String>() {
-					@Override
-					public void changed(
-							ObservableValue<? extends String> observable,
-							String oldValue, String newValue) {
-						if (newValue != null)
-							onKeywordSelected(newValue);
-					}
-				});
+		keywordLst.getSelectionModel().selectedItemProperty().addListener((obs, o, n) -> {
+			if (n != null)
+				onKeywordSelected(n);
+		});
 
 		photoViewController.initialize(photoView, rightPane);
 		photoViewController.setLimitersEnabled(true);
@@ -182,13 +167,8 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		mapViewController.initialize(mapView, mapPane);
 		mapViewController.setInitScale(1);
 
-		rootPane.addEventHandler(KeyEvent.KEY_PRESSED,
-				new EventHandler<KeyEvent>() {
-					public void handle(final KeyEvent keyEvent) {
-						onKeyPressed(keyEvent);
-					}
-				});
-		ctrlPane.setOnScroll(e -> {
+		rootPane.addEventHandler(KeyEvent.KEY_PRESSED, this::onKeyPressed);
+		controlPane.setOnScroll(e -> {
 			if (e.getDeltaY() > 0)
 				model.selectNextPhoto();
 			else
@@ -199,16 +179,15 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		model = new PVModel();
 		model.addObserver(this);
 		mapDataViewController.initialize(mapViewController, model);
-		mapViewController.viewParamsProperty().addListener(
-				e -> mapDataViewController.update(null));
-		
-		rightPane.setOnContextMenuRequested(e -> onPhotoContextMenuRequest(e));
-		
-		ctrlPaneMenu = new ContextMenuControlPane(this, model);
-		ctrlPane.setOnContextMenuRequested(e -> ctrlPaneMenu.show(e));
-		
-		mapMenu = new ContextMenuMapView(mapDataViewController, model);
-		mapPane.setOnContextMenuRequested(e -> mapMenu.show(e));
+		mapViewController.viewParamsProperty().addListener(e -> mapDataViewController.update(null));
+
+		rightPane.setOnContextMenuRequested(this::onPhotoContextMenuRequest);
+
+		controlPaneMenu = new ControlPaneMenu(this, model);
+		controlPane.setOnContextMenuRequested(controlPaneMenu::show);
+
+		mapMenu = new MapViewMenu(mapDataViewController, model);
+		mapPane.setOnContextMenuRequested(mapMenu::show);
 	}
 
 	@Override
@@ -218,8 +197,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			try {
 				PhotoMetadata data = model.getSelectedPhotoData();
 				if (data != null) {
-					image = new Image(model.getSelectedPhoto().toURI().toURL()
-							.toExternalForm());
+					image = new Image(model.getSelectedPhoto().toURI().toURL().toExternalForm());
 					captionPane.setText(data.getCaption());
 				} else {
 					image = null;
@@ -235,39 +213,32 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			try {
 				MapData mapData = model.getMapData();
 				if (mapData.getFile() != null) {
-					image = new Image(mapData.getFile().toURI().toURL()
-							.toExternalForm());
+					image = new Image(mapData.getFile().toURI().toURL().toExternalForm());
 				}
 				mapViewController.setImage(image);
 			} catch (MalformedURLException e) {
 				e.printStackTrace(); // should never happen...
 			}
 		} else if (arg == PVModel.METADATA_CHANGED) {
-			ObservableList<String> items = FXCollections
-					.observableArrayList(model.getAllKeywords());
+			ObservableList<String> items = FXCollections.observableArrayList(model.getAllKeywords());
 			keywordLst.getSelectionModel().clearSelection();
 			keywordLst.setItems(items);
 		}
 		mapDataViewController.update(arg);
-		keywordExpressionTxt
-				.setText(model.getVisibilityExpression().toString());
-		statusLabel
-				.setText(model.getVisiblePhotoCount() + " Photo(s) visible.");
+		keywordExpressionTxt.setText(model.getVisibilityExpression().toString());
+		statusLabel.setText(model.getVisiblePhotoCount() + " Photo(s) visible.");
 	}
 
 	public void onKeyPressed(KeyEvent keyEvent) {
 		if (keyEvent.getCode() == KeyCode.F) {
-			AgilePhotoViewerApp.getCurrStage()
-			.setFullScreen(!AgilePhotoViewerApp.getCurrStage().isFullScreen());
+			AgilePhotoViewerApp.getCurrStage().setFullScreen(!AgilePhotoViewerApp.getCurrStage().isFullScreen());
 		} else if (keyEvent.getCode() == KeyCode.PLUS) {
 			setCaptionFontSize(getCaptionFontSize() + 2);
 		} else if (keyEvent.getCode() == KeyCode.MINUS) {
 			setCaptionFontSize(getCaptionFontSize() - 2);
-		} else if (keyEvent.getCode() == KeyCode.PAGE_DOWN
-				|| keyEvent.getCode() == KeyCode.N) {
+		} else if (keyEvent.getCode() == KeyCode.PAGE_DOWN || keyEvent.getCode() == KeyCode.N) {
 			model.selectNextPhoto();
-		} else if (keyEvent.getCode() == KeyCode.PAGE_UP
-				|| keyEvent.getCode() == KeyCode.P) {
+		} else if (keyEvent.getCode() == KeyCode.PAGE_UP || keyEvent.getCode() == KeyCode.P) {
 			model.selectPrevPhoto();
 		}
 		// keyEvent.consume();
@@ -276,20 +247,18 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	@FXML
 	protected void onButtonAction(ActionEvent event) {
 		Node source = (Node) event.getSource();
-		if (source.getId().equals(SELECT_BTN))
+		if (source.getId().equals(SELECT_BTN_ID))
 			onSelectAction(event);
-		else if (source.getId().equals(FIRST_BTN))
+		else if (source.getId().equals(FIRST_BTN_ID))
 			model.selectFirstPhoto();
-		else if (source.getId().equals(PREV_BTN))
+		else if (source.getId().equals(PREV_BTN_ID))
 			model.selectPrevPhoto();
-		else if (source.getId().equals(NEXT_BTN))
+		else if (source.getId().equals(NEXT_BTN_ID))
 			model.selectNextPhoto();
 		else if (source == slideShowBtn) {
 			if (slideShowBtn.isSelected()) {
-				slideShowTimer = new Timeline(
-						new KeyFrame(Duration.millis(1000 * slideShowCombo
-								.getValue().seconds),
-								ae -> model.selectNextPhoto()));
+				slideShowTimer = new Timeline(new KeyFrame(Duration.millis(1000 * slideShowCombo.getValue().seconds),
+						ae -> model.selectNextPhoto()));
 				slideShowTimer.setCycleCount(Timeline.INDEFINITE);
 				slideShowTimer.play();
 			} else {
@@ -303,18 +272,16 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			model.setSortByDate(sortByDateBtn.isSelected());
 		else if (source == undecorateBtn)
 			AgilePhotoViewerApp.changeStage(undecorateBtn.isSelected());
-		else if (source.getId().equals(AND_BTN)) {
+		else if (source.getId().equals(AND_BTN_ID)) {
 			model.getVisibilityExpression().addClause();
 			notBtn.setSelected(false);
 			keywordLst.getSelectionModel().clearSelection();
-			model.setVisibility(model.getRatingFilter(),
-					model.getVisibilityExpression());
-		} else if (source.getId().equals(DELETE_BTN)) {
+			model.setVisibility(model.getRatingFilter(), model.getVisibilityExpression());
+		} else if (source.getId().equals(DELETE_BTN_ID)) {
 			model.getVisibilityExpression().deleteLastClause();
 			notBtn.setSelected(false);
 			keywordLst.getSelectionModel().clearSelection();
-			model.setVisibility(model.getRatingFilter(),
-					model.getVisibilityExpression());
+			model.setVisibility(model.getRatingFilter(), model.getVisibilityExpression());
 		}
 	}
 
@@ -336,8 +303,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 				tabPane.getSelectionModel().select(MAP_TAB_INDEX);
 			});
 		}
-		photoViewMenu.show((Node) event.getSource(), event.getScreenX(),
-				event.getScreenY());
+		photoViewMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
 
 		// event.consume();
 	}
@@ -349,8 +315,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			selectChooser.setInitialDirectory(curr.getParentFile());
 			selectChooser.setInitialFileName(curr.getName());
 		}
-		File next = selectChooser.showOpenDialog(AgilePhotoViewerApp
-				.getCurrStage());
+		File next = selectChooser.showOpenDialog(AgilePhotoViewerApp.getCurrStage());
 		if (next != null)
 			model.selectPhoto(next);
 	}
@@ -364,7 +329,7 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 	public double getCaptionFontSize() {
 		return captionPane.getFont().getSize();
 	}
-	
+
 	public void setCaptionFontSize(double size) {
 		captionPane.setFont(new Font(size));
 		double fontSize2 = Math.max(defaultFontSize, size / 2);
@@ -392,15 +357,11 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 			PropertyManager.setApplicationDataDirectory(propDir);
 			PropertyManager pm = PropertyManager.getInstance();
 
-			slideShowCombo.setValue(new Sec(pm.getIntValue("gui.slideshowsec",
-					5)));
-			sortByDateBtn.setSelected(pm
-					.getBooleanValue("gui.sortbydate", true));
+			slideShowCombo.setValue(new Sec(pm.getIntValue("gui.slideshowsec", 5)));
+			sortByDateBtn.setSelected(pm.getBooleanValue("gui.sortbydate", true));
 			model.setSortByDate(sortByDateBtn.isSelected());
-			setCaptionFontSize(pm.getDoubleValue("gui.fontsize",
-					defaultFontSize * 2));
-			tabPane.getSelectionModel().select(
-					pm.getIntValue("gui.selectedtab", 0));
+			setCaptionFontSize(pm.getDoubleValue("gui.fontsize", defaultFontSize * 2));
+			tabPane.getSelectionModel().select(pm.getIntValue("gui.selectedtab", 0));
 			String exp = pm.getStringValue("gui.outputfile", null);
 			if (exp != null)
 				exportPath = new File(exp);
@@ -441,15 +402,13 @@ public class AgilePhotoViewerController implements Initializable, Observer {
 		pm.setValue("gui.fontsize", captionPane.getFont().getSize());
 		// pm.setValue("gui.showcaptioninstatus",
 		// infoPanel.isShowCaptionInStatus());
-		pm.setValue("gui.selectedtab", tabPane.getSelectionModel()
-				.getSelectedIndex());
+		pm.setValue("gui.selectedtab", tabPane.getSelectionModel().getSelectedIndex());
 		if (exportPath != null)
 			pm.setValue("gui.outputfile", exportPath.getAbsolutePath());
 		if (model.getSelectedPhoto() != null)
 			pm.setValue("model.currfile", model.getSelectedPhoto());
 		File file = model.getMapData().getFile();
-		pm.setValue("model.currmapfile", file != null ? file.getAbsolutePath()
-				: "");
+		pm.setValue("model.currmapfile", file != null ? file.getAbsolutePath() : "");
 		model.saveMapParamLookup();
 		try {
 			pm.saveSessionProperties();

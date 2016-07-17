@@ -21,15 +21,15 @@ import rl.photoviewer.model.PhotoMetadata;
 
 /**
  * Controller which is responsible for handling user events for a map image pane.
- * It strongly cooperates with an <code>ImageViewController</code> and adds functionality
+ * It strongly cooperates with an {@link ImageViewCtrl} and adds functionality
  * for showing and editing markers representing geo-located images within the map image.
  * 
  * @author Ruediger Lunde
  *
  */
-public class MapDataViewController {
+public class MapDataViewCtrl {
 	private final static double TOLERANCE = 0.4;
-	private ImageViewController imageViewController;
+	private ImageViewCtrl imageViewController;
 	private PVModel model;
 
 	private Shape currPhotoMarker;
@@ -37,14 +37,14 @@ public class MapDataViewController {
 	private List<Shape> photoMarkers = new ArrayList<Shape>();
 	private MarkerFactory markerFactory = new MarkerFactory();
 
-	public void initialize(ImageViewController viewController, PVModel model) {
+	public void initialize(ImageViewCtrl viewController, PVModel model) {
 		this.imageViewController = viewController;
 		this.model = model;
 
-		viewController.getContainer().setOnMouseClicked(e -> onMouseClicked(e));
+		viewController.getContainer().setOnMouseClicked(this::onMouseClicked);
 	}
 	
-	public ImageViewController getImageViewController() {
+	public ImageViewCtrl getImageViewController() {
 		return imageViewController;
 	}
 	

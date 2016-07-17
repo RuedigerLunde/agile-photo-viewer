@@ -24,9 +24,9 @@ import rl.photoviewer.model.PhotoMetadata;
  * @author Ruediger Lunde
  *
  */
-public class ContextMenuMapView {
+public class MapViewMenu {
 	PVModel model;
-	MapDataViewController mapDataViewController;
+	MapDataViewCtrl mapDataViewController;
 
 	ContextMenu menu;
 	ContextMenuEvent trigger;
@@ -39,7 +39,7 @@ public class ContextMenuMapView {
 	MenuItem openMap2Item;
 	MenuItem closeMapItem;
 
-	public ContextMenuMapView(MapDataViewController mapDataViewController,
+	public MapViewMenu(MapDataViewCtrl mapDataViewController,
 			PVModel model) {
 		this.model = model;
 		this.mapDataViewController = mapDataViewController;
