@@ -106,11 +106,11 @@
             </AnchorPane>
             <AnchorPane>
                <children>
-                  <HBox fx:id="rightPane" alignment="CENTER" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                  <StackPane fx:id="rightPane" alignment="CENTER" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                      <children>
                         <ImageView fx:id="photoView" fitHeight="400.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true" />
                      </children>
-                  </HBox>
+                  </StackPane>
                </children>
             </AnchorPane>
          </items>

@@ -35,7 +35,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
@@ -120,7 +119,7 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 	private ImageView mapView;
 
 	@FXML
-	private HBox rightPane;
+	private StackPane rightPane;
 
 	@FXML
 	private ImageView photoView;
