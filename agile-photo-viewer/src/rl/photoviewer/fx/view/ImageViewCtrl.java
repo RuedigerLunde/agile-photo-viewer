@@ -30,14 +30,32 @@ public class ImageViewCtrl {
 	private Image image;
 
 	private ObjectProperty<ViewParams> viewParams = new SimpleObjectProperty<ViewParams>();
-	private Point2D lastMousePosition;
-	private boolean mouseDragged;
 
+	private Point2D lastMousePosition;
+	/** Indicator for pan operations. */
+	private boolean mouseDragged;
+	/**
+	 * If true, at least one dimension of the view (X or Y axis) remains fully
+	 * covered by the image. The effect of pane and zoom operations is
+	 * restricted accordingly.
+	 */
 	private boolean enableLimiters = false;
+	/**
+	 * The scale to be used when showing a new image. -1 denotes scale-to-fit.
+	 */
 	private double initScale = -1;
+	/**
+	 * Limits scale (if you don't want to see only one image pixel filling the
+	 * whole view...).
+	 */
 	private double maxScale = Double.MAX_VALUE;
 
 	private boolean isScaleToFitActive = true;
+	/**
+	 * If true, the next update with existing view (view screen size greater 0)
+	 * will set scale to the specified initial scale and show the image centered
+	 * in the view.
+	 */
 	private boolean isWaitingForInitScale;
 
 	public void initialize(ImageView imageView, Pane container) {
@@ -56,8 +74,6 @@ public class ImageViewCtrl {
 
 		container.setOnMousePressed(e -> {
 			if (image != null) {
-				// Point2D mousePress = viewParams.get().viewToImage(new
-				// Point2D(e.getX(), e.getY()));
 				lastMousePosition = new Point2D(e.getX(), e.getY()); // (mousePress);
 				mouseDragged = false;
 			}
@@ -119,6 +135,7 @@ public class ImageViewCtrl {
 		return viewParams;
 	}
 
+	/** Indicates whether the last click was a pan operation. */
 	public boolean isMouseDragged() {
 		return mouseDragged;
 	}
