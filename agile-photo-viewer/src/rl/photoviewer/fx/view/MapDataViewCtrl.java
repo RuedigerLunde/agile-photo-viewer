@@ -84,23 +84,6 @@ public class MapDataViewCtrl {
 		while (photoCount < photoMarkers.size())
 			container.getChildren().remove(photoMarkers.remove(photoMarkers.size() - 1));
 
-		if (photoCount > 0) {
-			while (photoCount > photoMarkers.size()) {
-				Shape photoMarker = markerFactory.createPhotoMarker();
-				photoMarkers.add(photoMarker);
-				container.getChildren().add(photoMarker);
-			}
-
-			int i = 0;
-			for (IndexedGeoPoint geoPoint : model.getVisiblePhotoPositions()) {
-				double[] posPhoto = mapData.latLonToImagePos(geoPoint.getLat(), geoPoint.getLon());
-				Point2D posPhotoMarker = viewParams.imageToView(new Point2D(posPhoto[0], posPhoto[1]));
-				Shape photoMarker = photoMarkers.get(i++);
-				photoMarker.setLayoutX(posPhotoMarker.getX());
-				photoMarker.setLayoutY(posPhotoMarker.getY());
-			}
-		}
-
 		while (mapData.getRefPoints().size() < refPointMarkers.size())
 			container.getChildren().remove(refPointMarkers.remove(refPointMarkers.size() - 1));
 		while (mapData.getRefPoints().size() > refPointMarkers.size()) {
@@ -117,6 +100,23 @@ public class MapDataViewCtrl {
 			refMarker.setLayoutY(posRefMarker.getY());
 		}
 
+		if (photoCount > 0) {
+			while (photoCount > photoMarkers.size()) {
+				Shape photoMarker = markerFactory.createPhotoMarker();
+				photoMarkers.add(photoMarker);
+				container.getChildren().add(photoMarker);
+			}
+
+			int i = 0;
+			for (IndexedGeoPoint geoPoint : model.getVisiblePhotoPositions()) {
+				double[] posPhoto = mapData.latLonToImagePos(geoPoint.getLat(), geoPoint.getLon());
+				Point2D posPhotoMarker = viewParams.imageToView(new Point2D(posPhoto[0], posPhoto[1]));
+				Shape photoMarker = photoMarkers.get(i++);
+				photoMarker.setLayoutX(posPhotoMarker.getX());
+				photoMarker.setLayoutY(posPhotoMarker.getY());
+			}
+		}
+		
 		PhotoMetadata currData = model.getSelectedPhotoData();
 		if (mapData.hasData() && currData != null && !Double.isNaN(currData.getLat())) {
 			if (currPhotoMarker == null) {

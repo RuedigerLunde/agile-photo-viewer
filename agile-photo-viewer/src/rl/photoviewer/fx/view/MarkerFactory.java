@@ -19,7 +19,7 @@ import javafx.scene.shape.Shape;
  *
  */
 public class MarkerFactory {
-	private double maxMarkerSize = 40;
+	private double maxMarkerSize = 20;
 
 	public void setMaxMarkerSize(double size) {
 		maxMarkerSize = size;
@@ -35,7 +35,7 @@ public class MarkerFactory {
 		result.setRadius(radius);
 		result.setFill(Color.TRANSPARENT);
 		result.setStroke(Color.RED);
-		result.setStrokeWidth(radius / 4);
+		result.setStrokeWidth(maxMarkerSize / 10);
 		result.setManaged(false);
 		result.setEffect(new Lighting());
 		return result;
@@ -53,11 +53,11 @@ public class MarkerFactory {
 
 	public Shape createRefPointMarker() {
 		Circle result = new Circle();
-		double radius = maxMarkerSize / 4;
+		double radius = maxMarkerSize / 6;
 		result.setRadius(radius);
 		result.setFill(Color.TRANSPARENT);
 		result.setStroke(Color.GREEN);
-		result.setStrokeWidth(radius / 2);
+		result.setStrokeWidth(maxMarkerSize / 10);
 		result.setManaged(false);
 		result.setEffect(new Lighting());
 		return result;

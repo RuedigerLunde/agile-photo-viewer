@@ -222,6 +222,7 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 			ObservableList<String> items = FXCollections.observableArrayList(model.getAllKeywords());
 			keywordLst.getSelectionModel().clearSelection();
 			keywordLst.setItems(items);
+			ratingCombo.getSelectionModel().select(model.getRatingFilter());
 		}
 		mapDataViewCtrl.update(arg);
 		keywordExpressionTxt.setText(model.getVisibilityExpression().toString());
