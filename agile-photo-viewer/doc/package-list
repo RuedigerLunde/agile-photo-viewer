@@ -1,6 +1,7 @@
-rl.photoviewer
-rl.photoviewer.controller
+rl.photoviewer.fx.view
 rl.photoviewer.model
-rl.photoviewer.view
+rl.photoviewer.swing
+rl.photoviewer.swing.controller
+rl.photoviewer.swing.view
 rl.util.exceptions
 rl.util.persistence
