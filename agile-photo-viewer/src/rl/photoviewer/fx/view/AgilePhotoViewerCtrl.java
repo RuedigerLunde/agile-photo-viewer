@@ -145,6 +145,8 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 		slideShowCombo.getItems().addAll(new Sec(2), new Sec(4), new Sec(6), new Sec(8), new Sec(12), new Sec(20));
 		slideShowCombo.setValue(new Sec(4));
 
+		captionPane.setOnMouseClicked(ev -> model.selectNextPhoto());
+
 		ratingCombo.getItems().addAll("No Rating Filter", ">= *", ">= **", ">= ***", ">= ****", ">= *****");
 		ratingCombo.setValue("No Rating Filter");
 		ratingCombo.setOnAction(ev -> {
