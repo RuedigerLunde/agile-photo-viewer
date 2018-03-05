@@ -33,8 +33,8 @@ public class MapDataViewCtrl {
 	private PVModel model;
 
 	private Shape currPhotoMarker;
-	private List<Shape> refPointMarkers = new ArrayList<Shape>();
-	private List<Shape> photoMarkers = new ArrayList<Shape>();
+	private List<Shape> refPointMarkers = new ArrayList<>();
+	private List<Shape> photoMarkers = new ArrayList<>();
 	private MarkerFactory markerFactory = new MarkerFactory();
 
 	public void initialize(ImageViewCtrl viewController, PVModel model) {
