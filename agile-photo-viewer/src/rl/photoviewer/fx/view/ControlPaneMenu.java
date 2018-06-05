@@ -118,22 +118,19 @@ public class ControlPaneMenu {
 
 	private void onExportAction(ActionEvent event) {
 		FileChooser exportChooser = new FileChooser();
-		if (mainController.exportPath != null) {
-			exportChooser.setInitialDirectory(mainController.exportPath
-					.getParentFile());
-			exportChooser.setInitialFileName("default");
+		exportChooser.setInitialFileName("default");
+		if (mainController.exportPath != null && mainController.exportPath.exists()) {
+			exportChooser.setInitialDirectory(mainController.exportPath);
 		}
-		File file = exportChooser.showSaveDialog(AgilePhotoViewerApp
-				.getCurrStage());
+		File file = exportChooser.showSaveDialog(AgilePhotoViewerApp.getCurrStage());
 		if (file != null) {
-
 			mainController.setStatus("Exporting "
 					+ model.getVisiblePhotoCount() + " photo(s) ...");
 			String name = file.getName().equals("default") ? null : file
 					.getName();
-			mainController.exportPath = file;
+			mainController.exportPath = file.getParentFile();
 			int copied = model.exportPhotos(model.getVisiblePhotos(),
-					mainController.exportPath.getParentFile(), name);
+					mainController.exportPath, name);
 			String txt = copied < model.getVisiblePhotoCount() ? " out of "
 					+ model.getVisiblePhotoCount() : "";
 			mainController.setStatus(copied + txt + " photo(s) exported.");
