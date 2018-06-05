@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import javafx.geometry.Point2D;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -76,6 +77,9 @@ public class MapDataViewCtrl {
 	}
 	
 	public void update(Object arg) {
+        if (arg == PVModel.SELECTED_PHOTO_CHANGED)
+            adjustMapPosition();
+
 		Pane container = imageViewController.getContainer();
 		ViewParams viewParams = imageViewController.viewParamsProperty().get();
 		MapData mapData = model.getMapData();
@@ -144,10 +148,37 @@ public class MapDataViewCtrl {
 			currPhotoMarker = null;
 		}
 	}
+
+    /**
+     * Shifts the map so that it covers as much as possible of the view area.
+     */
+	private void adjustMapPosition() {
+        Pane container = imageViewController.getContainer();
+        Image image = imageViewController.getImage();
+        ViewParams viewParams = imageViewController.viewParamsProperty().get();
+        if (image != null) {
+            double deltaX = 0;
+            double deltaY = 0;
+            if (viewParams.getImgX() > 0 &&
+                    image.getWidth() - viewParams.getImgX() < container.getWidth() / viewParams.getScale())
+                deltaX = viewParams.getImgX() + container.getWidth() / viewParams.getScale() - image.getWidth();
+            if (viewParams.getImgX() < deltaX)
+                deltaX = viewParams.getImgX() - deltaX;
+            if (viewParams.getImgY() > 0 &&
+                    image.getHeight() - viewParams.getImgY() < container.getHeight() / viewParams.getScale())
+                deltaY =   viewParams.getImgY() + container.getHeight() / viewParams.getScale() - image.getHeight();
+            if (viewParams.getImgY() < deltaY)
+                deltaY = viewParams.getImgY() - deltaY;
+            if (deltaX != 0 || deltaY != 0)
+                imageViewController.shift(new Point2D(deltaX, deltaY));
+        }
+    }
+
 	
 	public void onMouseClicked(MouseEvent event) {
 		if (event.getButton() == MouseButton.PRIMARY && model.getMapData().hasData()
 				&& !imageViewController.isMouseDragged()) {
+			// select photo next to mouse position
 			ViewParams vp = imageViewController.viewParamsProperty().get();
 			Point2D posImg = vp.viewToImage(new Point2D(event.getX(), event.getY()));
 			double radius = vp.viewToImage(getMaxMarkerSize() / 2);

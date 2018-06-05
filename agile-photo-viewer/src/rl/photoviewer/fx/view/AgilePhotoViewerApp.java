@@ -10,6 +10,7 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -46,6 +47,7 @@ public class AgilePhotoViewerApp extends Application {
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("AgilePhotoViewer.css").toExternalForm());
 			primaryStage.setTitle("Agile Photo Viewer FX");
+			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("AgilePhotoViewerIcon.jpg")));
 			primaryStage.setScene(scene);
 			primaryStage.setOnCloseRequest(windowCloseHandler);
 			primaryStage.show();

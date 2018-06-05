@@ -253,11 +253,13 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 			onSelectAction(event);
 		else if (source.getId().equals(FIRST_BTN_ID))
 			model.selectFirstPhoto();
-		else if (source.getId().equals(PREV_BTN_ID))
+		else if (source.getId().equals(PREV_BTN_ID)) {
+			stopSlideShow();
 			model.selectPrevPhoto();
-		else if (source.getId().equals(NEXT_BTN_ID))
+		} else if (source.getId().equals(NEXT_BTN_ID)) {
+			stopSlideShow();
 			model.selectNextPhoto();
-		else if (source == slideShowBtn) {
+		} else if (source == slideShowBtn) {
 			if (slideShowBtn.isSelected()) {
 				slideShowTimer = new Timeline(new KeyFrame(Duration.millis(1000 * slideShowCombo.getValue().seconds),
 						ae -> model.selectNextPhoto()));
@@ -267,9 +269,7 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 				slideShowTimer.stop();
 			}
 		} else if (source == slideShowCombo) {
-			slideShowBtn.setSelected(false);
-			if (slideShowTimer != null)
-				slideShowTimer.stop();
+			stopSlideShow();
 		} else if (source == sortByDateBtn)
 			model.setSortByDate(sortByDateBtn.isSelected());
 		else if (source == undecorateBtn)
@@ -284,6 +284,13 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 			notBtn.setSelected(false);
 			keywordLst.getSelectionModel().clearSelection();
 			model.setVisibility(model.getRatingFilter(), model.getVisibilityExpression());
+		}
+	}
+
+	private void stopSlideShow() {
+		if (slideShowTimer != null) {
+			slideShowBtn.setSelected(false);
+			slideShowTimer.stop();
 		}
 	}
 
