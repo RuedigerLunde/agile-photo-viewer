@@ -36,7 +36,7 @@ public class MapDataManager implements MapData {
 
 	private final static int MAX_LOOKUP_SIZE = 20;
 	private MapParams params;
-	private List<MapParams> mapParamLookup = new ArrayList<MapParams>();
+	private List<MapParams> mapParamLookup = new ArrayList<>();
 
 	public void setMap(File mapFile) {
 		params = null;
@@ -156,22 +156,14 @@ public class MapDataManager implements MapData {
 			p3 = params.refPoints.get(2);
 			return convertWith3Samples(lat, lon, p1, p2, p3);
 		} else { // find points closest to lat lon position
-			List<GeoRefPoint> points = new ArrayList<GeoRefPoint>(params.refPoints);
-			Collections.sort(points, new Comparator<GeoRefPoint>() {
-				@Override
-				public int compare(GeoRefPoint o1, GeoRefPoint o2) {
-					double[] dist = new double[2];
-					for (int i = 0; i < 2; i++) {
-						GeoRefPoint o = (i == 0) ? o1 : o2;
-						dist[i] = (o.getLat() - lat) * (o.getLat() - lat) + (o.getLon() - lon) * (o.getLon() - lon);
-					}
-					if (dist[0] < dist[1])
-						return -1;
-					else if (dist[0] > dist[1])
-						return 1;
-					else
-						return 0;
+			List<GeoRefPoint> points = new ArrayList<>(params.refPoints);
+			points.sort((o1, o2) -> {
+				double[] dist = new double[2];
+				for (int i = 0; i < 2; i++) {
+					GeoRefPoint o = (i == 0) ? o1 : o2;
+					dist[i] = (o.getLat() - lat) * (o.getLat() - lat) + (o.getLon() - lon) * (o.getLon() - lon);
 				}
+				return Double.compare(dist[0], dist[1]);
 			});
 			p1 = points.get(0);
 			p2 = points.get(1);

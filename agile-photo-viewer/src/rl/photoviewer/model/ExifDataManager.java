@@ -64,11 +64,10 @@ public class ExifDataManager {
 		selectedPhotoData = null;
 		boolean dirChanged = !dir.equals(currDirectory);
 		if (dirChanged) {
-			List<PhotoMetadata> newPhotoDataList = new ArrayList<PhotoMetadata>();
-			List<String> newKeywordList = new ArrayList<String>();
-			List<Integer> newKeywordCounts = new ArrayList<Integer>();
-			collectMetadata(dir, newPhotoDataList, newKeywordList,
-					newKeywordCounts);
+			List<PhotoMetadata> newPhotoDataList = new ArrayList<>();
+			List<String> newKeywordList = new ArrayList<>();
+			List<Integer> newKeywordCounts = new ArrayList<>();
+			collectMetadata(dir, newPhotoDataList, newKeywordList, newKeywordCounts);
 			Collections.sort(newKeywordList);
 			updateStoredMetadata(dir, newPhotoDataList, newKeywordList,
 					newKeywordCounts);
@@ -81,10 +80,9 @@ public class ExifDataManager {
 	private synchronized void sortPhotoDataList() {
 		Comparator<PhotoMetadata> comp = sortByDate ? new PhotoMetadata.SortByDateComparator()
 				: new PhotoMetadata.SortByFileNameComparator();
-		Collections.sort(photoDataList, comp);
-		for (int i = 0; i < photoDataList.size(); i++) {
+		photoDataList.sort(comp);
+		for (int i = 0; i < photoDataList.size(); i++)
 			photoDataList.get(i).setIndex(i);
-		}
 	}
 
 	public File getCurrDirectory() {
@@ -235,7 +233,7 @@ public class ExifDataManager {
 	private void collectMetadata(File dir, List<PhotoMetadata> newMetadata,
 			List<String> newKeywords, List<Integer> newKeywordCount) {
 		File[] files = dir.listFiles();
-		Hashtable<String, Integer> keywordHash = new Hashtable<String, Integer>();
+		Hashtable<String, Integer> keywordHash = new Hashtable<>();
 		for (File f : files) {
 			try {
 				Metadata metadata = ImageMetadataReader.readMetadata(f);

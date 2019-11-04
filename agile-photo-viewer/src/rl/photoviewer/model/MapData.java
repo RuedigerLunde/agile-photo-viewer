@@ -18,18 +18,18 @@ import java.util.Set;
  */
 public interface MapData {
 
-	public boolean hasData();
+	boolean hasData();
 
-	public File getFile();
+	File getFile();
 
-	public List<GeoRefPoint> getRefPoints();
+	List<GeoRefPoint> getRefPoints();
 
-	public GeoRefPoint findRefPointAt(double xImg, double yImg, double radius);
+	GeoRefPoint findRefPointAt(double xImg, double yImg, double radius);
 
-	public IndexedGeoPoint findPhotoPositionAt(Set<? extends IndexedGeoPoint> photoPositions, double xImg, double yImg,
+	IndexedGeoPoint findPhotoPositionAt(Set<? extends IndexedGeoPoint> photoPositions, double xImg, double yImg,
 			double radius, double tolerance);
 
-	public double[] latLonToImagePos(double lat, double lon);
+	double[] latLonToImagePos(double lat, double lon);
 
-	public File[] getAllMapFiles();
+	File[] getAllMapFiles();
 }

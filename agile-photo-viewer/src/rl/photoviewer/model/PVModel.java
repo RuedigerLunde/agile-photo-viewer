@@ -217,7 +217,6 @@ public class PVModel extends Observable {
 			String destFileNameTemplate) {
 		PhotoExporter exporter = new PhotoExporter();
 		exporter.setDestination(destDir, destFileNameTemplate);
-		int copied = exporter.copyFiles(photos);
-		return copied;
+		return exporter.copyFiles(photos);
 	}
 }

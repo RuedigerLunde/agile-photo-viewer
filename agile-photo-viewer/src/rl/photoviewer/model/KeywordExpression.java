@@ -21,7 +21,7 @@ public class KeywordExpression {
 	private List<List<Literal>> clauses;
 
 	public KeywordExpression() {
-		clauses = new ArrayList<List<Literal>>();
+		clauses = new ArrayList<>();
 		addClause();
 	}
 
@@ -66,7 +66,7 @@ public class KeywordExpression {
 						break;
 					}
 				}
-				if (clauseValue == false)
+				if (!clauseValue)
 					return false;
 			}
 		}
@@ -85,7 +85,7 @@ public class KeywordExpression {
 
 	@Override
 	public String toString() {
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 		for (int i = 0; i < clauses.size(); i++) {
 			if (i > 0)
 				result.append("and\n");
@@ -99,7 +99,7 @@ public class KeywordExpression {
 					result.append(" or");
 				if (l.isNegated)
 					result.append(" not");
-				result.append(" " + l.symbol);
+				result.append(" ").append(l.symbol);
 			}
 			result.append("\n");
 		}

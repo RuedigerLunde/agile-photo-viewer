@@ -190,7 +190,7 @@ public class PhotoMetadata implements IndexedGeoPoint {
 	}
 
 	public String toString() {
-		StringBuffer text = new StringBuffer();
+		StringBuilder text = new StringBuilder();
 		text.append("File:\n  " + getFileName());
 		if (getCaption() != null)
 			text.append("\nCaption:\n  " + getCaption());
