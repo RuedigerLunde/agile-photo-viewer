@@ -248,7 +248,7 @@ public class ImagePanel extends JPanel {
 			int rot = e.getWheelRotation();
 			int xm = e.getX();
 			int ym = e.getY();
-			float fac = ((e.getModifiers() & KeyEvent.SHIFT_MASK) != 0) ? 1.1f
+			float fac = ((e.getModifiersEx() & KeyEvent.SHIFT_DOWN_MASK) != 0) ? 1.1f
 					: 1.5f;
 			if (rot == 1)
 				fac = 1 / fac;

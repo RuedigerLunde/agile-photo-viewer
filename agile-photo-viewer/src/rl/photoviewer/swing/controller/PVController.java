@@ -179,12 +179,12 @@ public class PVController extends MouseAdapter implements Controller {
 						.isUndecorateSelected())) {
 			toggleFullScreen();
 		} else if (e.getKeyCode() == KeyEvent.VK_PLUS
-				&& e.getModifiers() == InputEvent.CTRL_MASK) {
+				&& e.getModifiersEx() == InputEvent.CTRL_DOWN_MASK) {
 			Font font = view.getStatusPanel().getFont();
 			Font nf = font.deriveFont(font.getSize() + 2.0f);
 			view.setInfoFont(nf);
 		} else if (e.getKeyCode() == KeyEvent.VK_MINUS
-				&& e.getModifiers() == InputEvent.CTRL_MASK) {
+				&& e.getModifiersEx() == InputEvent.CTRL_DOWN_MASK) {
 			Font font = view.getStatusPanel().getFont();
 			Font nf = font.deriveFont(Math.max(font.getSize() - 2.0f, 4.0f));
 			view.setInfoFont(nf);
