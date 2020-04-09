@@ -4,38 +4,21 @@
  */
 package rl.photoviewer.swing.view;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import rl.photoviewer.model.PVModel;
+import rl.photoviewer.swing.controller.Controller;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableModelEvent;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JToggleButton;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
-
-import rl.photoviewer.model.PVModel;
-import rl.photoviewer.swing.controller.Controller;
 
 public class VisibilityPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -61,7 +44,7 @@ public class VisibilityPanel extends JPanel {
 		// adjust free space around the components (in pixel)
 		c.insets = new Insets(5, 5, 5, 5);
 
-		ratingCombo = new JComboBox<String>(new String[] { "No Rating Filter",
+		ratingCombo = new JComboBox<>(new String[] { "No Rating Filter",
 				">= *", ">= **", ">= ***", ">= ****", ">= *****" });
 		ratingCombo.addItemListener(new ItemListener(){
 			@Override
@@ -76,15 +59,12 @@ public class VisibilityPanel extends JPanel {
 		keywordTable = new JTable(new KeywordTableModel("Specify Keyword Expression"));
 		keywordTable.addKeyListener(controller);
 		keywordTable.getSelectionModel().addListSelectionListener(
-				new ListSelectionListener() {
-					@Override
-					public void valueChanged(ListSelectionEvent e) {
-						if (e.getValueIsAdjusting() == false) {
+				(ListSelectionEvent e) -> {
+						if (!e.getValueIsAdjusting()) {
 							ActionEvent ae = new ActionEvent(this, 0,
 									Commands.KEYWORDS_CHANGED_SELECTION_CMD);
 							VisibilityPanel.this.controller.actionPerformed(ae);
 						}
-					}
 				});
 		JScrollPane scroller = new JScrollPane(keywordTable);
 		addAt(scroller, c, 0, 1, 3, 0.95);
@@ -140,7 +120,7 @@ public class VisibilityPanel extends JPanel {
 		if (keywordTable.getSelectionModel().isSelectionEmpty())
 			return Collections.emptyList();
 		else {
-			List<String> result = new ArrayList<String>();
+			List<String> result = new ArrayList<>();
 			ListSelectionModel sm = keywordTable.getSelectionModel();
 			TableModel tm = keywordTable.getModel();
 			for (int i = 0; i < tm.getRowCount(); i++) {
@@ -191,13 +171,9 @@ public class VisibilityPanel extends JPanel {
 
 		public KeywordTableModel(String title) {
 			colName = title;
-			pvModel.addObserver(new Observer() {
-				@Override
-				public void update(Observable source, Object arg) {
-					if (arg == PVModel.METADATA_CHANGED)
-						fireTableChanged(new TableModelEvent(
-								KeywordTableModel.this));
-				}
+			pvModel.addPropertyChangeListener(event -> {
+					if (event.getPropertyName().equals(PVModel.CURR_METADATA_PROP))
+						fireTableChanged(new TableModelEvent(KeywordTableModel.this));
 			});
 		}
 

@@ -6,6 +6,7 @@ package rl.photoviewer.model;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Comparator;
@@ -96,7 +97,7 @@ public class PhotoMetadata implements IndexedGeoPoint {
 				if (oldEn != null && newEn != null && newEn.equals('\u001b' + "%G")) {
 					try {
 						byte[] cap = caption.getBytes(oldEn);
-						caption = new String(cap, "UTF8");
+						caption = new String(cap, StandardCharsets.UTF_8);
 					} catch (UnsupportedEncodingException e) {
 						ErrorHandler.getInstance().handleWarning(e);
 					}
@@ -191,33 +192,34 @@ public class PhotoMetadata implements IndexedGeoPoint {
 
 	public String toString() {
 		StringBuilder text = new StringBuilder();
-		text.append("File:\n  " + getFileName());
+		text.append("File:\n  ").append(getFileName());
 		if (getCaption() != null)
-			text.append("\nCaption:\n  " + getCaption());
+			text.append("\nCaption:\n  ").append(getCaption());
 		if (getRating() != 0)
-			text.append("\nRating:\n  " + "******".substring(0, getRating()));
+			text.append("\nRating:\n  ").append("******", 0, getRating());
 		if (getDate() != null)
-			text.append("\nDate:\n  " + getDate());
+			text.append("\nDate:\n  ").append(getDate());
 		if (getExposureTime() != null && !Double.isNaN(getAperture())) {
 			DecimalFormat df = new DecimalFormat("##.#");
-			text.append("\nExposure:\n  " + getExposureTime() + " at f / " + df.format(getAperture()));
+			text.append("\nExposure:\n  ").append(getExposureTime()).append(" at f / ").
+					append(df.format(getAperture()));
 		}
 		if (getFocalLength() != null)
-			text.append("\nFocal Length:\n  " + getFocalLength());
+			text.append("\nFocal Length:\n  ").append(getFocalLength());
 		if (getIso() != null)
-			text.append("\nIso:\n  " + getIso());
+			text.append("\nIso:\n  ").append(getIso());
 		if (getModel() != null)
-			text.append("\nModel:\n  " + getModel());
+			text.append("\nModel:\n  ").append(getModel());
 		if (getLensModel() != null)
-			text.append("\nLens Model:\n  " + getLensModel());
+			text.append("\nLens Model:\n  ").append(getLensModel());
 		if (!Double.isNaN(getLat())) {
 			DecimalFormat df = new DecimalFormat("###.####");
-			text.append("\nLat:\n  " + df.format(getLat()) + "\nLon:\n  " + df.format(getLon()));
+			text.append("\nLat:\n  ").append(df.format(getLat())).append("\nLon:\n  ").append(df.format(getLon()));
 		}
 		if (!getKeywords().isEmpty()) {
 			text.append("\nKeywords:");
 			for (String key : getKeywords())
-				text.append("\n  " + key);
+				text.append("\n  ").append(key);
 		}
 		return text.toString();
 	}

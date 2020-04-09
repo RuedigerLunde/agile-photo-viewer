@@ -4,26 +4,6 @@
  */
 package rl.photoviewer.swing.view;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.BorderFactory;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
-
 import rl.photoviewer.model.PVModel;
 import rl.photoviewer.model.PhotoMetadata;
 import rl.photoviewer.swing.AgilePhotoViewerApp;
@@ -33,6 +13,15 @@ import rl.util.exceptions.ErrorHandler;
 import rl.util.exceptions.PersistenceException;
 import rl.util.persistence.PropertyManager;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+
 /**
  * Defines the main frame of the Agile Photo Viewer application. It consists of
  * a photo panel (showing a scaled image), a control panel (for navigation,
@@ -41,7 +30,7 @@ import rl.util.persistence.PropertyManager;
  * @author Ruediger Lunde
  * 
  */
-public class PVView implements Observer {
+public class PVView implements PropertyChangeListener {
 
 	protected JFrame frame;
 	private JSplitPane splitPane;
@@ -287,7 +276,7 @@ public class PVView implements Observer {
 	}
 
 	@Override
-	public void update(Observable arg0, Object arg1) {
+	public void propertyChange(PropertyChangeEvent event) {
 		PhotoMetadata data = model.getSelectedPhotoData();
 		infoPanel.update(data);
 		mapImagePanel.update(data, model.getVisiblePhotoPositions());

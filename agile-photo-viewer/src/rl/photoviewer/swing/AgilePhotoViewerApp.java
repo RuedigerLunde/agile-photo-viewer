@@ -43,7 +43,7 @@ public class AgilePhotoViewerApp {
 		model = new PVModel();
 		view = new PVView(model);
 		controller = new PVController(view, model);
-		model.addObserver(view);
+		model.addPropertyChangeListener(view);
 	}
 
 	public AgilePhotoViewerApp(File photo) {
@@ -72,8 +72,8 @@ public class AgilePhotoViewerApp {
 		// float screenRes = Toolkit.getDefaultToolkit().getScreenResolution();
 		// float factor = (float) (screenRes / 72.0 * 0.8);
 		UIDefaults defaults = UIManager.getDefaults();
-		List<Object> keys = new ArrayList<Object>();
-		List<Object> values = new ArrayList<Object>();
+		List<Object> keys = new ArrayList<>();
+		List<Object> values = new ArrayList<>();
 
 		for (Entry<Object, Object> entry : defaults.entrySet()) {
 			Font font = UIManager.getFont(entry.getKey());

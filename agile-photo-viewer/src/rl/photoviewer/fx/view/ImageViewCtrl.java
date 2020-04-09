@@ -29,7 +29,7 @@ public class ImageViewCtrl {
 
 	private Image image;
 
-	private ObjectProperty<ViewParams> viewParams = new SimpleObjectProperty<ViewParams>();
+	private ObjectProperty<ViewParams> viewParams = new SimpleObjectProperty<>();
 
 	private Point2D lastMousePosition;
 	/** Indicator for pan operations. */
@@ -99,7 +99,7 @@ public class ImageViewCtrl {
 			e.consume();
 		});
 
-		container.setOnMouseClicked(e -> onMouseClicked(e));
+		container.setOnMouseClicked(this::onMouseClicked);
 	}
 
 	public void onMouseClicked(MouseEvent event) {
@@ -159,28 +159,27 @@ public class ImageViewCtrl {
 		if (nextParams == viewParams.get())
 			nextParams = nextParams.clone();
 		if (image != null && container.getWidth() > 0) {
-			ViewParams vp = nextParams;
 			double scaleFit = computeScaleToFit();
 			if (isScaleToFitActive) {
-				vp.setScale(scaleFit);
-			} else if (enableLimiters && vp.getScale() <= scaleFit) {
-				vp.setScale(scaleFit);
+				nextParams.setScale(scaleFit);
+			} else if (enableLimiters && nextParams.getScale() <= scaleFit) {
+				nextParams.setScale(scaleFit);
 				isScaleToFitActive = true;
 			}
 			if (enableLimiters || isScaleToFitActive) {
 				if (image.getWidth() / image.getHeight() > container.getWidth() / container.getHeight()) {
-					vp.clampImgX(0, image.getWidth() - vp.viewToImage(container.getWidth()));
-					double tol = (container.getHeight() - image.getHeight() * scaleFit) / vp.getScale() / 2;
-					vp.clampImgY(-tol, image.getHeight() - vp.viewToImage(container.getHeight()) + tol);
+					nextParams.clampImgX(0, image.getWidth() - nextParams.viewToImage(container.getWidth()));
+					double tol = (container.getHeight() - image.getHeight() * scaleFit) / nextParams.getScale() / 2;
+					nextParams.clampImgY(-tol, image.getHeight() - nextParams.viewToImage(container.getHeight()) + tol);
 				} else {
-					vp.clampImgY(0, image.getHeight() - vp.viewToImage(container.getHeight()));
-					double tol = (container.getWidth() - image.getWidth() * scaleFit) / vp.getScale() / 2;
-					vp.clampImgX(-tol, image.getWidth() - vp.viewToImage(container.getWidth()) + tol);
+					nextParams.clampImgY(0, image.getHeight() - nextParams.viewToImage(container.getHeight()));
+					double tol = (container.getWidth() - image.getWidth() * scaleFit) / nextParams.getScale() / 2;
+					nextParams.clampImgX(-tol, image.getWidth() - nextParams.viewToImage(container.getWidth()) + tol);
 				}
 			}
-			viewParams.set(vp);
-			imageView.setViewport(new Rectangle2D(vp.getImgX(), vp.getImgY(), vp.viewToImage(container.getWidth()),
-					vp.viewToImage(container.getHeight())));
+			viewParams.set(nextParams);
+			imageView.setViewport(new Rectangle2D(nextParams.getImgX(), nextParams.getImgY(), nextParams.viewToImage(container.getWidth()),
+					nextParams.viewToImage(container.getHeight())));
 			if (isWaitingForInitScale) {
 				isWaitingForInitScale = false;
 				zoom(new Point2D(image.getWidth() / 2, image.getHeight() / 2), initScale);

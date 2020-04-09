@@ -69,11 +69,10 @@ public class SimpleErrorHandler extends ErrorHandler {
 	 * {@link #getExtendedMessage(Throwable)} and {@link #print(String)}.
 	 */
 	protected void printMessageAndCause(String type, Throwable t, int indent) {
-		StringBuffer text = new StringBuffer();
-		for (int i = 0; i < indent; ++i)
-			text.append("  ");
+		StringBuilder text = new StringBuilder();
+		text.append("  ".repeat(Math.max(0, indent)));
 		if (type != null)
-			text.append(type + ": ");
+			text.append(type).append(": ");
 		if (t.getMessage() != null)
 			text.append(getExtendedMessage(t));
 		text.append("\n");

@@ -77,7 +77,7 @@ public class MapDataViewCtrl {
 	}
 	
 	public void update(Object arg) {
-        if (arg == PVModel.SELECTED_PHOTO_CHANGED)
+        if (arg == PVModel.CURR_PHOTO_PROP)
             adjustMapPosition();
 
 		Pane container = imageViewController.getContainer();
@@ -131,7 +131,7 @@ public class MapDataViewCtrl {
 			Point2D posCurrPhotoMarker = viewParams.imageToView(new Point2D(posCurrPhoto[0], posCurrPhoto[1]));
 			currPhotoMarker.setLayoutX(posCurrPhotoMarker.getX());
 			currPhotoMarker.setLayoutY(posCurrPhotoMarker.getY());
-			if (arg == PVModel.SELECTED_PHOTO_CHANGED) {
+			if (arg == PVModel.CURR_PHOTO_PROP) {
 				double dist = getMaxMarkerSize() * 1.5;
 				double deltaX = posCurrPhotoMarker.getX() >= dist ? 0 : dist - posCurrPhotoMarker.getX();
 				if (posCurrPhotoMarker.getX() > container.getWidth() - dist)

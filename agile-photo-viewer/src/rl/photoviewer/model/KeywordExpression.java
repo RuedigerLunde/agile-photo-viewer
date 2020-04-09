@@ -32,7 +32,7 @@ public class KeywordExpression {
 
 	/** Adds a new empty clause (here denoting true!) at first position. */
 	public void addClause() {
-		clauses.add(new ArrayList<Literal>());
+		clauses.add(new ArrayList<>());
 	}
 
 	public void deleteLastClause() {
@@ -55,8 +55,7 @@ public class KeywordExpression {
 	 * Checks whether the provided list of photo keywords passes the filter.
 	 */
 	public boolean checkKeywords(List<String> photoKeywords) {
-		for (int i = 0; i < clauses.size(); i++) {
-			List<Literal> literals = clauses.get(i);
+		for (List<Literal> literals : clauses) {
 			if (!literals.isEmpty()) {
 				boolean clauseValue = false;
 				for (Literal l : literals) {

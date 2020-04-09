@@ -4,13 +4,6 @@
  */
 package rl.photoviewer.fx.view;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.ResourceBundle;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
@@ -19,15 +12,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
@@ -47,6 +32,13 @@ import rl.util.exceptions.ErrorHandler;
 import rl.util.exceptions.PersistenceException;
 import rl.util.persistence.PropertyManager;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
 /**
  * Controller which is responsible for handling all kinds of user events. It
  * mediates between view and model.
@@ -54,9 +46,9 @@ import rl.util.persistence.PropertyManager;
  * @author Ruediger Lunde
  *
  */
-public class AgilePhotoViewerCtrl implements Initializable, Observer {
+public class AgilePhotoViewerCtrl implements Initializable, PropertyChangeListener {
 
-	static final int INFO_TAB_INDEX = 0;
+	// static final int INFO_TAB_INDEX = 0;
 	static final int VISIBILITY_TAB_INDEX = 1;
 	static final int MAP_TAB_INDEX = 2;
 
@@ -124,8 +116,6 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 	@FXML
 	private ImageView photoView;
 
-	private ControlPaneMenu controlPaneMenu;
-	private MapViewMenu mapMenu;
 	private ContextMenu photoViewMenu;
 
 	private ImageViewCtrl photoViewCtrl = new ImageViewCtrl();
@@ -178,55 +168,61 @@ public class AgilePhotoViewerCtrl implements Initializable, Observer {
 		});
 
 		model = new PVModel();
-		model.addObserver(this);
+		model.addPropertyChangeListener(this);
 		mapDataViewCtrl.initialize(mapViewCtrl, model);
 		mapViewCtrl.viewParamsProperty().addListener(e -> mapDataViewCtrl.update(null));
 
 		rightPane.setOnContextMenuRequested(this::onPhotoContextMenuRequest);
 
-		controlPaneMenu = new ControlPaneMenu(this, model);
+		ControlPaneMenu controlPaneMenu = new ControlPaneMenu(this, model);
 		controlPane.setOnContextMenuRequested(controlPaneMenu::show);
 
-		mapMenu = new MapViewMenu(mapDataViewCtrl, model);
+		MapViewMenu mapMenu = new MapViewMenu(mapDataViewCtrl, model);
 		mapPane.setOnContextMenuRequested(mapMenu::show);
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		if (arg == PVModel.SELECTED_PHOTO_CHANGED) {
-			Image image;
-			try {
-				PhotoMetadata data = model.getSelectedPhotoData();
-				if (data != null) {
-					image = new Image(model.getSelectedPhoto().toURI().toURL().toExternalForm());
-					captionPane.setText(data.getCaption());
-				} else {
-					image = null;
-					captionPane.setText("");
+	public void propertyChange(PropertyChangeEvent event) {
+		switch (event.getPropertyName()) {
+			case PVModel.CURR_PHOTO_PROP: {
+				Image image;
+				try {
+					PhotoMetadata data = model.getSelectedPhotoData();
+					if (data != null) {
+						image = new Image(model.getSelectedPhoto().toURI().toURL().toExternalForm());
+						captionPane.setText(data.getCaption());
+					} else {
+						image = null;
+						captionPane.setText("");
+					}
+					photoViewCtrl.setImage(image);
+					updateInfoPane();
+				} catch (MalformedURLException e) {
+					e.printStackTrace(); // should never happen...
 				}
-				photoViewCtrl.setImage(image);
-				updateInfoPane();
-			} catch (MalformedURLException e) {
-				e.printStackTrace(); // should never happen...
+				break;
 			}
-		} else if (arg == PVModel.SELECTED_MAP_CHANGED) {
-			Image image = null;
-			try {
-				MapData mapData = model.getMapData();
-				if (mapData.getFile() != null) {
-					image = new Image(mapData.getFile().toURI().toURL().toExternalForm());
+			case PVModel.MAP_PROP: {
+				Image image = null;
+				try {
+					MapData mapData = model.getMapData();
+					if (mapData.getFile() != null) {
+						image = new Image(mapData.getFile().toURI().toURL().toExternalForm());
+					}
+					mapViewCtrl.setImage(image);
+				} catch (MalformedURLException e) {
+					e.printStackTrace(); // should never happen...
 				}
-				mapViewCtrl.setImage(image);
-			} catch (MalformedURLException e) {
-				e.printStackTrace(); // should never happen...
+				break;
 			}
-		} else if (arg == PVModel.METADATA_CHANGED) {
-			ObservableList<String> items = FXCollections.observableArrayList(model.getAllKeywords());
-			keywordLst.getSelectionModel().clearSelection();
-			keywordLst.setItems(items);
-			ratingCombo.getSelectionModel().select(model.getRatingFilter());
+			case PVModel.CURR_METADATA_PROP:
+				ObservableList<String> items = FXCollections.observableArrayList(model.getAllKeywords());
+				keywordLst.getSelectionModel().clearSelection();
+				keywordLst.setItems(items);
+				ratingCombo.getSelectionModel().select(model.getRatingFilter());
+				break;
 		}
-		mapDataViewCtrl.update(arg);
+		mapDataViewCtrl.update(event.getPropertyName());
 		keywordExpressionTxt.setText(model.getVisibilityExpression().toString());
 		statusLabel.setText(model.getVisiblePhotoCount() + " Photo(s) visible.");
 	}

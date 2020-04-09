@@ -42,7 +42,7 @@ public class ExifDataManager {
 	private PhotoMetadata selectedPhotoData;
 	private int minRating;
 	private KeywordExpression keywordExpression = new KeywordExpression();
-	private HashSet<PhotoMetadata> visiblePhotoData = new HashSet<PhotoMetadata>();
+	private HashSet<PhotoMetadata> visiblePhotoData = new HashSet<>();
 	private List<String> allKeywords = Collections.emptyList();
 	private List<Integer> keywordCounts = Collections.emptyList();
 
@@ -123,7 +123,7 @@ public class ExifDataManager {
 	}
 
 	public synchronized List<File> getVisiblePhotos() {
-		List<File> result = new ArrayList<File>();
+		List<File> result = new ArrayList<>();
 		for (int i = 0; i < photoDataList.size(); i++)
 			if (visiblePhotoData.contains(photoDataList.get(i)))
 				result.add(getFile(i));

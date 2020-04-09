@@ -94,8 +94,8 @@ public class PropertyManager {
 	 * {@link #STATIC_PROP_FILE_NAME} and {@link #SESSION_PROP_FILE_NAME}.
 	 */
 	private PropertyManager() {
-		staticProperties = new Hashtable<String, String>();
-		sessionProperties = new Hashtable<String, String>();
+		staticProperties = new Hashtable<>();
+		sessionProperties = new Hashtable<>();
 		try {
 			File file = getPropertyFile(STATIC_PROP_FILE_NAME);
 			if (file.exists())
@@ -222,7 +222,7 @@ public class PropertyManager {
 		if (value != null) {
 			StringTokenizer tokenizer = new StringTokenizer(value,
 					LIST_DELIMITER);
-			List<String> newValue = new ArrayList<String>();
+			List<String> newValue = new ArrayList<>();
 			while (tokenizer.hasMoreElements())
 				newValue.add(tokenizer.nextToken());
 			result = newValue;
@@ -304,9 +304,7 @@ public class PropertyManager {
 				hash.put(propName, propValue);
 			}
 		} catch (Exception e) {
-			PersistenceException pe = new PersistenceException(
-					"Loading property file " + propertyFile + " failed.", e);
-			throw pe;
+			throw new PersistenceException("Loading property file " + propertyFile + " failed.", e);
 		}
 	}
 
@@ -324,8 +322,7 @@ public class PropertyManager {
 			Document doc = builder.newDocument();
 			Element root = doc.createElement("application-properties");
 			doc.appendChild(root);
-			List<String> keys = new ArrayList<String>();
-			keys.addAll(sessionProperties.keySet());
+			List<String> keys = new ArrayList<>(sessionProperties.keySet());
 			Collections.sort(keys);
 			for (String propName : keys) {
 				String propValue = sessionProperties.get(propName);
@@ -342,11 +339,9 @@ public class PropertyManager {
 					getPropertyFile(SESSION_PROP_FILE_NAME));
 			transformer.transform(source, resultStream);
 		} catch (Exception e) {
-			PersistenceException pe = new PersistenceException(
-					"Saving session properties to file "
+			throw new PersistenceException("Saving session properties to file "
 							+ getPropertyFile(SESSION_PROP_FILE_NAME)
 							+ " failed.", e);
-			throw pe;
 		}
 	}
 

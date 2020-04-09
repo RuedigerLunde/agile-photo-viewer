@@ -38,11 +38,7 @@ public class ControlPaneMenu {
 	PVModel model;
 
 	private ContextMenu menu;
-	private MenuItem aboutItem;
 	private CheckMenuItem fullScreenItem;
-	private MenuItem increaseFontSizeItem;
-	private MenuItem decreaseFontSizeItem;
-	private MenuItem exportItem;
 	MenuItem exitItem;
 
 	public ControlPaneMenu(AgilePhotoViewerCtrl mainController,
@@ -51,7 +47,7 @@ public class ControlPaneMenu {
 		this.mainController = mainController;
 
 		menu = new ContextMenu();
-		aboutItem = new MenuItem("About");
+		MenuItem aboutItem = new MenuItem("About");
 		aboutItem.setOnAction(this::onAboutAction);
 
 		fullScreenItem = new CheckMenuItem("Full Sceen Mode");
@@ -59,17 +55,17 @@ public class ControlPaneMenu {
 				.setFullScreen(fullScreenItem.isSelected()));
 		fullScreenItem.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN));
 
-		increaseFontSizeItem = new MenuItem("Increase Font Size");
+		MenuItem increaseFontSizeItem = new MenuItem("Increase Font Size");
 		increaseFontSizeItem.setOnAction(e -> mainController
 				.setCaptionFontSize(mainController.getCaptionFontSize() + 2));
 		increaseFontSizeItem.setAccelerator(new KeyCodeCombination(KeyCode.PLUS, KeyCombination.CONTROL_DOWN));
 
-		decreaseFontSizeItem = new MenuItem("Decrease Font Size");
+		MenuItem decreaseFontSizeItem = new MenuItem("Decrease Font Size");
 		decreaseFontSizeItem.setOnAction(e -> mainController
 				.setCaptionFontSize(mainController.getCaptionFontSize() - 2));
 		decreaseFontSizeItem.setAccelerator(new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN));
-		
-		exportItem = new MenuItem("Export Visible Photos");
+
+		MenuItem exportItem = new MenuItem("Export Visible Photos");
 		exportItem.setOnAction(this::onExportAction);
 		
 		exitItem = new MenuItem("Exit");

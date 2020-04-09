@@ -4,9 +4,10 @@
  */
 package rl.photoviewer.model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.List;
-import java.util.Observable;
 import java.util.Set;
 
 /**
@@ -18,19 +19,26 @@ import java.util.Set;
  * @author Ruediger Lunde
  * 
  */
-public class PVModel extends Observable {
+public class PVModel {
 
-	public final static String METADATA_CHANGED = "MetadataChanged";
-	public final static String SELECTED_PHOTO_CHANGED = "SelectedPhotoChanged";
-	public final static String SELECTED_MAP_CHANGED = "SelectedMapChanged";
-	public final static String MAP_DATA_CHANGED = "MapDataChanged";
+	public final static String CURR_METADATA_PROP = "CurrentMetadata";
+	public final static String CURR_PHOTO_PROP = "CurrentPhoto";
+	public final static String VISIBILITY_PROP = "Visibility";
+	public final static String MAP_PROP = "Map";
+	public final static String MAP_DATA_PROP = "MapData";
 	
 	private ExifDataManager exifDataManager;
 	private MapDataManager mapDataManager;
 
+	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
 	public PVModel() {
 		exifDataManager = new ExifDataManager();
 		mapDataManager = new MapDataManager();
+	}
+
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		pcs.addPropertyChangeListener(listener);
 	}
 
 	/**
@@ -58,17 +66,14 @@ public class PVModel extends Observable {
 			exifDataManager.selectPhoto(fileName);
 		else if (exifDataManager.getVisiblePhotoCount() > 0)
 			exifDataManager.selectFirstPhoto();
-		setChanged();
-		notifyObservers(METADATA_CHANGED);
-		setChanged();
-		notifyObservers(SELECTED_PHOTO_CHANGED);
+		pcs.firePropertyChange(CURR_METADATA_PROP, null, null);
+		pcs.firePropertyChange(CURR_PHOTO_PROP, null, null);
 		return result;
 	}
 
 	public void setVisibility(int minRating, KeywordExpression expression) {
 		exifDataManager.setVisibility(minRating, expression);
-		setChanged();
-		notifyObservers();
+		pcs.firePropertyChange(VISIBILITY_PROP, null, null);
 	}
 
 	public int getRatingFilter() {
@@ -82,16 +87,14 @@ public class PVModel extends Observable {
 	/** Selects the first photo in the current directory. */
 	public void selectFirstPhoto() {
 		exifDataManager.selectFirstPhoto();
-		setChanged();
-		notifyObservers(SELECTED_PHOTO_CHANGED);
+		pcs.firePropertyChange(CURR_PHOTO_PROP, null, null);
 	}
 
 	public void selectPhotoByMetadata(IndexedGeoPoint pos) {
 		if (pos instanceof PhotoMetadata) {
 			PhotoMetadata data = (PhotoMetadata) pos;
 			exifDataManager.selectPhoto(data.getFileName());
-			setChanged();
-			notifyObservers(SELECTED_PHOTO_CHANGED);
+			pcs.firePropertyChange(CURR_PHOTO_PROP, null, null);
 		}
 	}
 
@@ -100,8 +103,7 @@ public class PVModel extends Observable {
 	 */
 	public void selectPrevPhoto() {
 		exifDataManager.selectPreviousPhoto();
-		setChanged();
-		notifyObservers(SELECTED_PHOTO_CHANGED);
+		pcs.firePropertyChange(CURR_PHOTO_PROP, null, null);
 	}
 
 	/**
@@ -109,8 +111,7 @@ public class PVModel extends Observable {
 	 */
 	public void selectNextPhoto() {
 		exifDataManager.selectNextPhoto();
-		setChanged();
-		notifyObservers(SELECTED_PHOTO_CHANGED);
+		pcs.firePropertyChange(CURR_PHOTO_PROP, null, null);
 	}
 
 	/** Changes the order of the photos. Options: Order by name or by date. */
@@ -144,8 +145,7 @@ public class PVModel extends Observable {
 
 	public void deleteSelectedPhoto() {
 		exifDataManager.deleteSelectedPhoto();
-		setChanged();
-		notifyObservers(SELECTED_PHOTO_CHANGED);
+		pcs.firePropertyChange(CURR_PHOTO_PROP, null, null);
 	}
 
 	public File getCurrDirectory() {
@@ -177,14 +177,12 @@ public class PVModel extends Observable {
 
 	public void setMap(File file) {
 		mapDataManager.setMap(file);
-		setChanged();
-		notifyObservers(SELECTED_MAP_CHANGED);
+		pcs.firePropertyChange(MAP_PROP, null, null);
 	}
 
 	public void clearCurrentMap() {
 		mapDataManager.clearCurrentMap();
-		setChanged();
-		notifyObservers(SELECTED_MAP_CHANGED);
+		pcs.firePropertyChange(MAP_PROP, null, null);
 	}
 
 	public MapData getMapData() {
@@ -201,14 +199,12 @@ public class PVModel extends Observable {
 	
 	public void addMapRefPoint(GeoRefPoint refPoint) {
 		mapDataManager.addRefPoint(refPoint);
-		setChanged();
-		notifyObservers(MAP_DATA_CHANGED);
+		pcs.firePropertyChange(MAP_DATA_PROP, null, null);
 	}
 
 	public void removeMapRefPoint(GeoRefPoint refPoint) {
 		mapDataManager.removeRefPoint(refPoint);
-		setChanged();
-		notifyObservers(MAP_DATA_CHANGED);
+		pcs.firePropertyChange(MAP_DATA_PROP, null, null);
 	}
 
 	

@@ -4,21 +4,15 @@
  */
 package rl.photoviewer.model;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-
 import rl.util.exceptions.ErrorHandler;
 import rl.util.exceptions.PersistenceException;
 import rl.util.persistence.PropertyManager;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The <code>MapDataManager</code> maintains all the data which is needed for

@@ -45,15 +45,13 @@ public class MapViewMenu {
 		this.mapDataViewController = mapDataViewController;
 
 		refPointItem = new MenuItem("Refpoint");
-		refPointItem.setOnAction(e -> onRefPointAction(e));
+		refPointItem.setOnAction(this::onRefPointAction);
 		openMap1Item = new MenuItem("Open");
 		openMap1Item.setOnAction(e -> model.setMap(map1));
 		openMap2Item = new MenuItem("Open");
 		openMap2Item.setOnAction(e -> model.setMap(map2));
 		closeMapItem = new MenuItem("Close Map");
-		closeMapItem.setOnAction(e -> {
-			model.setMap(null);
-		});
+		closeMapItem.setOnAction(e -> model.setMap(null));
 
 		menu = new ContextMenu();
 		menu.getItems().addAll(refPointItem, openMap1Item, openMap2Item,
@@ -91,11 +89,9 @@ public class MapViewMenu {
 
 		File[] mapFiles = model.getMapData().getAllMapFiles();
 		int idx = mapData.getFile() == null ? -1 : 0;
-		while (++idx < mapFiles.length && !mapFiles[idx].exists())
-			;
+		while (++idx < mapFiles.length && !mapFiles[idx].exists());
 		map1 = (idx < mapFiles.length) ? mapFiles[idx] : null;
-		while (++idx < mapFiles.length && !mapFiles[idx].exists())
-			;
+		while (++idx < mapFiles.length && !mapFiles[idx].exists());
 		map2 = (idx < mapFiles.length) ? mapFiles[idx] : null;
 		openMap1Item.setText("Open " + (map1 != null ? map1.getName() : ""));
 		openMap2Item.setText("Open " + (map2 != null ? map2.getName() : ""));
