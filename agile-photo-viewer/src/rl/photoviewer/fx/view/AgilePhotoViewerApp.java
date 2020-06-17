@@ -29,7 +29,7 @@ public class AgilePhotoViewerApp extends Application {
 	private static Stage currStage;
 	private static AgilePhotoViewerCtrl controller;
 	private static EventHandler<WindowEvent> windowCloseHandler =
-			(event) -> { if (currStage != null) controller.storeSession(); };
+			event -> { if (currStage != null) controller.storeSession(); };
 
 	@Override
 	public void start(Stage primaryStage) {
