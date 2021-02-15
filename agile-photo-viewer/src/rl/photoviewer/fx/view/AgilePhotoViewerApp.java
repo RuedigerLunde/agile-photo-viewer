@@ -16,6 +16,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
+// settings / path variables: PATH_TO_FX C:\Program Files\Java\javafx-sdk-11.0.2\lib
+// project structure / project settings / libraries: fxlib with lib path
+// run: VM options --module-path ${PATH_TO_FX} --add-modules javafx.controls,javafx.fxml
+
 /**
  * Central class for creating and running the Agile Photo Viewer FX application.
  * This version of the photo viewer shares the model with the Swing version but
